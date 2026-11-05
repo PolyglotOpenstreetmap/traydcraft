@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../features/customers/customers_page.dart';
 import '../features/login/login_page.dart';
+import '../features/opportunities/opportunities_page.dart';
+import '../features/opportunities/opportunity_screen.dart';
+import '../features/products/product_screen.dart';
 import '../features/products/products_page.dart';
 import '../features/quotations/quotation_screen.dart';
 import '../features/quotations/quotations_page.dart';
@@ -35,7 +38,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/quotations/new',
-            builder: (_, _) => const QuotationScreen(),
+            builder: (_, s) => QuotationScreen(
+              customerId: s.uri.queryParameters['customer'],
+              opportunityId: s.uri.queryParameters['opportunity'],
+            ),
           ),
           GoRoute(
             path: '/quotations/:id',
@@ -43,6 +49,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: '/customers', builder: (_, _) => const CustomersPage()),
           GoRoute(path: '/products', builder: (_, _) => const ProductsPage()),
+          GoRoute(
+            path: '/products/:id',
+            builder: (_, s) => ProductScreen(id: s.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/opportunities',
+            builder: (_, _) => const OpportunitiesPage(),
+          ),
+          GoRoute(
+            path: '/opportunities/:id',
+            builder: (_, s) => OpportunityScreen(id: s.pathParameters['id']!),
+          ),
         ],
       ),
     ],

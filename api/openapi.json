@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "traydcraft API",
-    "description": "Business platform API (CRM, products, pricing, sales).",
+    "description": "Business platform API (CRM, products, pricing, sales, engineering).",
     "license": {
       "name": "GPL-3.0-or-later",
       "identifier": "GPL-3.0-or-later"
@@ -10,6 +10,159 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v1/boms/{id}": {
+      "get": {
+        "tags": [
+          "engineering"
+        ],
+        "operationId": "get_bom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bom"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Replaces the notes and lines of a draft BOM.",
+        "operationId": "update_bom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BomInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bom"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/boms/{id}/activate": {
+      "post": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Makes a draft the active revision. The previous active revision becomes obsolete.\nRefused if it would create a cycle anywhere in the product structure.",
+        "operationId": "activate_bom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bom"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/customers": {
       "get": {
         "tags": [
@@ -204,6 +357,303 @@
             }
           },
           "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opportunities": {
+      "get": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "list_opportunities",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches number, title and customer name.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "stage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "open",
+            "in": "query",
+            "description": "Only open (not won or lost) opportunities.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityPage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "create_opportunity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpportunityInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Opportunity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opportunities/pipeline": {
+      "get": {
+        "tags": [
+          "crm"
+        ],
+        "summary": "Count, value and probability-weighted value per stage.",
+        "operationId": "pipeline",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PipelineStage"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opportunities/{id}": {
+      "get": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "get_opportunity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Opportunity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "update_opportunity",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpportunityInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Opportunity"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/opportunities/{id}/stage": {
+      "post": {
+        "tags": [
+          "crm"
+        ],
+        "summary": "Moves an opportunity through the pipeline. `won`/`lost` close it; any other stage reopens it.",
+        "operationId": "change_stage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StageInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Opportunity"
+                }
+              }
+            }
+          },
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -467,6 +917,154 @@
         }
       }
     },
+    "/api/v1/products/{id}/bom/explode": {
+      "get": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Explodes the active BOM of a product through all levels.",
+        "operationId": "explode_bom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "quantity",
+            "in": "query",
+            "description": "Quantity of the product to explode. Default 1.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Explosion"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/products/{id}/boms": {
+      "get": {
+        "tags": [
+          "engineering"
+        ],
+        "operationId": "list_boms",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BomSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Starts a new draft revision, copied from `copy_from` or from the active BOM.",
+        "operationId": "create_bom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewBomInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Bom"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/products/{id}/prices": {
       "get": {
         "tags": [
@@ -552,6 +1150,68 @@
         }
       }
     },
+    "/api/v1/products/{id}/serials": {
+      "post": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Registers a serialised unit. (Later also created automatically by production and goods receipt.)",
+        "operationId": "create_serial",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SerialInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerialUnitDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/quotations": {
       "get": {
         "tags": [
@@ -584,6 +1244,18 @@
           },
           {
             "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "opportunity_id",
             "in": "query",
             "required": false,
             "schema": {
@@ -973,10 +1645,541 @@
           }
         }
       }
+    },
+    "/api/v1/serials": {
+      "get": {
+        "tags": [
+          "engineering"
+        ],
+        "operationId": "list_serials",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches serial number and product code.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerialUnitPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/serials/{id}": {
+      "get": {
+        "tags": [
+          "engineering"
+        ],
+        "operationId": "get_serial",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerialUnitDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/serials/{id}/components": {
+      "post": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Records that a serialised component was built into this unit. The component's product must be\npart of the unit's BOM revision, and no more units may be attached than the BOM quantity.",
+        "operationId": "attach_component",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerialUnitDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/serials/{id}/components/{child_id}/remove": {
+      "post": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Removes a component (e.g. replaced during a repair). The link is kept in the history.",
+        "operationId": "detach_component",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "child_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DetachInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerialUnitDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/serials/{id}/status": {
+      "put": {
+        "tags": [
+          "engineering"
+        ],
+        "operationId": "set_status",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SerialStatusInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerialUnitDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AttachInput": {
+        "type": "object",
+        "required": [
+          "child_id"
+        ],
+        "properties": {
+          "child_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Bom": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "product_code",
+          "product_name",
+          "revision",
+          "status",
+          "notes",
+          "created_at",
+          "lines"
+        ],
+        "properties": {
+          "activated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomLine"
+            }
+          },
+          "notes": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "description": "draft | active | obsolete"
+          }
+        }
+      },
+      "BomInput": {
+        "type": "object",
+        "required": [
+          "lines"
+        ],
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomLineInput"
+            }
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "BomLine": {
+        "type": "object",
+        "required": [
+          "position",
+          "component_product_id",
+          "component_code",
+          "component_name",
+          "component_unit",
+          "component_type",
+          "component_tracking",
+          "component_has_bom",
+          "quantity",
+          "scrap_percent",
+          "notes"
+        ],
+        "properties": {
+          "component_code": {
+            "type": "string"
+          },
+          "component_has_bom": {
+            "type": "boolean",
+            "description": "True if the component has an active BOM itself (a subassembly)."
+          },
+          "component_name": {
+            "type": "string"
+          },
+          "component_product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "component_tracking": {
+            "type": "string"
+          },
+          "component_type": {
+            "type": "string"
+          },
+          "component_unit": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "scrap_percent": {
+            "type": "string"
+          }
+        }
+      },
+      "BomLineInput": {
+        "type": "object",
+        "required": [
+          "component_product_id",
+          "quantity"
+        ],
+        "properties": {
+          "component_product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string",
+            "example": "2"
+          },
+          "scrap_percent": {
+            "type": "string",
+            "example": "0"
+          }
+        }
+      },
+      "BomSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "revision",
+          "status",
+          "line_count",
+          "notes",
+          "created_at"
+        ],
+        "properties": {
+          "activated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "line_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "description": "draft | active | obsolete"
+          }
+        }
+      },
       "Company": {
         "type": "object",
         "description": "A legal entity (own VAT number, own numbering, own stock and books).",
@@ -1035,6 +2238,49 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "ComponentHistory": {
+        "type": "object",
+        "description": "A component link of this unit, including removed ones.",
+        "required": [
+          "child_id",
+          "product_code",
+          "serial_number",
+          "added_at",
+          "added_by_name"
+        ],
+        "properties": {
+          "added_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "added_by_name": {
+            "type": "string"
+          },
+          "child_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "removed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "removed_by_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serial_number": {
+            "type": "string"
           }
         }
       },
@@ -1210,6 +2456,18 @@
           }
         }
       },
+      "DetachInput": {
+        "type": "object",
+        "properties": {
+          "child_status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What happens to the removed component: in_stock (default) or scrapped."
+          }
+        }
+      },
       "ErrorBody": {
         "type": "object",
         "description": "Error body returned by every endpoint.",
@@ -1223,6 +2481,100 @@
             "description": "Machine-readable code: unauthorized, forbidden, not_found, validation, conflict, internal."
           },
           "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Explosion": {
+        "type": "object",
+        "required": [
+          "product_id",
+          "bom_revision",
+          "quantity",
+          "nodes",
+          "requirements"
+        ],
+        "properties": {
+          "bom_revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExplosionNode"
+            }
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "requirements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Requirement"
+            },
+            "description": "Totals of leaf components (to buy, or to make without a BOM)."
+          }
+        }
+      },
+      "ExplosionNode": {
+        "type": "object",
+        "description": "One row of an exploded structure, depth-first. `parent_index` points into the same list.",
+        "required": [
+          "level",
+          "product_id",
+          "code",
+          "name",
+          "unit",
+          "product_type",
+          "quantity_per_parent",
+          "scrap_percent",
+          "required_quantity",
+          "is_leaf"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "is_leaf": {
+            "type": "boolean"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_index": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "quantity_per_parent": {
+            "type": "string"
+          },
+          "required_quantity": {
+            "type": "string",
+            "description": "Needed for the requested quantity, scrap included (rounded to 4 decimals)."
+          },
+          "scrap_percent": {
+            "type": "string"
+          },
+          "unit": {
             "type": "string"
           }
         }
@@ -1297,6 +2649,208 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "NewBomInput": {
+        "type": "object",
+        "properties": {
+          "copy_from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Copies the lines of this BOM (any revision of the same product). Default: the active BOM, if any."
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "Opportunity": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "title",
+          "customer_id",
+          "customer_name",
+          "owner_user_id",
+          "owner_name",
+          "stage",
+          "expected_value",
+          "probability",
+          "notes",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "expected_close": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "expected_value": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lost_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "owner_name": {
+            "type": "string"
+          },
+          "owner_user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "probability": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/OpportunityStage"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OpportunityInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "customer_id"
+        ],
+        "properties": {
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expected_close": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "expected_value": {
+            "type": "string",
+            "example": "25000"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "owner_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Defaults to the current user."
+          },
+          "probability": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Defaults to the stage's default probability."
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "OpportunityPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Opportunity"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "OpportunityStage": {
+        "type": "string",
+        "enum": [
+          "lead",
+          "qualified",
+          "proposal",
+          "negotiation",
+          "won",
+          "lost"
+        ]
+      },
+      "PipelineStage": {
+        "type": "object",
+        "required": [
+          "stage",
+          "count",
+          "total_value",
+          "weighted_value"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "stage": {
+            "$ref": "#/components/schemas/OpportunityStage"
+          },
+          "total_value": {
+            "type": "string"
+          },
+          "weighted_value": {
+            "type": "string",
+            "description": "Sum of expected value × probability."
           }
         }
       },
@@ -1408,6 +2962,7 @@
           "unit",
           "product_type",
           "vat_rate",
+          "tracking",
           "active"
         ],
         "properties": {
@@ -1430,6 +2985,10 @@
           "product_type": {
             "type": "string",
             "description": "purchased | manufactured | configurable | service"
+          },
+          "tracking": {
+            "type": "string",
+            "description": "none | serial — serial-tracked products get an individual serial number per unit."
           },
           "unit": {
             "type": "string"
@@ -1462,6 +3021,10 @@
           },
           "product_type": {
             "type": "string"
+          },
+          "tracking": {
+            "type": "string",
+            "description": "none | serial"
           },
           "unit": {
             "type": "string"
@@ -1585,6 +3148,13 @@
           "number": {
             "type": "string"
           },
+          "opportunity_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
           "price_zone_code": {
             "type": "string"
           },
@@ -1657,6 +3227,14 @@
           },
           "notes": {
             "type": "string"
+          },
+          "opportunity_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Links the quotation to an open opportunity of the same customer."
           },
           "quote_date": {
             "type": [
@@ -1821,6 +3399,13 @@
           "number": {
             "type": "string"
           },
+          "opportunity_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
           "quote_date": {
             "type": "string",
             "format": "date"
@@ -1841,6 +3426,290 @@
           "valid_until": {
             "type": "string",
             "format": "date"
+          }
+        }
+      },
+      "Requirement": {
+        "type": "object",
+        "required": [
+          "product_id",
+          "code",
+          "name",
+          "unit",
+          "product_type",
+          "quantity"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_type": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "SerialComponent": {
+        "type": "object",
+        "description": "A serialised component in the current as-built tree, depth-first.",
+        "required": [
+          "id",
+          "parent_id",
+          "level",
+          "product_code",
+          "product_name",
+          "serial_number",
+          "status",
+          "added_at"
+        ],
+        "properties": {
+          "added_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parent_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "SerialInput": {
+        "type": "object",
+        "required": [
+          "serial_number"
+        ],
+        "properties": {
+          "bom_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "BOM revision the unit was built to. Default: the product's active BOM, if any."
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          }
+        }
+      },
+      "SerialStatusInput": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Required for delivered and installed, unless the unit already has a customer."
+          },
+          "status": {
+            "type": "string",
+            "description": "in_stock | delivered | installed | scrapped (built_in is set by attaching to another unit)"
+          }
+        }
+      },
+      "SerialUnit": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "product_code",
+          "product_name",
+          "serial_number",
+          "status",
+          "notes",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "bom_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "bom_revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The unit this one is currently built into."
+          },
+          "parent_serial_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "in_stock | built_in | delivered | installed | scrapped"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SerialUnitDetail": {
+        "type": "object",
+        "required": [
+          "unit",
+          "components",
+          "history"
+        ],
+        "properties": {
+          "components": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SerialComponent"
+            }
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ComponentHistory"
+            }
+          },
+          "unit": {
+            "$ref": "#/components/schemas/SerialUnit"
+          }
+        }
+      },
+      "SerialUnitPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SerialUnit"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "StageInput": {
+        "type": "object",
+        "required": [
+          "stage"
+        ],
+        "properties": {
+          "lost_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Required when the stage is `lost`."
+          },
+          "probability": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Defaults to the stage's default probability."
+          },
+          "stage": {
+            "$ref": "#/components/schemas/OpportunityStage"
           }
         }
       },
@@ -1937,7 +3806,7 @@
     },
     {
       "name": "crm",
-      "description": "Customers"
+      "description": "Customers and opportunities"
     },
     {
       "name": "products",
@@ -1946,6 +3815,10 @@
     {
       "name": "sales",
       "description": "Quotations and pricing"
+    },
+    {
+      "name": "engineering",
+      "description": "Bills of materials and serial numbers"
     }
   ]
 }

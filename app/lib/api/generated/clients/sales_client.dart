@@ -30,6 +30,7 @@ abstract class SalesClient {
     @Query('q') String? q,
     @Query('status') String? status,
     @Query('customer_id') String? customerId,
+    @Query('opportunity_id') String? opportunityId,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
   });

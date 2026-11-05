@@ -8,6 +8,11 @@ import 'package:retrofit/retrofit.dart';
 import '../models/customer.dart';
 import '../models/customer_input.dart';
 import '../models/customer_page.dart';
+import '../models/opportunity.dart';
+import '../models/opportunity_input.dart';
+import '../models/opportunity_page.dart';
+import '../models/pipeline_stage.dart';
+import '../models/stage_input.dart';
 
 part 'crm_client.g.dart';
 
@@ -37,5 +42,45 @@ abstract class CrmClient {
   Future<Customer> updateCustomer({
     @Path('id') required String id,
     @Body() required CustomerInput body,
+  });
+
+  /// [q] - Searches number, title and customer name.
+  ///
+  /// [open] - Only open (not won or lost) opportunities.
+  @GET('/api/v1/opportunities')
+  Future<OpportunityPage> listOpportunities({
+    @Query('q') String? q,
+    @Query('stage') String? stage,
+    @Query('customer_id') String? customerId,
+    @Query('open') bool? open,
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+  });
+
+  @POST('/api/v1/opportunities')
+  Future<Opportunity> createOpportunity({
+    @Body() required OpportunityInput body,
+  });
+
+  /// Count, value and probability-weighted value per stage.
+  @GET('/api/v1/opportunities/pipeline')
+  Future<List<PipelineStage>> pipeline();
+
+  @GET('/api/v1/opportunities/{id}')
+  Future<Opportunity> getOpportunity({
+    @Path('id') required String id,
+  });
+
+  @PUT('/api/v1/opportunities/{id}')
+  Future<Opportunity> updateOpportunity({
+    @Path('id') required String id,
+    @Body() required OpportunityInput body,
+  });
+
+  /// Moves an opportunity through the pipeline. `won`/`lost` close it; any other stage reopens it.
+  @POST('/api/v1/opportunities/{id}/stage')
+  Future<Opportunity> changeStage({
+    @Path('id') required String id,
+    @Body() required StageInput body,
   });
 }

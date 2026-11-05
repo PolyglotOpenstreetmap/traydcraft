@@ -63,17 +63,19 @@ async fn list_quotations(
     let filter = "WHERE company_id = $1
           AND ($2::text IS NULL OR lower(number) LIKE $2 OR lower(customer_name) LIKE $2)
           AND ($3::text IS NULL OR status = $3)
-          AND ($4::uuid IS NULL OR customer_id = $4)";
+          AND ($4::uuid IS NULL OR customer_id = $4)
+          AND ($5::uuid IS NULL OR opportunity_id = $5)";
     let items = sqlx::query_as(&format!(
-        "SELECT id, number, revision, status, customer_id, customer_name, quote_date, valid_until,
+        "SELECT id, number, revision, status, customer_id, opportunity_id, customer_name, quote_date, valid_until,
                 currency::text AS currency, subtotal, total
          FROM sales.quotations {filter}
-         ORDER BY quote_date DESC, number DESC, revision DESC LIMIT $5 OFFSET $6"
+         ORDER BY quote_date DESC, number DESC, revision DESC LIMIT $6 OFFSET $7"
     ))
     .bind(user.company_id)
     .bind(&pattern)
     .bind(&p.status)
     .bind(p.customer_id)
+    .bind(p.opportunity_id)
     .bind(p.limit.unwrap_or(50).clamp(1, 500))
     .bind(p.offset.unwrap_or(0).max(0))
     .fetch_all(&state.db)
@@ -83,6 +85,7 @@ async fn list_quotations(
         .bind(&pattern)
         .bind(&p.status)
         .bind(p.customer_id)
+        .bind(p.opportunity_id)
         .fetch_one(&state.db)
         .await?;
     Ok(Json(QuotationPage { items, total }))
@@ -123,6 +126,10 @@ async fn create_quotation(
     let company = get_company(&state.db, user.company_id).await?;
 
     let mut tx = state.db.begin().await?;
+    if let Some(opp) = input.opportunity_id {
+        traydcraft_crm::opportunities::link_quotation(&mut tx, &user, opp, input.customer_id)
+            .await?;
+    }
     let number = service::allocate_number(&mut tx, user.company_id, date).await?;
     let id = service::insert_quotation(
         &mut tx,
@@ -135,6 +142,7 @@ async fn create_quotation(
             notes: &input.notes,
             currency: &company.currency,
             supersedes_id: None,
+            opportunity_id: input.opportunity_id,
         },
     )
     .await?;
@@ -172,6 +180,10 @@ async fn update_quotation(
             current.number, current.status
         )));
     }
+    if let Some(opp) = input.opportunity_id {
+        traydcraft_crm::opportunities::link_quotation(&mut tx, &user, opp, input.customer_id)
+            .await?;
+    }
     let date = input.quote_date.unwrap_or(current.quote_date);
     let priced = service::price_lines(
         &state.db,
@@ -186,7 +198,8 @@ async fn update_quotation(
         "UPDATE sales.quotations SET customer_id = $2, customer_name = $3, customer_vat_number = $4,
             customer_street = $5, customer_postal_code = $6, customer_city = $7, customer_country_code = $8,
             customer_language = $9, price_zone_code = $10, customer_discount_percent = $11, quote_date = $12,
-            valid_until = $13, notes = $14, subtotal = $15, vat_total = $16, total = $17, updated_at = now()
+            valid_until = $13, notes = $14, subtotal = $15, vat_total = $16, total = $17, opportunity_id = $18,
+            updated_at = now()
          WHERE id = $1",
     )
     .bind(id)
@@ -206,6 +219,7 @@ async fn update_quotation(
     .bind(priced.totals.subtotal)
     .bind(priced.totals.vat_total)
     .bind(priced.totals.total)
+    .bind(input.opportunity_id)
     .execute(&mut *tx)
     .await?;
     sqlx::query("DELETE FROM sales.quotation_lines WHERE quotation_id = $1")
@@ -264,6 +278,9 @@ async fn transition(
         serde_json::json!({ "from": from.as_str() }),
     )
     .await?;
+    if let (QuotationStatus::Accepted, Some(opp)) = (to, current.opportunity_id) {
+        traydcraft_crm::opportunities::mark_won(&mut tx, user, opp).await?;
+    }
     let q = service::load_quotation(&mut tx, user.company_id, id, false).await?;
     tx.commit().await?;
     Ok(q)
@@ -360,6 +377,9 @@ async fn revise_quotation(
                 .ok_or_else(|| AppError::Validation(format!("line {} has no product", l.position)))
         })
         .collect::<AppResult<_>>()?;
+    if let Some(opp) = old.opportunity_id {
+        traydcraft_crm::opportunities::link_quotation(&mut tx, &user, opp, old.customer_id).await?;
+    }
     let date = service::today();
     let validity = (old.valid_until - old.quote_date).num_days().clamp(1, 365);
     let priced =
@@ -375,6 +395,7 @@ async fn revise_quotation(
             notes: &old.notes,
             currency: &old.currency,
             supersedes_id: Some(id),
+            opportunity_id: old.opportunity_id,
         },
     )
     .await?;

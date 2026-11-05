@@ -7,8 +7,9 @@ our own processes.
 
 **Stack:** Rust (Axum, SQLx) · PostgreSQL · Flutter (Windows, Android, iOS, web) · Typst for PDFs.
 
-> Status: **vertical slice**. Customers, products, five price zones, quotations with revisions,
-> server-side pricing, PDF output, generated Dart API client and a Flutter app.
+> Status: **vertical slice**. Customers and opportunities, products with five price zones,
+> quotations with revisions and server-side pricing, PDF output, multi-level bills of materials
+> with revisions, serial numbers with as-built genealogy, generated Dart API client and a Flutter app.
 > See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the target architecture and roadmap.
 
 ## Repository layout
@@ -17,9 +18,10 @@ our own processes.
 apps/api/            HTTP server: wires modules, OpenAPI, migrations, integration tests
 crates/core/         errors, auth (OIDC / dev), companies, numbering, audit trail
 crates/pricing/      pure pricing engine (no I/O): zone prices, discounts, rounding, VAT
-crates/crm/          customers + per-company commercial terms
+crates/crm/          customers, per-company commercial terms, opportunities
 crates/products/     products, price zones, price history
 crates/sales/        quotations: drafts, snapshots, revisions, PDF data
+crates/engineering/  BOM revisions, explosion, serial units and genealogy
 crates/documents/    Typst PDF rendering, Belgian number formatting
 migrations/          SQLx migrations (one PostgreSQL schema per module)
 templates/           Typst document templates (nl / fr / en)

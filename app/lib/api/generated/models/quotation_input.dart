@@ -14,6 +14,7 @@ class QuotationInput {
     required this.customerId,
     required this.lines,
     this.notes,
+    this.opportunityId,
     this.quoteDate,
     this.validDays,
   });
@@ -25,6 +26,10 @@ class QuotationInput {
   final List<QuotationLineInput> lines;
   @JsonKey(includeIfNull: false)
   final String? notes;
+
+  /// Links the quotation to an open opportunity of the same customer.
+  @JsonKey(includeIfNull: false,name: 'opportunity_id')
+  final String? opportunityId;
 
   /// Defaults to today. Prices valid on this date are used.
   @JsonKey(includeIfNull: false,name: 'quote_date')

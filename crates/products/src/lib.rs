@@ -19,6 +19,7 @@ use utoipa_axum::routes;
 use uuid::Uuid;
 
 const PRODUCT_TYPES: [&str; 4] = ["purchased", "manufactured", "configurable", "service"];
+const TRACKING: [&str; 2] = ["none", "serial"];
 
 #[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
 pub struct Product {
@@ -31,6 +32,8 @@ pub struct Product {
     pub product_type: String,
     #[schema(value_type = String, example = "21")]
     pub vat_rate: Decimal,
+    /// none | serial — serial-tracked products get an individual serial number per unit.
+    pub tracking: String,
     pub active: bool,
 }
 
@@ -46,8 +49,15 @@ pub struct ProductInput {
     pub product_type: String,
     #[schema(value_type = String, example = "21")]
     pub vat_rate: Decimal,
+    /// none | serial
+    #[serde(default = "default_tracking")]
+    pub tracking: String,
     #[serde(default = "default_true")]
     pub active: bool,
+}
+
+fn default_tracking() -> String {
+    "none".into()
 }
 
 fn default_unit() -> String {
@@ -70,6 +80,17 @@ impl ProductInput {
                 "product_type must be one of {}",
                 PRODUCT_TYPES.join(", ")
             )));
+        }
+        if !TRACKING.contains(&self.tracking.as_str()) {
+            return Err(AppError::Validation(format!(
+                "tracking must be one of {}",
+                TRACKING.join(", ")
+            )));
+        }
+        if self.tracking == "serial" && self.product_type == "service" {
+            return Err(AppError::Validation(
+                "services cannot be serial-tracked".into(),
+            ));
         }
         if self.vat_rate < Decimal::ZERO {
             return Err(AppError::Validation("vat_rate cannot be negative".into()));
@@ -121,7 +142,7 @@ pub struct ZonePriceInput {
 }
 
 const SELECT_PRODUCT: &str =
-    "SELECT id, code, name, description, unit, product_type, vat_rate, active
+    "SELECT id, code, name, description, unit, product_type, vat_rate, tracking, active
                               FROM products.products";
 
 pub async fn get_product<'e>(db: impl PgExecutor<'e>, id: Uuid) -> AppResult<Product> {
@@ -262,8 +283,8 @@ async fn create_product(
     let id = new_id();
     let mut tx = state.db.begin().await?;
     sqlx::query(
-        "INSERT INTO products.products (id, code, name, description, unit, product_type, vat_rate, active)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        "INSERT INTO products.products (id, code, name, description, unit, product_type, vat_rate, active, tracking)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
     )
     .bind(id)
     .bind(input.code.trim())
@@ -273,6 +294,7 @@ async fn create_product(
     .bind(&input.product_type)
     .bind(input.vat_rate)
     .bind(input.active)
+    .bind(&input.tracking)
     .execute(&mut *tx)
     .await?;
     audit::record(
@@ -301,7 +323,7 @@ async fn update_product(
     let mut tx = state.db.begin().await?;
     let updated = sqlx::query(
         "UPDATE products.products SET code = $2, name = $3, description = $4, unit = $5, product_type = $6,
-                vat_rate = $7, active = $8, updated_at = now() WHERE id = $1",
+                vat_rate = $7, active = $8, tracking = $9, updated_at = now() WHERE id = $1",
     )
     .bind(id)
     .bind(input.code.trim())
@@ -311,6 +333,7 @@ async fn update_product(
     .bind(&input.product_type)
     .bind(input.vat_rate)
     .bind(input.active)
+    .bind(&input.tracking)
     .execute(&mut *tx)
     .await?;
     if updated.rows_affected() == 0 {

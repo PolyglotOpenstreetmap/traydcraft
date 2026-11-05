@@ -41,6 +41,7 @@ class Quotation {
     required this.vatGroups,
     required this.vatTotal,
     this.customerVatNumber,
+    this.opportunityId,
     this.sentAt,
     this.supersedesId,
   });
@@ -76,6 +77,8 @@ class Quotation {
   final List<QuotationLine> lines;
   final String notes;
   final String number;
+  @JsonKey(includeIfNull: false,name: 'opportunity_id')
+  final String? opportunityId;
   @JsonKey(name: 'price_zone_code')
   final String priceZoneCode;
   @JsonKey(name: 'quote_date')

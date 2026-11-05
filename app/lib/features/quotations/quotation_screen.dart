@@ -34,9 +34,18 @@ class _Line {
 
 /// Create, edit (drafts), view and process a quotation.
 class QuotationScreen extends ConsumerStatefulWidget {
-  const QuotationScreen({super.key, this.id});
+  const QuotationScreen({
+    super.key,
+    this.id,
+    this.customerId,
+    this.opportunityId,
+  });
 
   final String? id;
+
+  /// Pre-selects the customer and opportunity of a new quotation.
+  final String? customerId;
+  final String? opportunityId;
 
   @override
   ConsumerState<QuotationScreen> createState() => _QuotationPageState();
@@ -46,6 +55,8 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
   late String? _id = widget.id;
   Quotation? _q;
   Customer? _customer;
+  late String? _opportunityId = widget.opportunityId;
+  List<Opportunity> _opportunities = [];
   final List<_Line> _lines = [];
   final _notes = TextEditingController();
   PricingPreview? _preview;
@@ -63,7 +74,35 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
   @override
   void initState() {
     super.initState();
-    if (_id != null) _load();
+    if (_id != null) {
+      _load();
+    } else if (widget.customerId != null) {
+      _api.crm
+          .getCustomer(id: widget.customerId!)
+          .then(
+            _selectCustomer,
+            onError: (Object e) {
+              if (mounted) setState(() => _error = errorMessage(e));
+            },
+          );
+    }
+  }
+
+  /// Selects a customer and loads their open opportunities.
+  Future<void> _selectCustomer(Customer c) async {
+    setState(() => _customer = c);
+    _refreshPreview();
+    // Linking an opportunity is optional: without access to opportunities, quoting still works.
+    final opportunities = await _api.crm
+        .listOpportunities(customerId: c.id, open: true, limit: 100)
+        .then((p) => p.items, onError: (Object _) => <Opportunity>[]);
+    if (!mounted) return;
+    setState(() {
+      _opportunities = opportunities;
+      if (!_opportunities.any((o) => o.id == _opportunityId)) {
+        _opportunityId = null;
+      }
+    });
   }
 
   @override
@@ -87,8 +126,9 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         final products = {
           for (final id in ids) id: await _api.products.getProduct(id: id),
         };
+        _opportunityId = q.opportunityId;
+        await _selectCustomer(customer);
         setState(() {
-          _customer = customer;
           for (final l in _lines) {
             l.dispose();
           }
@@ -198,6 +238,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
     }
     final body = QuotationInput(
       customerId: _customer!.id,
+      opportunityId: _opportunityId,
       notes: _notes.text,
       lines: inputs,
     );
@@ -366,10 +407,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
               display: (c) => '${c.code} · ${c.name}',
               search: (q) async =>
                   (await _api.crm.listCustomers(q: q, limit: 20)).items,
-              onSelected: (c) {
-                setState(() => _customer = c);
-                _refreshPreview();
-              },
+              onSelected: _selectCustomer,
             ),
           ),
           const SizedBox(width: 16),
@@ -383,6 +421,28 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
             ),
         ],
       ),
+      if (_customer != null) ...[
+        const SizedBox(height: 12),
+        SizedBox(
+          width: 520,
+          child: DropdownButtonFormField<String?>(
+            key: ValueKey('opp-${_customer!.id}-${_opportunities.length}'),
+            initialValue: _opportunityId,
+            decoration: const InputDecoration(
+              labelText: 'Opportunity (optional)',
+            ),
+            items: [
+              const DropdownMenuItem<String?>(value: null, child: Text('None')),
+              for (final o in _opportunities)
+                DropdownMenuItem<String?>(
+                  value: o.id,
+                  child: Text('${o.number} · ${o.title} (${o.stage.json})'),
+                ),
+            ],
+            onChanged: (v) => setState(() => _opportunityId = v),
+          ),
+        ),
+      ],
       const SizedBox(height: 16),
       _linesTable(
         theme,
@@ -472,6 +532,15 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
       'Zone ${q.priceZoneCode} · discount ${number(q.customerDiscountPercent)} % · '
       '${date(q.quoteDate)} – valid until ${date(q.validUntil)}',
     ),
+    if (q.opportunityId != null)
+      Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          icon: const Icon(Icons.trending_up),
+          label: const Text('Open opportunity'),
+          onPressed: () => context.push('/opportunities/${q.opportunityId}'),
+        ),
+      ),
     const SizedBox(height: 16),
     _linesTable(
       theme,

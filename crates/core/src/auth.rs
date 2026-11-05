@@ -38,10 +38,16 @@ pub enum Permission {
     PricesWrite,
     QuotationsRead,
     QuotationsWrite,
+    OpportunitiesRead,
+    OpportunitiesWrite,
+    BomRead,
+    BomWrite,
+    SerialsRead,
+    SerialsWrite,
 }
 
 impl Permission {
-    pub const ALL: [Permission; 7] = [
+    pub const ALL: [Permission; 13] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -49,6 +55,12 @@ impl Permission {
         Permission::PricesWrite,
         Permission::QuotationsRead,
         Permission::QuotationsWrite,
+        Permission::OpportunitiesRead,
+        Permission::OpportunitiesWrite,
+        Permission::BomRead,
+        Permission::BomWrite,
+        Permission::SerialsRead,
+        Permission::SerialsWrite,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -60,6 +72,12 @@ impl Permission {
             Permission::PricesWrite => "prices.write",
             Permission::QuotationsRead => "quotations.read",
             Permission::QuotationsWrite => "quotations.write",
+            Permission::OpportunitiesRead => "opportunities.read",
+            Permission::OpportunitiesWrite => "opportunities.write",
+            Permission::BomRead => "bom.read",
+            Permission::BomWrite => "bom.write",
+            Permission::SerialsRead => "serials.read",
+            Permission::SerialsWrite => "serials.write",
         }
     }
 }
@@ -71,13 +89,38 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
         "admin" => true,
         "sales" => matches!(
             p,
-            CustomersRead | CustomersWrite | ProductsRead | QuotationsRead | QuotationsWrite
+            CustomersRead
+                | CustomersWrite
+                | ProductsRead
+                | QuotationsRead
+                | QuotationsWrite
+                | OpportunitiesRead
+                | OpportunitiesWrite
+                | BomRead
+                | SerialsRead
         ),
         "product_manager" => matches!(
             p,
-            CustomersRead | ProductsRead | ProductsWrite | PricesWrite | QuotationsRead
+            CustomersRead
+                | ProductsRead
+                | ProductsWrite
+                | PricesWrite
+                | QuotationsRead
+                | OpportunitiesRead
+                | BomRead
+                | BomWrite
+                | SerialsRead
+                | SerialsWrite
         ),
-        "viewer" => matches!(p, CustomersRead | ProductsRead | QuotationsRead),
+        "viewer" => matches!(
+            p,
+            CustomersRead
+                | ProductsRead
+                | QuotationsRead
+                | OpportunitiesRead
+                | BomRead
+                | SerialsRead
+        ),
         _ => false,
     }
 }

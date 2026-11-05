@@ -22,6 +22,7 @@ class QuotationSummary {
     required this.subtotal,
     required this.total,
     required this.validUntil,
+    this.opportunityId,
   });
   
   factory QuotationSummary.fromJson(Map<String, Object?> json) => _$QuotationSummaryFromJson(json);
@@ -33,6 +34,8 @@ class QuotationSummary {
   final String customerName;
   final String id;
   final String number;
+  @JsonKey(includeIfNull: false,name: 'opportunity_id')
+  final String? opportunityId;
   @JsonKey(name: 'quote_date')
   final DateTime quoteDate;
   final int revision;

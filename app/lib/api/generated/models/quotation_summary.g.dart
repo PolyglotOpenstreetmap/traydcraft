@@ -19,6 +19,7 @@ QuotationSummary _$QuotationSummaryFromJson(Map<String, dynamic> json) =>
       subtotal: json['subtotal'] as String,
       total: json['total'] as String,
       validUntil: DateTime.parse(json['valid_until'] as String),
+      opportunityId: json['opportunity_id'] as String?,
     );
 
 Map<String, dynamic> _$QuotationSummaryToJson(QuotationSummary instance) =>
@@ -28,6 +29,7 @@ Map<String, dynamic> _$QuotationSummaryToJson(QuotationSummary instance) =>
       'customer_name': instance.customerName,
       'id': instance.id,
       'number': instance.number,
+      'opportunity_id': ?instance.opportunityId,
       'quote_date': instance.quoteDate.toIso8601String(),
       'revision': instance.revision,
       'status': instance.status,

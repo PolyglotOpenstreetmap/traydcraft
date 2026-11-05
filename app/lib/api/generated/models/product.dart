@@ -15,6 +15,7 @@ class Product {
     required this.id,
     required this.name,
     required this.productType,
+    required this.tracking,
     required this.unit,
     required this.vatRate,
   });
@@ -30,6 +31,9 @@ class Product {
   /// purchased | manufactured | configurable | service
   @JsonKey(name: 'product_type')
   final String productType;
+
+  /// none | serial — serial-tracked products get an individual serial number per unit.
+  final String tracking;
   final String unit;
   @JsonKey(name: 'vat_rate')
   final String vatRate;

@@ -15,6 +15,7 @@ traydcraft-crm = { path = "crates/crm" }
 traydcraft-products = { path = "crates/products" }
 traydcraft-sales = { path = "crates/sales" }
 traydcraft-documents = { path = "crates/documents" }
+traydcraft-engineering = { path = "crates/engineering" }
 
 anyhow = "1"
 axum = { version = "0.8", features = ["macros"] }

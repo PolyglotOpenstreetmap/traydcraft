@@ -12,6 +12,7 @@ path = "src/main.rs"
 [dependencies]
 traydcraft-core.workspace = true
 traydcraft-crm.workspace = true
+traydcraft-engineering.workspace = true
 traydcraft-products.workspace = true
 traydcraft-sales.workspace = true
 anyhow.workspace = true

@@ -38,6 +38,7 @@ Quotation _$QuotationFromJson(Map<String, dynamic> json) => Quotation(
       .toList(),
   vatTotal: json['vat_total'] as String,
   customerVatNumber: json['customer_vat_number'] as String?,
+  opportunityId: json['opportunity_id'] as String?,
   sentAt: json['sent_at'] == null
       ? null
       : DateTime.parse(json['sent_at'] as String),
@@ -62,6 +63,7 @@ Map<String, dynamic> _$QuotationToJson(Quotation instance) => <String, dynamic>{
   'lines': instance.lines,
   'notes': instance.notes,
   'number': instance.number,
+  'opportunity_id': ?instance.opportunityId,
   'price_zone_code': instance.priceZoneCode,
   'quote_date': instance.quoteDate.toIso8601String(),
   'revision': instance.revision,

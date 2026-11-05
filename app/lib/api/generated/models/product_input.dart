@@ -15,6 +15,7 @@ class ProductInput {
     this.active,
     this.description,
     this.productType,
+    this.tracking,
     this.unit,
   });
   
@@ -28,6 +29,10 @@ class ProductInput {
   final String name;
   @JsonKey(includeIfNull: false,name: 'product_type')
   final String? productType;
+
+  /// none | serial
+  @JsonKey(includeIfNull: false)
+  final String? tracking;
   @JsonKey(includeIfNull: false)
   final String? unit;
   @JsonKey(name: 'vat_rate')

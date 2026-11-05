@@ -53,6 +53,8 @@ pub struct QuotationLineInput {
 #[derive(Debug, Clone, Deserialize, ToSchema)]
 pub struct QuotationInput {
     pub customer_id: Uuid,
+    /// Links the quotation to an open opportunity of the same customer.
+    pub opportunity_id: Option<Uuid>,
     /// Defaults to today. Prices valid on this date are used.
     #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub quote_date: Option<NaiveDate>,
@@ -127,6 +129,7 @@ pub struct QuotationSummary {
     #[schema(value_type = QuotationStatus)]
     pub status: String,
     pub customer_id: Uuid,
+    pub opportunity_id: Option<Uuid>,
     pub customer_name: String,
     pub quote_date: NaiveDate,
     pub valid_until: NaiveDate,
@@ -152,6 +155,7 @@ pub struct QuotationHeader {
     #[schema(value_type = QuotationStatus)]
     pub status: String,
     pub customer_id: Uuid,
+    pub opportunity_id: Option<Uuid>,
     pub customer_name: String,
     pub customer_vat_number: Option<String>,
     pub customer_street: String,
@@ -189,6 +193,7 @@ pub struct Quotation {
     #[schema(value_type = QuotationStatus)]
     pub status: String,
     pub customer_id: Uuid,
+    pub opportunity_id: Option<Uuid>,
     pub customer_name: String,
     pub customer_vat_number: Option<String>,
     pub customer_street: String,
@@ -227,6 +232,7 @@ impl Quotation {
             revision: h.revision,
             status: h.status,
             customer_id: h.customer_id,
+            opportunity_id: h.opportunity_id,
             customer_name: h.customer_name,
             customer_vat_number: h.customer_vat_number,
             customer_street: h.customer_street,
@@ -260,6 +266,7 @@ pub struct ListParams {
     pub q: Option<String>,
     pub status: Option<String>,
     pub customer_id: Option<Uuid>,
+    pub opportunity_id: Option<Uuid>,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
 }

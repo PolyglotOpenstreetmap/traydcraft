@@ -13,6 +13,7 @@ class _Dest {
 }
 
 const _destinations = [
+  _Dest('/opportunities', 'Opportunities', Icons.trending_up),
   _Dest('/quotations', 'Quotations', Icons.request_quote_outlined),
   _Dest('/customers', 'Customers', Icons.business_outlined),
   _Dest('/products', 'Products', Icons.inventory_2_outlined),

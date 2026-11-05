@@ -104,6 +104,7 @@ class FakeApi implements HttpClientAdapter {
           'description': '',
           'unit': 'pcs',
           'product_type': 'manufactured',
+          'tracking': 'serial',
           'vat_rate': '21',
           'active': true,
         };

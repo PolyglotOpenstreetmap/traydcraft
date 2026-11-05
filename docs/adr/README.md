@@ -15,3 +15,4 @@ accepted one; mark superseded records as such.
 | [0008](0008-accounting-stays-external.md) | Statutory accounting stays in Exact; Peppol via an access point | Accepted |
 | [0009](0009-pdf-with-typst.md) | PDF documents with Typst | Accepted |
 | [0010](0010-flutter-desktop-first.md) | Flutter, desktop-first for the office | Accepted |
+| [0011](0011-bom-revisions-and-serial-genealogy.md) | BOM revisions and serial-number genealogy | Accepted |

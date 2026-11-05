@@ -53,6 +53,7 @@ class _SalesClient implements SalesClient {
     String? q,
     String? status,
     String? customerId,
+    String? opportunityId,
     int? limit,
     int? offset,
   }) async {
@@ -61,6 +62,7 @@ class _SalesClient implements SalesClient {
       r'q': q,
       r'status': status,
       r'customer_id': customerId,
+      r'opportunity_id': opportunityId,
       r'limit': limit,
       r'offset': offset,
     };

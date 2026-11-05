@@ -26,7 +26,10 @@ PostgreSQL — one database, one schema per module
 
 * **Modular monolith** ([ADR 0001](adr/0001-modular-monolith.md)): one deployable, modules as crates.
   A module owns its schema; other modules call its public Rust functions, never its tables.
-  Example: `sales` uses `crm::get_customer_for_quoting` and `products::get_products_for_quoting`.
+  Example: `sales` uses `crm::get_customer_for_quoting` and `products::get_products_for_quoting`,
+  and accepting a quotation calls `crm::opportunities::mark_won` in the same transaction.
+  Read-only joins to another module's tables for display (names, codes) are allowed;
+  writes and business rules always go through the owning module.
 * **Pricing is authoritative on the server** ([ADR 0002](adr/0002-money-and-pricing.md)).
   The app calls `POST /pricing/preview` while editing; it never calculates prices.
 * **Multi-company from day one** ([ADR 0003](adr/0003-multi-company.md)).
@@ -39,16 +42,16 @@ PostgreSQL — one database, one schema per module
 | Module | Status | Owns (schema) |
 |---|---|---|
 | core | slice | companies, users, memberships/roles, numbering, audit |
-| crm | slice | customers, per-company terms (zone, discount, payment terms) |
+| crm | slice | customers, per-company terms (zone, discount, payment terms), opportunities / pipeline |
 | products / pricing | slice | products, price zones, dated zone prices |
-| sales | slice | quotations and lines (snapshots, revisions) |
+| sales | slice | quotations and lines (snapshots, revisions), linked to opportunities |
 | documents | slice | PDF rendering (Typst) |
-| engineering | planned | BOMs (multi-level, versioned), routings, configurable products |
+| engineering | slice | BOM revisions (multi-level via subassemblies), explosion, serial units and as-built genealogy ([ADR 0011](adr/0011-bom-revisions-and-serial-genealogy.md)); routings and configurator planned |
 | purchasing | planned | suppliers, purchase orders, receipts |
 | inventory | planned | warehouses, locations (incl. service vans), movements, reservations |
 | production | planned | production orders, work orders, consumption, MTS/MTO planning |
 | quality | planned | inspections, non-conformances, traceability |
-| service | planned | installed assets (serial numbers), repairs, warranties |
+| service | planned | installed assets (builds on serial units), repairs, warranties |
 | field service | planned | planning board, mobile app with offline sync ([ADR 0006](adr/0006-offline-sync.md)) |
 | helpdesk | planned | tickets, SLA, e-mail-to-ticket, portal |
 | finance | planned | invoices, credit notes, Peppol via access point, Exact integration |
@@ -65,8 +68,8 @@ PostgreSQL — one database, one schema per module
 
 ## Roadmap
 
-1. **Foundation & sales** — this slice; next: contacts, opportunities, sales orders, e-mailing quotes.
-2. **Engineering & inventory** — BOMs and revisions, warehouses, stock ledger, purchasing.
+1. **Foundation & sales** — customers, opportunities, quotations; next: contacts, activities, sales orders, e-mailing quotes.
+2. **Engineering & inventory** — BOM revisions and serial numbers (done); next: routings, configurator, warehouses, stock ledger, purchasing.
 3. **Manufacturing** — MRP for MTS and MTO, production orders, labour, quality.
 4. **Service** — installed assets, repairs, field service planning, mobile app with offline sync.
 5. **Helpdesk & portal** — tickets, SLA, e-mail integration, customer portal.

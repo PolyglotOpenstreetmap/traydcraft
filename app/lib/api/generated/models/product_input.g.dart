@@ -13,6 +13,7 @@ ProductInput _$ProductInputFromJson(Map<String, dynamic> json) => ProductInput(
   active: json['active'] as bool?,
   description: json['description'] as String?,
   productType: json['product_type'] as String?,
+  tracking: json['tracking'] as String?,
   unit: json['unit'] as String?,
 );
 
@@ -23,6 +24,7 @@ Map<String, dynamic> _$ProductInputToJson(ProductInput instance) =>
       'description': ?instance.description,
       'name': instance.name,
       'product_type': ?instance.productType,
+      'tracking': ?instance.tracking,
       'unit': ?instance.unit,
       'vat_rate': instance.vatRate,
     };

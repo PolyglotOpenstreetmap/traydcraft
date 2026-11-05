@@ -146,6 +146,7 @@ pub struct NewQuotation<'a> {
     pub notes: &'a str,
     pub currency: &'a str,
     pub supersedes_id: Option<Uuid>,
+    pub opportunity_id: Option<Uuid>,
 }
 
 pub async fn insert_quotation(
@@ -160,9 +161,9 @@ pub async fn insert_quotation(
             id, company_id, number, revision, status, customer_id, customer_name, customer_vat_number,
             customer_street, customer_postal_code, customer_city, customer_country_code, customer_language,
             price_zone_code, customer_discount_percent, currency, quote_date, valid_until, notes,
-            subtotal, vat_total, total, supersedes_id, created_by)
+            subtotal, vat_total, total, supersedes_id, created_by, opportunity_id)
          VALUES ($1, $2, $3, $4, 'draft', $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
-                 $19, $20, $21, $22, $23)",
+                 $19, $20, $21, $22, $23, $24)",
     )
     .bind(id)
     .bind(user.company_id)
@@ -187,6 +188,7 @@ pub async fn insert_quotation(
     .bind(q.priced.totals.total)
     .bind(q.supersedes_id)
     .bind(user.user_id)
+    .bind(q.opportunity_id)
     .execute(&mut *conn)
     .await?;
     insert_lines(conn, id, &q.priced.lines).await?;
@@ -223,7 +225,7 @@ pub async fn insert_lines(
     Ok(())
 }
 
-const SELECT_HEADER: &str = "SELECT id, company_id, number, revision, status, customer_id, customer_name,
+const SELECT_HEADER: &str = "SELECT id, company_id, number, revision, status, customer_id, opportunity_id, customer_name,
     customer_vat_number, customer_street, customer_postal_code, customer_city,
     customer_country_code::text AS customer_country_code, customer_language::text AS customer_language,
     price_zone_code, customer_discount_percent, currency::text AS currency, quote_date, valid_until, notes,

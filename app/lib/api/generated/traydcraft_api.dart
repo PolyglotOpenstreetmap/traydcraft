@@ -4,6 +4,7 @@
 
 import 'package:dio/dio.dart';
 
+import 'clients/engineering_client.dart';
 import 'clients/crm_client.dart';
 import 'clients/core_client.dart';
 import 'clients/products_client.dart';
@@ -11,7 +12,7 @@ import 'clients/sales_client.dart';
 
 /// traydcraft API `v0.1.0`.
 ///
-/// Business platform API (CRM, products, pricing, sales).
+/// Business platform API (CRM, products, pricing, sales, engineering).
 class TraydcraftApi {
   TraydcraftApi(
     Dio dio, {
@@ -24,10 +25,13 @@ class TraydcraftApi {
 
   static String get version => '0.1.0';
 
+  EngineeringClient? _engineering;
   CrmClient? _crm;
   CoreClient? _core;
   ProductsClient? _products;
   SalesClient? _sales;
+
+  EngineeringClient get engineering => _engineering ??= EngineeringClient(_dio, baseUrl: _baseUrl);
 
   CrmClient get crm => _crm ??= CrmClient(_dio, baseUrl: _baseUrl);
 

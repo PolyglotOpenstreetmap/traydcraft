@@ -3,6 +3,8 @@
 //! Other modules use the public service functions here (e.g. [`get_customer_for_quoting`])
 //! and never query `crm.*` tables directly.
 
+pub mod opportunities;
+
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::Json;
@@ -357,4 +359,5 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(list_customers, create_customer))
         .routes(routes!(get_customer_handler, update_customer))
+        .merge(opportunities::router())
 }
