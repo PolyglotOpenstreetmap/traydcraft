@@ -124,3 +124,41 @@ INSERT INTO crm.opportunities (id, company_id, number, title, customer_id, owner
      'negotiation', 65000, 75, DATE '2026-11-30');
 INSERT INTO core.number_sequences (company_id, code, year, next_value)
 VALUES ('00000000-0000-7000-8000-000000000001', 'opportunity', 2026, 4);
+
+-- A sales manager may change rebates and quote on an earlier price list.
+INSERT INTO core.users (id, email, display_name) VALUES
+    ('00000000-0000-7000-8000-000000000104', 'manager@example.com', 'Sales Manager');
+INSERT INTO core.user_companies (user_id, company_id, roles, is_default) VALUES
+    ('00000000-0000-7000-8000-000000000104', '00000000-0000-7000-8000-000000000001', '{sales_manager}', true);
+
+-- Product families and pricing types.
+INSERT INTO products.product_families (id, code, name) VALUES
+    ('00000000-0000-7000-8000-000000000801', 'UNITS', 'Process units'),
+    ('00000000-0000-7000-8000-000000000802', 'PUMPS', 'Pumps'),
+    ('00000000-0000-7000-8000-000000000803', 'MATERIALS', 'Materials and fasteners'),
+    ('00000000-0000-7000-8000-000000000804', 'ELECTRONICS', 'Controls and electronics'),
+    ('00000000-0000-7000-8000-000000000805', 'ASSEMBLIES', 'Subassemblies'),
+    ('00000000-0000-7000-8000-000000000806', 'SERVICES', 'Services');
+UPDATE products.products SET family_id = '00000000-0000-7000-8000-000000000801' WHERE code IN ('UNIT-100', 'UNIT-200');
+UPDATE products.products SET family_id = '00000000-0000-7000-8000-000000000802' WHERE code = 'PUMP-05';
+UPDATE products.products SET family_id = '00000000-0000-7000-8000-000000000803' WHERE code IN ('HOSE-25', 'PROFILE-40', 'BOLT-M8');
+UPDATE products.products SET family_id = '00000000-0000-7000-8000-000000000804' WHERE code = 'CTRL-01';
+UPDATE products.products SET family_id = '00000000-0000-7000-8000-000000000805' WHERE code = 'FRAME-A';
+UPDATE products.products SET family_id = '00000000-0000-7000-8000-000000000806' WHERE code IN ('INSTALL', 'TRAVEL');
+-- Services have a fixed net price; the configurable unit only has an indicative list price.
+UPDATE products.products SET pricing_type = 'net' WHERE code IN ('INSTALL', 'TRAVEL');
+UPDATE products.products SET pricing_type = 'indicative' WHERE code = 'UNIT-200';
+
+-- Alpha: 5 % general rebate (in its terms), 12 % on pumps, 15 % on the controller.
+INSERT INTO crm.customer_rebates (id, company_id, customer_id, scope, product_id, family_id, percent, created_by) VALUES
+    ('00000000-0000-7000-8000-000000000901', '00000000-0000-7000-8000-000000000001',
+     '00000000-0000-7000-8000-000000000401', 'family', NULL, '00000000-0000-7000-8000-000000000802', 12,
+     '00000000-0000-7000-8000-000000000101'),
+    ('00000000-0000-7000-8000-000000000902', '00000000-0000-7000-8000-000000000001',
+     '00000000-0000-7000-8000-000000000401', 'product', '00000000-0000-7000-8000-000000000310', NULL, 15,
+     '00000000-0000-7000-8000-000000000101');
+
+-- The previous price list (2025): 4 % below the 2026 prices.
+INSERT INTO pricing.zone_prices (id, company_id, zone_id, product_id, unit_price, valid_from)
+SELECT gen_random_uuid(), company_id, zone_id, product_id, round(unit_price * 0.96, 2), DATE '2025-01-01'
+FROM pricing.zone_prices WHERE valid_from = DATE '2026-01-01';

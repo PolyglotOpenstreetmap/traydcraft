@@ -82,6 +82,8 @@ class ProductScreen extends ConsumerWidget {
                       InfoItem('Unit', p.unit),
                       InfoItem('VAT', '${number(p.vatRate)} %'),
                       InfoItem('Tracking', serial ? 'serial numbers' : 'none'),
+                      InfoItem('Family', p.familyCode ?? ''),
+                      InfoItem('Pricing', p.pricingType),
                       InfoItem('Status', p.active ? 'active' : 'inactive'),
                       if (p.description.isNotEmpty)
                         InfoItem('Description', p.description),

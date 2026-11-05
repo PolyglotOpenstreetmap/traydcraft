@@ -20,6 +20,10 @@ use uuid::Uuid;
 
 const PRODUCT_TYPES: [&str; 4] = ["purchased", "manufactured", "configurable", "service"];
 const TRACKING: [&str; 2] = ["none", "serial"];
+const PRICING_TYPES: [&str; 3] = ["list", "net", "indicative"];
+
+pub mod bulk;
+pub mod families;
 
 #[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
 pub struct Product {
@@ -34,6 +38,11 @@ pub struct Product {
     pub vat_rate: Decimal,
     /// none | serial — serial-tracked products get an individual serial number per unit.
     pub tracking: String,
+    pub family_id: Option<Uuid>,
+    pub family_code: Option<String>,
+    /// list (rebates apply) | net (fixed net price, never discounted) |
+    /// indicative (price must be confirmed on each quotation)
+    pub pricing_type: String,
     pub active: bool,
 }
 
@@ -52,8 +61,16 @@ pub struct ProductInput {
     /// none | serial
     #[serde(default = "default_tracking")]
     pub tracking: String,
+    pub family_id: Option<Uuid>,
+    /// list | net | indicative
+    #[serde(default = "default_pricing_type")]
+    pub pricing_type: String,
     #[serde(default = "default_true")]
     pub active: bool,
+}
+
+fn default_pricing_type() -> String {
+    "list".into()
 }
 
 fn default_tracking() -> String {
@@ -92,6 +109,12 @@ impl ProductInput {
                 "services cannot be serial-tracked".into(),
             ));
         }
+        if !PRICING_TYPES.contains(&self.pricing_type.as_str()) {
+            return Err(AppError::Validation(format!(
+                "pricing_type must be one of {}",
+                PRICING_TYPES.join(", ")
+            )));
+        }
         if self.vat_rate < Decimal::ZERO {
             return Err(AppError::Validation("vat_rate cannot be negative".into()));
         }
@@ -110,6 +133,7 @@ pub struct ListParams {
     /// Searches code and name.
     pub q: Option<String>,
     pub active: Option<bool>,
+    pub family_id: Option<Uuid>,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
 }
@@ -141,9 +165,12 @@ pub struct ZonePriceInput {
     pub valid_from: NaiveDate,
 }
 
-const SELECT_PRODUCT: &str =
-    "SELECT id, code, name, description, unit, product_type, vat_rate, tracking, active
-                              FROM products.products";
+/// Products with their family code; wrapped so callers can filter on plain column names.
+const SELECT_PRODUCT: &str = "SELECT * FROM (
+        SELECT p.id, p.code, p.name, p.description, p.unit, p.product_type, p.vat_rate, p.tracking,
+               p.family_id, f.code AS family_code, p.pricing_type, p.active
+        FROM products.products p LEFT JOIN products.product_families f ON f.id = p.family_id
+    ) p";
 
 pub async fn get_product<'e>(db: impl PgExecutor<'e>, id: Uuid) -> AppResult<Product> {
     sqlx::query_as(&format!("{SELECT_PRODUCT} WHERE id = $1"))
@@ -242,7 +269,8 @@ async fn list_products(
         p.q.as_deref()
             .map(|q| format!("%{}%", q.trim().to_lowercase()));
     let filter = "WHERE ($1::text IS NULL OR lower(code) LIKE $1 OR lower(name) LIKE $1)
-                  AND ($2::boolean IS NULL OR active = $2)";
+                  AND ($2::boolean IS NULL OR active = $2)
+                  AND ($5::uuid IS NULL OR family_id = $5)";
     let items = sqlx::query_as(&format!(
         "{SELECT_PRODUCT} {filter} ORDER BY code LIMIT $3 OFFSET $4"
     ))
@@ -250,13 +278,18 @@ async fn list_products(
     .bind(p.active)
     .bind(p.limit.unwrap_or(50).clamp(1, 500))
     .bind(p.offset.unwrap_or(0).max(0))
+    .bind(p.family_id)
     .fetch_all(&state.db)
     .await?;
-    let total = sqlx::query_scalar(&format!("SELECT count(*) FROM products.products {filter}"))
-        .bind(&pattern)
-        .bind(p.active)
-        .fetch_one(&state.db)
-        .await?;
+    let total = sqlx::query_scalar(&format!(
+        "SELECT count(*) FROM products.products {}",
+        filter.replace("$5", "$3")
+    ))
+    .bind(&pattern)
+    .bind(p.active)
+    .bind(p.family_id)
+    .fetch_one(&state.db)
+    .await?;
     Ok(Json(ProductPage { items, total }))
 }
 
@@ -283,8 +316,9 @@ async fn create_product(
     let id = new_id();
     let mut tx = state.db.begin().await?;
     sqlx::query(
-        "INSERT INTO products.products (id, code, name, description, unit, product_type, vat_rate, active, tracking)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+        "INSERT INTO products.products (id, code, name, description, unit, product_type, vat_rate, active, tracking,
+                                        family_id, pricing_type)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
     )
     .bind(id)
     .bind(input.code.trim())
@@ -295,6 +329,8 @@ async fn create_product(
     .bind(input.vat_rate)
     .bind(input.active)
     .bind(&input.tracking)
+    .bind(input.family_id)
+    .bind(&input.pricing_type)
     .execute(&mut *tx)
     .await?;
     audit::record(
@@ -323,7 +359,8 @@ async fn update_product(
     let mut tx = state.db.begin().await?;
     let updated = sqlx::query(
         "UPDATE products.products SET code = $2, name = $3, description = $4, unit = $5, product_type = $6,
-                vat_rate = $7, active = $8, tracking = $9, updated_at = now() WHERE id = $1",
+                vat_rate = $7, active = $8, tracking = $9, family_id = $10, pricing_type = $11, updated_at = now()
+         WHERE id = $1",
     )
     .bind(id)
     .bind(input.code.trim())
@@ -334,6 +371,8 @@ async fn update_product(
     .bind(input.vat_rate)
     .bind(input.active)
     .bind(&input.tracking)
+    .bind(input.family_id)
+    .bind(&input.pricing_type)
     .execute(&mut *tx)
     .await?;
     if updated.rows_affected() == 0 {
@@ -459,4 +498,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(get_product_handler, update_product))
         .routes(routes!(list_product_prices, add_product_price))
         .routes(routes!(list_price_zones))
+        .merge(families::router())
+        .merge(bulk::router())
 }

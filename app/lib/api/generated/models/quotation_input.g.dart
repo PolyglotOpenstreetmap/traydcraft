@@ -14,6 +14,9 @@ QuotationInput _$QuotationInputFromJson(Map<String, dynamic> json) =>
           .toList(),
       notes: json['notes'] as String?,
       opportunityId: json['opportunity_id'] as String?,
+      priceDate: json['price_date'] == null
+          ? null
+          : DateTime.parse(json['price_date'] as String),
       quoteDate: json['quote_date'] == null
           ? null
           : DateTime.parse(json['quote_date'] as String),
@@ -26,6 +29,7 @@ Map<String, dynamic> _$QuotationInputToJson(QuotationInput instance) =>
       'lines': instance.lines,
       'notes': ?instance.notes,
       'opportunity_id': ?instance.opportunityId,
+      'price_date': ?instance.priceDate?.toIso8601String(),
       'quote_date': ?instance.quoteDate?.toIso8601String(),
       'valid_days': ?instance.validDays,
     };

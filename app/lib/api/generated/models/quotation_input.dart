@@ -15,6 +15,7 @@ class QuotationInput {
     required this.lines,
     this.notes,
     this.opportunityId,
+    this.priceDate,
     this.quoteDate,
     this.validDays,
   });
@@ -31,7 +32,12 @@ class QuotationInput {
   @JsonKey(includeIfNull: false,name: 'opportunity_id')
   final String? opportunityId;
 
-  /// Defaults to today. Prices valid on this date are used.
+  /// Date of the price list used. Defaults to the quote date (on update: unchanged).
+  /// A date before the quote date needs the prices.backdate permission.
+  @JsonKey(includeIfNull: false,name: 'price_date')
+  final DateTime? priceDate;
+
+  /// Defaults to today.
   @JsonKey(includeIfNull: false,name: 'quote_date')
   final DateTime? quoteDate;
 

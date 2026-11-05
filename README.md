@@ -7,8 +7,9 @@ our own processes.
 
 **Stack:** Rust (Axum, SQLx) · PostgreSQL · Flutter (Windows, Android, iOS, web) · Typst for PDFs.
 
-> Status: **vertical slice**. Customers and opportunities, products with five price zones,
-> quotations with revisions and server-side pricing, PDF output, multi-level bills of materials
+> Status: **vertical slice**. Customers and opportunities, products with families and five price
+> zones, customer rebates (product / family / general), net and indicative prices, bulk price
+> changes, quotations with revisions and server-side pricing (incl. earlier price lists), PDF output, multi-level bills of materials
 > with revisions, serial numbers with as-built genealogy, generated Dart API client and a Flutter app.
 > See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the target architecture and roadmap.
 
@@ -49,7 +50,8 @@ cargo run -p traydcraft-api
 
 The API listens on `http://localhost:8080`; interactive API docs are at `/docs`.
 With `SEED_DEV_DATA=true` a demo company is created with users `admin@example.com`,
-`sales@example.com` and `viewer@example.com` (development authentication only).
+`sales@example.com`, `manager@example.com` (sales manager) and `viewer@example.com`
+(development authentication only).
 
 Flutter app:
 

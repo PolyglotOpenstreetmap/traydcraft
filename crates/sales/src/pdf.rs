@@ -57,7 +57,6 @@ pub struct Vat {
 
 pub fn document(company: &Company, q: &Quotation) -> Doc {
     let h = q;
-    let has_customer_discount = !h.customer_discount_percent.is_zero();
     Doc {
         language: h.customer_language.clone(),
         draft: h.status == "draft",
@@ -95,11 +94,13 @@ pub fn document(company: &Company, q: &Quotation) -> Doc {
             .lines
             .iter()
             .map(|l| {
-                // The document shows one combined discount, consistent with the net line total.
-                let combined = if has_customer_discount || !l.line_discount_percent.is_zero() {
+                // The document shows one combined discount (rebate and line discount), consistent
+                // with the net line total. Net-priced lines are marked as such.
+                let combined = if l.pricing_type == "net" {
+                    "net".to_string()
+                } else if !l.rebate_percent.is_zero() || !l.line_discount_percent.is_zero() {
                     let hundred = rust_decimal::Decimal::ONE_HUNDRED;
-                    let factor = (hundred - h.customer_discount_percent)
-                        * (hundred - l.line_discount_percent)
+                    let factor = (hundred - l.rebate_percent) * (hundred - l.line_discount_percent)
                         / hundred;
                     format!("{} %", format_number((hundred - factor).round_dp(2)))
                 } else {

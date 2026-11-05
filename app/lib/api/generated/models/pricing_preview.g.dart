@@ -12,10 +12,12 @@ PricingPreview _$PricingPreviewFromJson(Map<String, dynamic> json) =>
       lines: (json['lines'] as List<dynamic>)
           .map((e) => QuotationLine.fromJson(e as Map<String, dynamic>))
           .toList(),
+      priceDate: DateTime.parse(json['price_date'] as String),
       priceZoneCode: json['price_zone_code'] as String,
       quoteDate: DateTime.parse(json['quote_date'] as String),
       subtotal: json['subtotal'] as String,
       total: json['total'] as String,
+      unconfirmedLines: (json['unconfirmed_lines'] as num).toInt(),
       vatGroups: (json['vat_groups'] as List<dynamic>)
           .map((e) => VatGroup.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -26,10 +28,12 @@ Map<String, dynamic> _$PricingPreviewToJson(PricingPreview instance) =>
     <String, dynamic>{
       'customer_discount_percent': instance.customerDiscountPercent,
       'lines': instance.lines,
+      'price_date': instance.priceDate.toIso8601String(),
       'price_zone_code': instance.priceZoneCode,
       'quote_date': instance.quoteDate.toIso8601String(),
       'subtotal': instance.subtotal,
       'total': instance.total,
+      'unconfirmed_lines': instance.unconfirmedLines,
       'vat_groups': instance.vatGroups,
       'vat_total': instance.vatTotal,
     };

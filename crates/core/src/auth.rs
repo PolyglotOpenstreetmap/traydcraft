@@ -44,10 +44,14 @@ pub enum Permission {
     BomWrite,
     SerialsRead,
     SerialsWrite,
+    /// Create and change customer rebates.
+    RebatesWrite,
+    /// Price a quotation on an earlier price list than its quote date.
+    PricesBackdate,
 }
 
 impl Permission {
-    pub const ALL: [Permission; 13] = [
+    pub const ALL: [Permission; 15] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -61,6 +65,8 @@ impl Permission {
         Permission::BomWrite,
         Permission::SerialsRead,
         Permission::SerialsWrite,
+        Permission::RebatesWrite,
+        Permission::PricesBackdate,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -78,6 +84,8 @@ impl Permission {
             Permission::BomWrite => "bom.write",
             Permission::SerialsRead => "serials.read",
             Permission::SerialsWrite => "serials.write",
+            Permission::RebatesWrite => "rebates.write",
+            Permission::PricesBackdate => "prices.backdate",
         }
     }
 }
@@ -87,6 +95,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
     use Permission::*;
     match role {
         "admin" => true,
+        "sales_manager" => role_grants("sales", p) || matches!(p, RebatesWrite | PricesBackdate),
         "sales" => matches!(
             p,
             CustomersRead
@@ -376,6 +385,16 @@ mod tests {
         for p in Permission::ALL {
             assert_eq!(role_grants("viewer", p), p.as_str().ends_with(".read"));
         }
+    }
+
+    #[test]
+    fn only_managers_change_rebates_or_backdate_prices() {
+        for p in [Permission::RebatesWrite, Permission::PricesBackdate] {
+            assert!(role_grants("sales_manager", p));
+            assert!(role_grants("admin", p));
+            assert!(!role_grants("sales", p));
+        }
+        assert!(role_grants("sales_manager", Permission::QuotationsWrite));
     }
 
     #[test]

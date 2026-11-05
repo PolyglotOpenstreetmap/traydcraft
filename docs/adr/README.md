@@ -16,3 +16,4 @@ accepted one; mark superseded records as such.
 | [0009](0009-pdf-with-typst.md) | PDF documents with Typst | Accepted |
 | [0010](0010-flutter-desktop-first.md) | Flutter, desktop-first for the office | Accepted |
 | [0011](0011-bom-revisions-and-serial-genealogy.md) | BOM revisions and serial-number genealogy | Accepted |
+| [0012](0012-rebates-price-dates-and-price-changes.md) | Rebates, pricing types, price dates and price changes | Accepted |

@@ -8,10 +8,12 @@ import 'package:retrofit/retrofit.dart';
 import '../models/customer.dart';
 import '../models/customer_input.dart';
 import '../models/customer_page.dart';
+import '../models/customer_rebate.dart';
 import '../models/opportunity.dart';
 import '../models/opportunity_input.dart';
 import '../models/opportunity_page.dart';
 import '../models/pipeline_stage.dart';
+import '../models/rebate_input.dart';
 import '../models/stage_input.dart';
 
 part 'crm_client.g.dart';
@@ -42,6 +44,31 @@ abstract class CrmClient {
   Future<Customer> updateCustomer({
     @Path('id') required String id,
     @Body() required CustomerInput body,
+  });
+
+  @GET('/api/v1/customers/{id}/rebates')
+  Future<List<CustomerRebate>> listRebates({
+    @Path('id') required String id,
+  });
+
+  @POST('/api/v1/customers/{id}/rebates')
+  Future<CustomerRebate> createRebate({
+    @Path('id') required String id,
+    @Body() required RebateInput body,
+  });
+
+  @PUT('/api/v1/customers/{id}/rebates/{rebate_id}')
+  Future<CustomerRebate> updateRebate({
+    @Path('id') required String id,
+    @Path('rebate_id') required String rebateId,
+    @Body() required RebateInput body,
+  });
+
+  /// Removes a rebate. Quotations keep the rebate they were priced with.
+  @DELETE('/api/v1/customers/{id}/rebates/{rebate_id}')
+  Future<void> deleteRebate({
+    @Path('id') required String id,
+    @Path('rebate_id') required String rebateId,
   });
 
   /// [q] - Searches number, title and customer name.

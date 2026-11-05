@@ -17,3 +17,8 @@ pub use state::{AppState, DocumentConfig};
 pub fn new_id() -> uuid::Uuid {
     uuid::Uuid::now_v7()
 }
+
+/// Today's date (UTC). Business dates are calendar dates without time zone.
+pub fn today() -> chrono::NaiveDate {
+    chrono::Utc::now().date_naive()
+}

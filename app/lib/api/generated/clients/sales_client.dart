@@ -10,6 +10,8 @@ import '../models/pricing_preview_input.dart';
 import '../models/quotation.dart';
 import '../models/quotation_input.dart';
 import '../models/quotation_page.dart';
+import '../models/repricing_comparison.dart';
+import '../models/revise_input.dart';
 
 part 'sales_client.g.dart';
 
@@ -45,7 +47,7 @@ abstract class SalesClient {
     @Path('id') required String id,
   });
 
-  /// Replaces customer, dates, notes and lines of a draft, repricing everything.
+  /// Replaces customer, dates, notes and lines of a draft, repricing everything at its price date.
   @PUT('/api/v1/quotations/{id}')
   Future<Quotation> updateQuotation({
     @Path('id') required String id,
@@ -67,14 +69,23 @@ abstract class SalesClient {
     @Path('id') required String id,
   });
 
-  /// Creates the next revision as a new draft (same number), repriced at today's prices.
-  /// The revised quotation becomes `superseded`.
-  @POST('/api/v1/quotations/{id}/revise')
-  Future<Quotation> reviseQuotation({
+  /// Compares a quotation with today's price list and rebates, line by line. Changes nothing.
+  @GET('/api/v1/quotations/{id}/repricing')
+  Future<RepricingComparison> repricing({
     @Path('id') required String id,
   });
 
+  /// Creates the next revision as a new draft with the same number; the revised quotation becomes.
+  /// `superseded`. `keep` copies the agreed prices and price list date unchanged; `current` reprices.
+  /// at today's price list and rebates (indicative prices must then be confirmed again).
+  @POST('/api/v1/quotations/{id}/revise')
+  Future<Quotation> reviseQuotation({
+    @Path('id') required String id,
+    @Body() required ReviseInput body,
+  });
+
   /// Freezes the quotation. From now on it can only be accepted, rejected or revised.
+  /// Refused while indicative prices are unconfirmed.
   @POST('/api/v1/quotations/{id}/send')
   Future<Quotation> sendQuotation({
     @Path('id') required String id,

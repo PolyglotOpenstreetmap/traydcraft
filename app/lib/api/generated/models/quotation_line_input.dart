@@ -13,6 +13,7 @@ class QuotationLineInput {
     required this.quantity,
     this.description,
     this.lineDiscountPercent,
+    this.unitPrice,
   });
   
   factory QuotationLineInput.fromJson(Map<String, Object?> json) => _$QuotationLineInputFromJson(json);
@@ -25,6 +26,11 @@ class QuotationLineInput {
   @JsonKey(name: 'product_id')
   final String productId;
   final String quantity;
+
+  /// Confirmed unit price (before rebates) for an indicative product. Indicative lines must be.
+  /// confirmed before the quotation can be sent. Not allowed for other products.
+  @JsonKey(includeIfNull: false,name: 'unit_price')
+  final String? unitPrice;
 
   Map<String, Object?> toJson() => _$QuotationLineInputToJson(this);
 }

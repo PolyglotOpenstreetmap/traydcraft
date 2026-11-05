@@ -14,6 +14,8 @@ class ProductInput {
     required this.vatRate,
     this.active,
     this.description,
+    this.familyId,
+    this.pricingType,
     this.productType,
     this.tracking,
     this.unit,
@@ -26,7 +28,13 @@ class ProductInput {
   final String code;
   @JsonKey(includeIfNull: false)
   final String? description;
+  @JsonKey(includeIfNull: false,name: 'family_id')
+  final String? familyId;
   final String name;
+
+  /// list | net | indicative
+  @JsonKey(includeIfNull: false,name: 'pricing_type')
+  final String? pricingType;
   @JsonKey(includeIfNull: false,name: 'product_type')
   final String? productType;
 

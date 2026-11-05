@@ -17,6 +17,7 @@ const _product = Product(
   productType: 'manufactured',
   vatRate: '21',
   tracking: 'serial',
+  pricingType: 'list',
   active: true,
 );
 

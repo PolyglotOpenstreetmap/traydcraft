@@ -5,8 +5,12 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/bulk_price_change_input.dart';
+import '../models/bulk_price_preview.dart';
 import '../models/price_zone.dart';
 import '../models/product.dart';
+import '../models/product_family.dart';
+import '../models/product_family_input.dart';
 import '../models/product_input.dart';
 import '../models/product_page.dart';
 import '../models/zone_price_entry.dart';
@@ -21,11 +25,39 @@ abstract class ProductsClient {
   @GET('/api/v1/price-zones')
   Future<List<PriceZone>> listPriceZones();
 
+  /// Applies a bulk price change: one new dated price per product and zone.
+  /// Refused if any product already has a price starting on the same date.
+  @POST('/api/v1/prices/bulk/apply')
+  Future<BulkPricePreview> applyBulk({
+    @Body() required BulkPriceChangeInput body,
+  });
+
+  /// Shows what a bulk price change would do, without changing anything.
+  @POST('/api/v1/prices/bulk/preview')
+  Future<BulkPricePreview> previewBulk({
+    @Body() required BulkPriceChangeInput body,
+  });
+
+  @GET('/api/v1/product-families')
+  Future<List<ProductFamily>> listFamilies();
+
+  @POST('/api/v1/product-families')
+  Future<ProductFamily> createFamily({
+    @Body() required ProductFamilyInput body,
+  });
+
+  @PUT('/api/v1/product-families/{id}')
+  Future<ProductFamily> updateFamily({
+    @Path('id') required String id,
+    @Body() required ProductFamilyInput body,
+  });
+
   /// [q] - Searches code and name.
   @GET('/api/v1/products')
   Future<ProductPage> listProducts({
     @Query('q') String? q,
     @Query('active') bool? active,
+    @Query('family_id') String? familyId,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
   });

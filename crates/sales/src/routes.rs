@@ -2,6 +2,7 @@ use axum::extract::{Path, Query, State};
 use axum::http::{header, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use rust_decimal::Decimal;
 use traydcraft_core::company::get_company;
 use traydcraft_core::{audit, AppError, AppResult, AppState, CurrentUser, Permission};
 use utoipa_axum::router::OpenApiRouter;
@@ -17,26 +18,30 @@ type ErrorBody = traydcraft_core::error::ErrorBody;
 /// Prices lines for a customer without saving. The app calls this while the user edits,
 /// so every number on screen comes from the server's pricing engine.
 #[utoipa::path(post, path = "/pricing/preview", tag = "sales", request_body = PricingPreviewInput,
-    responses((status = 200, body = PricingPreview), (status = 422, body = ErrorBody)))]
+    responses((status = 200, body = PricingPreview), (status = 403, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn preview(
     State(state): State<AppState>,
     user: CurrentUser,
     Json(input): Json<PricingPreviewInput>,
 ) -> AppResult<Json<PricingPreview>> {
     user.require(Permission::QuotationsRead)?;
-    let date = input.quote_date.unwrap_or_else(service::today);
+    let quote_date = input.quote_date.unwrap_or_else(service::today);
+    let price_date = input.price_date.unwrap_or(quote_date);
+    service::check_price_date(&user, quote_date, price_date)?;
     let p = service::price_lines(
         &state.db,
         user.company_id,
         input.customer_id,
-        date,
+        price_date,
         &input.lines,
     )
     .await?;
     Ok(Json(PricingPreview {
         price_zone_code: p.customer.price_zone_code.clone(),
         customer_discount_percent: p.customer.discount_percent,
-        quote_date: p.quote_date,
+        quote_date,
+        price_date,
+        unconfirmed_lines: p.unconfirmed_lines(),
         vat_groups: service::vat_groups(&p.totals),
         subtotal: p.totals.subtotal,
         vat_total: p.totals.vat_total,
@@ -106,7 +111,7 @@ async fn get_quotation(
 }
 
 #[utoipa::path(post, path = "/quotations", tag = "sales", request_body = QuotationInput,
-    responses((status = 201, body = Quotation), (status = 422, body = ErrorBody)))]
+    responses((status = 201, body = Quotation), (status = 403, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn create_quotation(
     State(state): State<AppState>,
     user: CurrentUser,
@@ -114,12 +119,14 @@ async fn create_quotation(
 ) -> AppResult<(StatusCode, Json<Quotation>)> {
     user.require(Permission::QuotationsWrite)?;
     service::validate_input(&input)?;
-    let date = input.quote_date.unwrap_or_else(service::today);
+    let quote_date = input.quote_date.unwrap_or_else(service::today);
+    let price_date = input.price_date.unwrap_or(quote_date);
+    let backdated = service::check_price_date(&user, quote_date, price_date)?;
     let priced = service::price_lines(
         &state.db,
         user.company_id,
         input.customer_id,
-        date,
+        price_date,
         &input.lines,
     )
     .await?;
@@ -130,7 +137,7 @@ async fn create_quotation(
         traydcraft_crm::opportunities::link_quotation(&mut tx, &user, opp, input.customer_id)
             .await?;
     }
-    let number = service::allocate_number(&mut tx, user.company_id, date).await?;
+    let number = service::allocate_number(&mut tx, user.company_id, quote_date).await?;
     let id = service::insert_quotation(
         &mut tx,
         &user,
@@ -138,7 +145,8 @@ async fn create_quotation(
             number: &number,
             revision: 1,
             priced: &priced,
-            valid_until: service::valid_until(date, input.valid_days),
+            quote_date,
+            valid_until: service::valid_until(quote_date, input.valid_days),
             notes: &input.notes,
             currency: &company.currency,
             supersedes_id: None,
@@ -155,15 +163,26 @@ async fn create_quotation(
         serde_json::json!({ "number": number }),
     )
     .await?;
+    if backdated {
+        audit::record(
+            &mut tx,
+            &user,
+            "quotation",
+            id,
+            "price_date_backdated",
+            serde_json::json!({ "price_date": price_date }),
+        )
+        .await?;
+    }
     let q = service::load_quotation(&mut tx, user.company_id, id, false).await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(q)))
 }
 
-/// Replaces customer, dates, notes and lines of a draft, repricing everything.
+/// Replaces customer, dates, notes and lines of a draft, repricing everything at its price date.
 #[utoipa::path(put, path = "/quotations/{id}", tag = "sales", params(("id" = Uuid, Path)),
     request_body = QuotationInput,
-    responses((status = 200, body = Quotation), (status = 409, body = ErrorBody)))]
+    responses((status = 200, body = Quotation), (status = 403, body = ErrorBody), (status = 409, body = ErrorBody)))]
 async fn update_quotation(
     State(state): State<AppState>,
     user: CurrentUser,
@@ -184,12 +203,16 @@ async fn update_quotation(
         traydcraft_crm::opportunities::link_quotation(&mut tx, &user, opp, input.customer_id)
             .await?;
     }
-    let date = input.quote_date.unwrap_or(current.quote_date);
+    let quote_date = input.quote_date.unwrap_or(current.quote_date);
+    let price_date = input.price_date.unwrap_or(current.price_date);
+    // Only a change to an earlier price list needs the permission; keeping one is fine.
+    let backdated = price_date != current.price_date
+        && service::check_price_date(&user, quote_date, price_date)?;
     let priced = service::price_lines(
         &state.db,
         user.company_id,
         input.customer_id,
-        date,
+        price_date,
         &input.lines,
     )
     .await?;
@@ -199,7 +222,7 @@ async fn update_quotation(
             customer_street = $5, customer_postal_code = $6, customer_city = $7, customer_country_code = $8,
             customer_language = $9, price_zone_code = $10, customer_discount_percent = $11, quote_date = $12,
             valid_until = $13, notes = $14, subtotal = $15, vat_total = $16, total = $17, opportunity_id = $18,
-            updated_at = now()
+            price_date = $19, updated_at = now()
          WHERE id = $1",
     )
     .bind(id)
@@ -213,13 +236,14 @@ async fn update_quotation(
     .bind(&c.customer.language)
     .bind(&c.price_zone_code)
     .bind(c.discount_percent)
-    .bind(date)
-    .bind(service::valid_until(date, input.valid_days))
+    .bind(quote_date)
+    .bind(service::valid_until(quote_date, input.valid_days))
     .bind(&input.notes)
     .bind(priced.totals.subtotal)
     .bind(priced.totals.vat_total)
     .bind(priced.totals.total)
     .bind(input.opportunity_id)
+    .bind(price_date)
     .execute(&mut *tx)
     .await?;
     sqlx::query("DELETE FROM sales.quotation_lines WHERE quotation_id = $1")
@@ -236,6 +260,17 @@ async fn update_quotation(
         serde_json::json!({}),
     )
     .await?;
+    if backdated {
+        audit::record(
+            &mut tx,
+            &user,
+            "quotation",
+            id,
+            "price_date_backdated",
+            serde_json::json!({ "price_date": price_date }),
+        )
+        .await?;
+    }
     let q = service::load_quotation(&mut tx, user.company_id, id, false).await?;
     tx.commit().await?;
     Ok(Json(q))
@@ -259,6 +294,20 @@ async fn transition(
             from.as_str(),
             to.as_str()
         )));
+    }
+    if to == QuotationStatus::Sent {
+        let unconfirmed: Vec<String> = current
+            .lines
+            .iter()
+            .filter(|l| !l.price_confirmed)
+            .map(|l| format!("line {} ({})", l.position, l.product_code))
+            .collect();
+        if !unconfirmed.is_empty() {
+            return Err(AppError::Validation(format!(
+                "confirm the indicative prices first: {}",
+                unconfirmed.join(", ")
+            )));
+        }
     }
     sqlx::query(
         "UPDATE sales.quotations SET status = $2, updated_at = now(),
@@ -287,8 +336,9 @@ async fn transition(
 }
 
 /// Freezes the quotation. From now on it can only be accepted, rejected or revised.
+/// Refused while indicative prices are unconfirmed.
 #[utoipa::path(post, path = "/quotations/{id}/send", tag = "sales", params(("id" = Uuid, Path)),
-    responses((status = 200, body = Quotation), (status = 409, body = ErrorBody)))]
+    responses((status = 200, body = Quotation), (status = 409, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn send_quotation(
     State(state): State<AppState>,
     user: CurrentUser,
@@ -344,14 +394,64 @@ async fn reject_quotation(
     ))
 }
 
-/// Creates the next revision as a new draft (same number), repriced at today's prices.
-/// The revised quotation becomes `superseded`.
+/// Compares a quotation with today's price list and rebates, line by line. Changes nothing.
+#[utoipa::path(get, path = "/quotations/{id}/repricing", tag = "sales", params(("id" = Uuid, Path)),
+    responses((status = 200, body = RepricingComparison), (status = 422, body = ErrorBody)))]
+async fn repricing(
+    State(state): State<AppState>,
+    user: CurrentUser,
+    Path(id): Path<Uuid>,
+) -> AppResult<Json<RepricingComparison>> {
+    user.require(Permission::QuotationsRead)?;
+    let mut conn = state.db.acquire().await?;
+    let q = service::load_quotation(&mut conn, user.company_id, id, false).await?;
+    drop(conn);
+    let today = service::today();
+    let inputs = service::line_inputs(&q.lines, false)?;
+    let now =
+        service::price_lines(&state.db, user.company_id, q.customer_id, today, &inputs).await?;
+    let lines: Vec<RepricingLine> = q
+        .lines
+        .iter()
+        .zip(&now.lines)
+        .map(|(old, new)| RepricingLine {
+            position: old.position,
+            product_code: old.product_code.clone(),
+            description: old.description.clone(),
+            quantity: old.quantity,
+            pricing_type: new.pricing_type.clone(),
+            old_list_unit_price: old.list_unit_price,
+            new_list_unit_price: new.list_unit_price,
+            old_rebate_percent: old.rebate_percent,
+            new_rebate_percent: new.rebate_percent,
+            old_line_total: old.line_total,
+            new_line_total: new.line_total,
+            difference: new.line_total - old.line_total,
+            needs_confirmation: !new.price_confirmed,
+        })
+        .collect();
+    let old_subtotal: Decimal = q.subtotal;
+    Ok(Json(RepricingComparison {
+        old_price_date: q.price_date,
+        new_price_date: today,
+        lines,
+        old_subtotal,
+        new_subtotal: now.totals.subtotal,
+        difference: now.totals.subtotal - old_subtotal,
+    }))
+}
+
+/// Creates the next revision as a new draft with the same number; the revised quotation becomes
+/// `superseded`. `keep` copies the agreed prices and price list date unchanged; `current` reprices
+/// at today's price list and rebates (indicative prices must then be confirmed again).
 #[utoipa::path(post, path = "/quotations/{id}/revise", tag = "sales", params(("id" = Uuid, Path)),
+    request_body = ReviseInput,
     responses((status = 201, body = Quotation), (status = 409, body = ErrorBody)))]
 async fn revise_quotation(
     State(state): State<AppState>,
     user: CurrentUser,
     Path(id): Path<Uuid>,
+    Json(input): Json<ReviseInput>,
 ) -> AppResult<(StatusCode, Json<Quotation>)> {
     user.require(Permission::QuotationsWrite)?;
     let mut tx = state.db.begin().await?;
@@ -363,64 +463,92 @@ async fn revise_quotation(
             from.as_str()
         )));
     }
-    let lines: Vec<QuotationLineInput> = old
-        .lines
-        .iter()
-        .map(|l| {
-            l.product_id
-                .map(|product_id| QuotationLineInput {
-                    product_id,
-                    quantity: l.quantity,
-                    line_discount_percent: l.line_discount_percent,
-                    description: Some(l.description.clone()),
-                })
-                .ok_or_else(|| AppError::Validation(format!("line {} has no product", l.position)))
-        })
-        .collect::<AppResult<_>>()?;
     if let Some(opp) = old.opportunity_id {
         traydcraft_crm::opportunities::link_quotation(&mut tx, &user, opp, old.customer_id).await?;
     }
-    let date = service::today();
+    let today = service::today();
     let validity = (old.valid_until - old.quote_date).num_days().clamp(1, 365);
-    let priced =
-        service::price_lines(&state.db, user.company_id, old.customer_id, date, &lines).await?;
-    let new_id = service::insert_quotation(
-        &mut tx,
-        &user,
-        NewQuotation {
-            number: &old.number,
-            revision: old.revision + 1,
-            priced: &priced,
-            valid_until: service::valid_until(date, Some(validity)),
-            notes: &old.notes,
-            currency: &old.currency,
-            supersedes_id: Some(id),
-            opportunity_id: old.opportunity_id,
-        },
-    )
-    .await?;
+    let new_id = traydcraft_core::new_id();
+    match input.pricing {
+        RevisionPricing::Keep => {
+            // Copy header and lines verbatim: same prices, rebates and price list date.
+            sqlx::query(
+                "INSERT INTO sales.quotations (
+                    id, company_id, number, revision, status, customer_id, customer_name, customer_vat_number,
+                    customer_street, customer_postal_code, customer_city, customer_country_code, customer_language,
+                    price_zone_code, customer_discount_percent, currency, quote_date, valid_until, notes,
+                    subtotal, vat_total, total, supersedes_id, created_by, opportunity_id, price_date)
+                 SELECT $2, company_id, number, revision + 1, 'draft', customer_id, customer_name,
+                    customer_vat_number, customer_street, customer_postal_code, customer_city,
+                    customer_country_code, customer_language, price_zone_code, customer_discount_percent, currency,
+                    $3, $4, notes, subtotal, vat_total, total, id, $5, opportunity_id, price_date
+                 FROM sales.quotations WHERE id = $1",
+            )
+            .bind(id)
+            .bind(new_id)
+            .bind(today)
+            .bind(service::valid_until(today, Some(validity)))
+            .bind(user.user_id)
+            .execute(&mut *tx)
+            .await?;
+            service::insert_lines(&mut tx, new_id, &old.lines).await?;
+        }
+        RevisionPricing::Current => {
+            let inputs = service::line_inputs(&old.lines, false)?;
+            let priced =
+                service::price_lines(&state.db, user.company_id, old.customer_id, today, &inputs)
+                    .await?;
+            let created = service::insert_quotation(
+                &mut tx,
+                &user,
+                NewQuotation {
+                    number: &old.number,
+                    revision: old.revision + 1,
+                    priced: &priced,
+                    quote_date: today,
+                    valid_until: service::valid_until(today, Some(validity)),
+                    notes: &old.notes,
+                    currency: &old.currency,
+                    supersedes_id: Some(id),
+                    opportunity_id: old.opportunity_id,
+                },
+            )
+            .await?;
+            return finish_revision(tx, &user, id, created, "current").await;
+        }
+    }
+    finish_revision(tx, &user, id, new_id, "keep").await
+}
+
+async fn finish_revision(
+    mut tx: sqlx::Transaction<'_, sqlx::Postgres>,
+    user: &CurrentUser,
+    old_id: Uuid,
+    new_id: Uuid,
+    pricing: &str,
+) -> AppResult<(StatusCode, Json<Quotation>)> {
     sqlx::query(
         "UPDATE sales.quotations SET status = 'superseded', updated_at = now() WHERE id = $1",
     )
-    .bind(id)
+    .bind(old_id)
     .execute(&mut *tx)
     .await?;
     audit::record(
         &mut tx,
-        &user,
+        user,
         "quotation",
-        id,
+        old_id,
         "superseded",
         serde_json::json!({ "by": new_id }),
     )
     .await?;
     audit::record(
         &mut tx,
-        &user,
+        user,
         "quotation",
         new_id,
         "created",
-        serde_json::json!({ "revision_of": id }),
+        serde_json::json!({ "revision_of": old_id, "pricing": pricing }),
     )
     .await?;
     let q = service::load_quotation(&mut tx, user.company_id, new_id, false).await?;
@@ -468,6 +596,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(send_quotation))
         .routes(routes!(accept_quotation))
         .routes(routes!(reject_quotation))
+        .routes(routes!(repricing))
         .routes(routes!(revise_quotation))
         .routes(routes!(quotation_pdf))
 }

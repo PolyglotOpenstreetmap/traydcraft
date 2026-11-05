@@ -12,6 +12,7 @@ QuotationLineInput _$QuotationLineInputFromJson(Map<String, dynamic> json) =>
       quantity: json['quantity'] as String,
       description: json['description'] as String?,
       lineDiscountPercent: json['line_discount_percent'] as String?,
+      unitPrice: json['unit_price'] as String?,
     );
 
 Map<String, dynamic> _$QuotationLineInputToJson(QuotationLineInput instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$QuotationLineInputToJson(QuotationLineInput instance) =>
       'line_discount_percent': ?instance.lineDiscountPercent,
       'product_id': instance.productId,
       'quantity': instance.quantity,
+      'unit_price': ?instance.unitPrice,
     };

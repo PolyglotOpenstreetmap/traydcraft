@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/api.dart';
 import '../../shared/format.dart';
+import 'families_dialog.dart';
 
 const productTypes = ['purchased', 'manufactured', 'configurable', 'service'];
 
@@ -30,6 +31,8 @@ class _ProductFormState extends ConsumerState<ProductForm> {
   late final _vat = TextEditingController(text: number(p?.vatRate ?? '21'));
   late String _type = p?.productType ?? 'purchased';
   late bool _serial = p?.tracking == 'serial';
+  late String? _familyId = p?.familyId;
+  late String _pricing = p?.pricingType ?? 'list';
   late bool _active = p?.active ?? true;
   String? _error;
 
@@ -47,6 +50,8 @@ class _ProductFormState extends ConsumerState<ProductForm> {
       productType: _type,
       vatRate: vat,
       tracking: _serial ? 'serial' : 'none',
+      familyId: _familyId,
+      pricingType: _pricing,
       active: _active,
     );
     try {
@@ -121,6 +126,53 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                   child: TextField(
                     controller: _vat,
                     decoration: const InputDecoration(labelText: 'VAT %'),
+                  ),
+                ),
+              ],
+            ),
+            gap,
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String?>(
+                    initialValue: _familyId,
+                    decoration: const InputDecoration(labelText: 'Family'),
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text('None'),
+                      ),
+                      for (final f
+                          in ref.watch(familiesProvider).value ??
+                              const <ProductFamily>[])
+                        DropdownMenuItem<String?>(
+                          value: f.id,
+                          child: Text('${f.code} · ${f.name}'),
+                        ),
+                    ],
+                    onChanged: (v) => setState(() => _familyId = v),
+                  ),
+                ),
+                gap,
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    initialValue: _pricing,
+                    decoration: const InputDecoration(labelText: 'Pricing'),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'list',
+                        child: Text('List price (rebates apply)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'net',
+                        child: Text('Net price (never discounted)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'indicative',
+                        child: Text('Indicative (confirm per quote)'),
+                      ),
+                    ],
+                    onChanged: (v) => setState(() => _pricing = v!),
                   ),
                 ),
               ],

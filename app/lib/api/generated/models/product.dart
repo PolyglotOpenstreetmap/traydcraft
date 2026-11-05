@@ -14,10 +14,13 @@ class Product {
     required this.description,
     required this.id,
     required this.name,
+    required this.pricingType,
     required this.productType,
     required this.tracking,
     required this.unit,
     required this.vatRate,
+    this.familyCode,
+    this.familyId,
   });
   
   factory Product.fromJson(Map<String, Object?> json) => _$ProductFromJson(json);
@@ -25,8 +28,17 @@ class Product {
   final bool active;
   final String code;
   final String description;
+  @JsonKey(includeIfNull: false,name: 'family_code')
+  final String? familyCode;
+  @JsonKey(includeIfNull: false,name: 'family_id')
+  final String? familyId;
   final String id;
   final String name;
+
+  /// list (rebates apply) | net (fixed net price, never discounted) |.
+  /// indicative (price must be confirmed on each quotation).
+  @JsonKey(name: 'pricing_type')
+  final String pricingType;
 
   /// purchased | manufactured | configurable | service
   @JsonKey(name: 'product_type')

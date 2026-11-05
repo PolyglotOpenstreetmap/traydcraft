@@ -163,6 +163,149 @@ pub fn totals(lines: &[PricedLine]) -> Totals {
     }
 }
 
+// ---------------------------------------------------------------------------------------------
+// Rebates
+// ---------------------------------------------------------------------------------------------
+
+/// How a product is priced.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PricingType {
+    /// List price; customer rebates apply.
+    List,
+    /// Fixed net price; never discounted.
+    Net,
+    /// The list price is a suggestion; the price must be confirmed per quotation.
+    Indicative,
+}
+
+impl PricingType {
+    pub fn parse(s: &str) -> Option<Self> {
+        match s {
+            "list" => Some(PricingType::List),
+            "net" => Some(PricingType::Net),
+            "indicative" => Some(PricingType::Indicative),
+            _ => None,
+        }
+    }
+
+    pub fn as_str(self) -> &'static str {
+        match self {
+            PricingType::List => "list",
+            PricingType::Net => "net",
+            PricingType::Indicative => "indicative",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RebateScope {
+    Product(Uuid),
+    Family(Uuid),
+}
+
+/// A customer rebate for one product or one product family, optionally limited in time.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RebateRule {
+    pub scope: RebateScope,
+    pub percent: Decimal,
+    pub valid_from: Option<NaiveDate>,
+    pub valid_to: Option<NaiveDate>,
+}
+
+impl RebateRule {
+    fn valid_on(&self, date: NaiveDate) -> bool {
+        self.valid_from.is_none_or(|f| f <= date) && self.valid_to.is_none_or(|t| date <= t)
+    }
+}
+
+/// Where the rebate of a line comes from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RebateSource {
+    Product,
+    Family,
+    General,
+    /// Net-priced product: no rebate.
+    Net,
+}
+
+impl RebateSource {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            RebateSource::Product => "product",
+            RebateSource::Family => "family",
+            RebateSource::General => "general",
+            RebateSource::Net => "net",
+        }
+    }
+}
+
+/// The rebate for a product: the most specific rule valid on `date` wins
+/// (product, then family, then the customer's general rebate). Net products get none.
+/// If several rules of the same scope are valid, the one that started last applies.
+pub fn resolve_rebate(
+    rules: &[RebateRule],
+    general_percent: Decimal,
+    product_id: Uuid,
+    family_id: Option<Uuid>,
+    pricing_type: PricingType,
+    date: NaiveDate,
+) -> (Decimal, RebateSource) {
+    if pricing_type == PricingType::Net {
+        return (Decimal::ZERO, RebateSource::Net);
+    }
+    let best = |scope: RebateScope| {
+        rules
+            .iter()
+            .filter(|r| r.scope == scope && r.valid_on(date))
+            .max_by_key(|r| r.valid_from)
+            .map(|r| r.percent)
+    };
+    if let Some(p) = best(RebateScope::Product(product_id)) {
+        return (p, RebateSource::Product);
+    }
+    if let Some(p) = family_id.and_then(|f| best(RebateScope::Family(f))) {
+        return (p, RebateSource::Family);
+    }
+    (general_percent, RebateSource::General)
+}
+
+// ---------------------------------------------------------------------------------------------
+// Bulk price changes
+// ---------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PriceChange {
+    /// Percentage change, e.g. 4.5 for +4.5 %, -2 for -2 %.
+    Percent(Decimal),
+    /// Fixed amount added to the price (may be negative).
+    Amount(Decimal),
+}
+
+/// Applies a price change and rounds to the nearest multiple of `step` (e.g. 0.01, 0.05, 1),
+/// half away from zero. Returns an error if the result would be negative.
+pub fn change_price(
+    base: Decimal,
+    change: PriceChange,
+    step: Decimal,
+) -> Result<Decimal, PricingError> {
+    let raw = match change {
+        PriceChange::Percent(p) => base * (HUNDRED + p) / HUNDRED,
+        PriceChange::Amount(a) => base + a,
+    };
+    let rounded = if step > Decimal::ZERO {
+        (raw / step).round_dp_with_strategy(0, RoundingStrategy::MidpointAwayFromZero) * step
+    } else {
+        raw
+    };
+    if rounded < Decimal::ZERO {
+        return Err(PricingError::NegativePrice);
+    }
+    Ok(rounded.round_dp(4))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -352,6 +495,163 @@ mod tests {
         assert_eq!(
             resolve_zone_price(&prices, zone_b, d("2026-11-05")),
             Some(dec!(90))
+        );
+    }
+
+    // --- rebates -------------------------------------------------------------------------
+
+    const PUMP: Uuid = Uuid::from_u128(10);
+    const PUMPS: Uuid = Uuid::from_u128(20);
+    const UNITS: Uuid = Uuid::from_u128(21);
+
+    fn rule(
+        scope: RebateScope,
+        percent: Decimal,
+        from: Option<&str>,
+        to: Option<&str>,
+    ) -> RebateRule {
+        RebateRule {
+            scope,
+            percent,
+            valid_from: from.map(d),
+            valid_to: to.map(d),
+        }
+    }
+
+    #[test]
+    fn most_specific_rebate_wins() {
+        let rules = vec![
+            rule(RebateScope::Family(PUMPS), dec!(15), None, None),
+            rule(RebateScope::Product(PUMP), dec!(20), None, None),
+        ];
+        let date = d("2026-11-05");
+        assert_eq!(
+            resolve_rebate(&rules, dec!(10), PUMP, Some(PUMPS), PricingType::List, date),
+            (dec!(20), RebateSource::Product)
+        );
+        // Another pump: the family rule applies.
+        let other = Uuid::from_u128(11);
+        assert_eq!(
+            resolve_rebate(
+                &rules,
+                dec!(10),
+                other,
+                Some(PUMPS),
+                PricingType::List,
+                date
+            ),
+            (dec!(15), RebateSource::Family)
+        );
+        // A more specific rule wins even when it is lower.
+        let low = vec![rule(RebateScope::Product(PUMP), dec!(2), None, None)];
+        assert_eq!(
+            resolve_rebate(&low, dec!(10), PUMP, Some(PUMPS), PricingType::List, date),
+            (dec!(2), RebateSource::Product)
+        );
+        // Other family: general rebate.
+        assert_eq!(
+            resolve_rebate(
+                &rules,
+                dec!(10),
+                Uuid::from_u128(12),
+                Some(UNITS),
+                PricingType::List,
+                date
+            ),
+            (dec!(10), RebateSource::General)
+        );
+    }
+
+    #[test]
+    fn net_products_never_get_a_rebate() {
+        let rules = vec![rule(RebateScope::Product(PUMP), dec!(20), None, None)];
+        assert_eq!(
+            resolve_rebate(
+                &rules,
+                dec!(10),
+                PUMP,
+                Some(PUMPS),
+                PricingType::Net,
+                d("2026-11-05")
+            ),
+            (dec!(0), RebateSource::Net)
+        );
+    }
+
+    #[test]
+    fn indicative_products_get_rebates_like_list_products() {
+        assert_eq!(
+            resolve_rebate(
+                &[],
+                dec!(7.5),
+                PUMP,
+                None,
+                PricingType::Indicative,
+                d("2026-11-05")
+            ),
+            (dec!(7.5), RebateSource::General)
+        );
+    }
+
+    #[test]
+    fn rebate_rules_respect_validity_dates() {
+        let rules = vec![
+            rule(
+                RebateScope::Family(PUMPS),
+                dec!(12),
+                Some("2026-01-01"),
+                Some("2026-06-30"),
+            ),
+            rule(
+                RebateScope::Family(PUMPS),
+                dec!(14),
+                Some("2026-07-01"),
+                None,
+            ),
+        ];
+        let at = |date| {
+            resolve_rebate(
+                &rules,
+                dec!(5),
+                PUMP,
+                Some(PUMPS),
+                PricingType::List,
+                d(date),
+            )
+        };
+        assert_eq!(at("2025-12-31"), (dec!(5), RebateSource::General));
+        assert_eq!(at("2026-03-01"), (dec!(12), RebateSource::Family));
+        assert_eq!(at("2026-06-30"), (dec!(12), RebateSource::Family));
+        assert_eq!(at("2026-07-01"), (dec!(14), RebateSource::Family));
+    }
+
+    // --- bulk price changes --------------------------------------------------------------
+
+    #[test]
+    fn price_changes_round_to_the_step() {
+        assert_eq!(
+            change_price(dec!(100), PriceChange::Percent(dec!(4.5)), dec!(0.01)),
+            Ok(dec!(104.50))
+        );
+        assert_eq!(
+            change_price(dec!(12.40), PriceChange::Percent(dec!(3)), dec!(0.05)),
+            Ok(dec!(12.75))
+        ); // 12.772
+        assert_eq!(
+            change_price(dec!(3880), PriceChange::Percent(dec!(2.7)), dec!(1)),
+            Ok(dec!(3985))
+        ); // 3984.76
+        assert_eq!(
+            change_price(dec!(9.99), PriceChange::Amount(dec!(0.5)), dec!(0.01)),
+            Ok(dec!(10.49))
+        );
+        assert_eq!(
+            change_price(dec!(10), PriceChange::Percent(dec!(-10)), dec!(0.01)),
+            Ok(dec!(9.00))
+        );
+        assert_eq!(
+            change_price(dec!(1), PriceChange::Amount(dec!(-2)), dec!(0.01)),
+            Err(PricingError::NegativePrice)
         );
     }
 }

@@ -28,6 +28,7 @@ utoipa-axum.workspace = true
 utoipa-scalar.workspace = true
 
 [dev-dependencies]
+chrono.workspace = true
 http-body-util = "0.1"
 rust_decimal.workspace = true
 serde.workspace = true

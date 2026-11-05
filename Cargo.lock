@@ -2485,6 +2485,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "axum",
+ "chrono",
  "http-body-util",
  "rust_decimal",
  "serde",
@@ -2537,6 +2538,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "traydcraft-core",
+ "traydcraft-pricing",
  "utoipa",
  "utoipa-axum",
  "uuid",

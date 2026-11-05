@@ -38,6 +38,7 @@ class EntityList<T> extends StatefulWidget {
     this.onCreate,
     this.createLabel = 'New',
     this.filters,
+    this.actions = const [],
   });
 
   final String title;
@@ -47,6 +48,9 @@ class EntityList<T> extends StatefulWidget {
   final Future<bool?> Function()? onCreate;
   final String createLabel;
   final Widget? filters;
+
+  /// Extra buttons next to the create button.
+  final List<Widget> actions;
 
   @override
   State<EntityList<T>> createState() => EntityListState<T>();
@@ -122,6 +126,8 @@ class EntityListState<T> extends State<EntityList<T>> {
             children: [
               Text(widget.title, style: theme.textTheme.headlineSmall),
               const Spacer(),
+              for (final a in widget.actions)
+                Padding(padding: const EdgeInsets.only(right: 8), child: a),
               if (widget.onCreate != null)
                 FilledButton.icon(
                   onPressed: () => _after(widget.onCreate!()),

@@ -30,6 +30,7 @@ class Quotation {
     required this.lines,
     required this.notes,
     required this.number,
+    required this.priceDate,
     required this.priceZoneCode,
     required this.quoteDate,
     required this.revision,
@@ -79,6 +80,8 @@ class Quotation {
   final String number;
   @JsonKey(includeIfNull: false,name: 'opportunity_id')
   final String? opportunityId;
+  @JsonKey(name: 'price_date')
+  final DateTime priceDate;
   @JsonKey(name: 'price_zone_code')
   final String priceZoneCode;
   @JsonKey(name: 'quote_date')

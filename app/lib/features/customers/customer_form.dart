@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/api.dart';
 import '../../shared/format.dart';
+import 'rebates_dialog.dart';
 
 /// Shows the customer form; returns true when saved.
 Future<bool?> showCustomerForm(
@@ -204,7 +205,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                       width: 110,
                       child: _field(
                         _discount,
-                        'Discount %',
+                        'General rebate %',
                         check: (s) =>
                             parseDecimalInput(s.isEmpty ? '0' : s) == null
                             ? 'Number'
@@ -237,6 +238,15 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
         ),
       ),
       actions: [
+        if (c != null)
+          TextButton.icon(
+            icon: const Icon(Icons.percent),
+            label: const Text('Product rebates'),
+            onPressed: () => showDialog<void>(
+              context: context,
+              builder: (_) => RebatesDialog(customer: c!),
+            ),
+          ),
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(widget.readOnly ? 'Close' : 'Cancel'),

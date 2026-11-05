@@ -13,6 +13,7 @@ class PricingPreviewInput {
   const PricingPreviewInput({
     required this.customerId,
     required this.lines,
+    this.priceDate,
     this.quoteDate,
   });
   
@@ -21,6 +22,10 @@ class PricingPreviewInput {
   @JsonKey(name: 'customer_id')
   final String customerId;
   final List<QuotationLineInput> lines;
+
+  /// Price list date; defaults to the quote date.
+  @JsonKey(includeIfNull: false,name: 'price_date')
+  final DateTime? priceDate;
   @JsonKey(includeIfNull: false,name: 'quote_date')
   final DateTime? quoteDate;
 

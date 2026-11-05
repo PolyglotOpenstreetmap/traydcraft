@@ -130,13 +130,13 @@ async fn sent_quotation_is_a_frozen_snapshot(db: PgPool) {
         "3880".parse().unwrap()
     );
 
-    // A revision keeps the number, reprices at today's price and supersedes the original.
+    // A revision at current prices keeps the number, reprices and supersedes the original.
     let (status, rev) = call(
         &app,
         "sales@example.com",
         Method::POST,
         &format!("/api/v1/quotations/{id}/revise"),
-        None,
+        Some(json!({ "pricing": "current" })),
     )
     .await;
     assert_eq!(status, StatusCode::CREATED, "{rev}");

@@ -15,10 +15,12 @@ class PricingPreview {
   const PricingPreview({
     required this.customerDiscountPercent,
     required this.lines,
+    required this.priceDate,
     required this.priceZoneCode,
     required this.quoteDate,
     required this.subtotal,
     required this.total,
+    required this.unconfirmedLines,
     required this.vatGroups,
     required this.vatTotal,
   });
@@ -28,12 +30,18 @@ class PricingPreview {
   @JsonKey(name: 'customer_discount_percent')
   final String customerDiscountPercent;
   final List<QuotationLine> lines;
+  @JsonKey(name: 'price_date')
+  final DateTime priceDate;
   @JsonKey(name: 'price_zone_code')
   final String priceZoneCode;
   @JsonKey(name: 'quote_date')
   final DateTime quoteDate;
   final String subtotal;
   final String total;
+
+  /// Indicative prices still to confirm; the quotation cannot be sent while this is not 0.
+  @JsonKey(name: 'unconfirmed_lines')
+  final int unconfirmedLines;
   @JsonKey(name: 'vat_groups')
   final List<VatGroup> vatGroups;
   @JsonKey(name: 'vat_total')

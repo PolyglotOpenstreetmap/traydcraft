@@ -4,6 +4,7 @@
 //! and never query `crm.*` tables directly.
 
 pub mod opportunities;
+pub mod rebates;
 
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
@@ -360,4 +361,5 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list_customers, create_customer))
         .routes(routes!(get_customer_handler, update_customer))
         .merge(opportunities::router())
+        .merge(rebates::router())
 }
