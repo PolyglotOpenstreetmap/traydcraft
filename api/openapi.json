@@ -534,6 +534,47 @@
         }
       }
     },
+    "/api/v1/helpdesk/inbound": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Imports a raw e-mail (RFC 5322, e.g. a saved .eml file) as if it had arrived in the mailbox.",
+        "operationId": "inbound",
+        "requestBody": {
+          "content": {
+            "message/rfc822": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InboundResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -854,6 +895,278 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "operationId": "list_orders",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches order number, quotation number, customer name and customer reference.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "operationId": "get_order",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prepared-answers": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "list_answers",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches code, name and texts.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PreparedAnswer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "create_answer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreparedAnswerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreparedAnswer"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prepared-answers/placeholders": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Placeholders that can be used in prepared answers, e.g. `{{quotation.number}}`.",
+        "operationId": "placeholders",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prepared-answers/{id}": {
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "update_answer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreparedAnswerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreparedAnswer"
                 }
               }
             }
@@ -1906,6 +2219,58 @@
         }
       }
     },
+    "/api/v1/quotations/{id}/convert": {
+      "post": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Converts a sent or accepted quotation revision into a sales order.",
+        "operationId": "convert",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/quotations/{id}/pdf": {
       "get": {
         "tags": [
@@ -2456,10 +2821,686 @@
           }
         }
       }
+    },
+    "/api/v1/tickets": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "list_tickets",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches number, subject, contact and customer.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "A status, or `active` for everything not closed.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "description": "`me` for my tickets, `none` for unassigned, or a user id.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketPage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "create_ticket",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTicketInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/production-question": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Production asks a question about an order. It becomes an internal ticket for the salesperson,\nin the customer's language, so they can ask the customer and report back in a note.",
+        "operationId": "production_question",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductionQuestionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "get_ticket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "update_ticket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/convert": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "The customer confirmed the linked quotation: convert it into a sales order.\nIf the customer asked for changes, revise the quotation first and link the new revision.",
+        "operationId": "convert",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertTicketInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/lead": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Turns the ticket into a sales lead: creates an opportunity for its customer and links it.",
+        "operationId": "create_lead",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/notes": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Adds an internal note: never sent to the customer.",
+        "operationId": "add_note",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/prepared-answers/{answer_id}/render": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Fills in a prepared answer for a ticket, in the ticket's language. Nothing is sent.",
+        "operationId": "render_answer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "answer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenderedAnswer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/replies": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Queues an e-mail to the customer. The worker sends it; delivery status shows on the article.",
+        "operationId": "reply",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "core"
+        ],
+        "operationId": "list_users",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyUser"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AnswerText": {
+        "type": "object",
+        "required": [
+          "language",
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "description": "nl | fr | en | de | es"
+          },
+          "subject": {
+            "type": "string"
+          }
+        }
+      },
+      "Article": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "from_address",
+          "from_name",
+          "to_addresses",
+          "cc_addresses",
+          "subject",
+          "body",
+          "created_at"
+        ],
+        "properties": {
+          "author_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "author_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "cc_addresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "delivery": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "For outgoing e-mail: queued | sent | failed"
+          },
+          "delivery_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "from_address": {
+            "type": "string"
+          },
+          "from_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "email_in | email_out | note"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sent_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "to_addresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "AttachInput": {
         "type": "object",
         "required": [
@@ -2828,7 +3869,8 @@
           "postal_code",
           "city",
           "country_code",
-          "currency"
+          "currency",
+          "default_language"
         ],
         "properties": {
           "city": {
@@ -2838,6 +3880,9 @@
             "type": "string"
           },
           "currency": {
+            "type": "string"
+          },
+          "default_language": {
             "type": "string"
           },
           "email": {
@@ -2876,6 +3921,34 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "CompanyUser": {
+        "type": "object",
+        "description": "A colleague in the active company (for assigning tickets, owners, ...).",
+        "required": [
+          "id",
+          "display_name",
+          "email",
+          "roles"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -2918,6 +3991,30 @@
             ]
           },
           "serial_number": {
+            "type": "string"
+          }
+        }
+      },
+      "ConvertInput": {
+        "type": "object",
+        "properties": {
+          "customer_reference": {
+            "type": "string",
+            "description": "The customer's purchase order number or reference."
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "ConvertTicketInput": {
+        "type": "object",
+        "properties": {
+          "customer_reference": {
+            "type": "string",
+            "description": "The customer's purchase order number or reference."
+          },
+          "notes": {
             "type": "string"
           }
         }
@@ -3293,6 +4390,48 @@
           }
         }
       },
+      "InboundResult": {
+        "type": "object",
+        "required": [
+          "ticket_id",
+          "ticket_number",
+          "new_ticket",
+          "duplicate"
+        ],
+        "properties": {
+          "duplicate": {
+            "type": "boolean"
+          },
+          "new_ticket": {
+            "type": "boolean"
+          },
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticket_number": {
+            "type": "string"
+          }
+        }
+      },
+      "LeadInput": {
+        "type": "object",
+        "properties": {
+          "expected_value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to the ticket subject."
+          }
+        }
+      },
       "Me": {
         "type": "object",
         "description": "The authenticated user, the active company and all companies they can switch to.",
@@ -3379,6 +4518,67 @@
           },
           "notes": {
             "type": "string"
+          }
+        }
+      },
+      "NewTicketInput": {
+        "type": "object",
+        "description": "A ticket opened by hand (phone call, visit, internal question).",
+        "required": [
+          "subject",
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string",
+            "description": "First internal note (what was asked)."
+          },
+          "category": {
+            "type": "string"
+          },
+          "contact_email": {
+            "type": "string"
+          },
+          "contact_name": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "internal": {
+            "type": "boolean"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to the customer's language, else the company's."
+          },
+          "subject": {
+            "type": "string"
+          }
+        }
+      },
+      "NoteInput": {
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "New ticket status; unchanged when omitted."
           }
         }
       },
@@ -3543,6 +4743,189 @@
           "lost"
         ]
       },
+      "Order": {
+        "type": "object",
+        "required": [
+          "order",
+          "vat_total",
+          "notes",
+          "created_at",
+          "lines"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLine"
+            }
+          },
+          "notes": {
+            "type": "string"
+          },
+          "order": {
+            "$ref": "#/components/schemas/OrderSummary"
+          },
+          "vat_total": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderLine": {
+        "type": "object",
+        "required": [
+          "position",
+          "product_code",
+          "description",
+          "unit",
+          "quantity",
+          "list_unit_price",
+          "rebate_percent",
+          "line_discount_percent",
+          "net_unit_price",
+          "line_total",
+          "vat_rate"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "line_discount_percent": {
+            "type": "string"
+          },
+          "line_total": {
+            "type": "string"
+          },
+          "list_unit_price": {
+            "type": "string"
+          },
+          "net_unit_price": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "rebate_percent": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "vat_rate": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderSummary"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "OrderSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "quotation_id",
+          "quotation_number",
+          "quotation_revision",
+          "customer_id",
+          "customer_name",
+          "customer_reference",
+          "order_date",
+          "currency",
+          "subtotal",
+          "total",
+          "salesperson_id",
+          "salesperson_name"
+        ],
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "customer_reference": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "order_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "quotation_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quotation_number": {
+            "type": "string"
+          },
+          "quotation_revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "salesperson_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "salesperson_name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "confirmed | cancelled"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
       "PipelineStage": {
         "type": "object",
         "required": [
@@ -3565,6 +4948,81 @@
           "weighted_value": {
             "type": "string",
             "description": "Sum of expected value × probability."
+          }
+        }
+      },
+      "PreparedAnswer": {
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "active",
+          "updated_at",
+          "texts"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "description": "Short code to find the answer quickly, e.g. `order-confirmed`."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "texts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnswerText"
+            }
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PreparedAnswerInput": {
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "texts"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "texts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnswerText"
+            },
+            "description": "At least one language; missing languages fall back to English, then any other."
           }
         }
       },
@@ -3860,6 +5318,27 @@
           "total": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "ProductionQuestionInput": {
+        "type": "object",
+        "description": "A question from production about an order, routed to the salesperson who sold it.",
+        "required": [
+          "order_id",
+          "subject",
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subject": {
+            "type": "string"
           }
         }
       },
@@ -4328,6 +5807,74 @@
           }
         }
       },
+      "RenderedAnswer": {
+        "type": "object",
+        "required": [
+          "answer_id",
+          "language",
+          "fallback",
+          "subject",
+          "body"
+        ],
+        "properties": {
+          "answer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "body": {
+            "type": "string"
+          },
+          "fallback": {
+            "type": "boolean",
+            "description": "True when no text exists in the ticket's language and another language was used."
+          },
+          "language": {
+            "type": "string",
+            "description": "Language of the text used."
+          },
+          "subject": {
+            "type": "string"
+          }
+        }
+      },
+      "ReplyInput": {
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "New ticket status; defaults to pending_customer."
+          },
+          "subject": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to \"Re: <ticket subject>\". The ticket tag is always added."
+          },
+          "to": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Defaults to the ticket's contact e-mail."
+          }
+        }
+      },
       "RepricingComparison": {
         "type": "object",
         "description": "What would change if a quotation were repriced at today's prices.",
@@ -4729,6 +6276,271 @@
           }
         }
       },
+      "Ticket": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "subject",
+          "status",
+          "priority",
+          "category",
+          "language",
+          "contact_name",
+          "contact_email",
+          "internal",
+          "article_count",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "article_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "category": {
+            "type": "string",
+            "description": "question | lead | quote_change | order_confirmation | production_question | service | complaint | other"
+          },
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "contact_email": {
+            "type": "string"
+          },
+          "contact_name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_response_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "internal": {
+            "type": "boolean"
+          },
+          "language": {
+            "type": "string",
+            "description": "nl | fr | en | de | es — the language to answer in."
+          },
+          "number": {
+            "type": "string"
+          },
+          "opportunity_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "opportunity_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "order_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "order_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "priority": {
+            "type": "string",
+            "description": "low | normal | high | urgent"
+          },
+          "quotation_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "quotation_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "quotation_revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "quotation_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "new | open | pending_customer | pending_internal | closed"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "suggested_category": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What the system guessed from the last incoming e-mail."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TicketDetail": {
+        "type": "object",
+        "required": [
+          "ticket",
+          "articles"
+        ],
+        "properties": {
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Article"
+            }
+          },
+          "ticket": {
+            "$ref": "#/components/schemas/Ticket"
+          }
+        }
+      },
+      "TicketInput": {
+        "type": "object",
+        "description": "Full update of the ticket's fields and links.",
+        "required": [
+          "subject",
+          "status",
+          "priority",
+          "category",
+          "language"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "contact_email": {
+            "type": "string"
+          },
+          "contact_name": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "language": {
+            "type": "string"
+          },
+          "opportunity_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "owner_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "quotation_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          }
+        }
+      },
+      "TicketPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ticket"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "VatGroup": {
         "type": "object",
         "required": [
@@ -4830,11 +6642,15 @@
     },
     {
       "name": "sales",
-      "description": "Quotations and pricing"
+      "description": "Quotations, pricing and orders"
     },
     {
       "name": "engineering",
       "description": "Bills of materials and serial numbers"
+    },
+    {
+      "name": "helpdesk",
+      "description": "Tickets, e-mail and prepared answers"
     }
   ]
 }

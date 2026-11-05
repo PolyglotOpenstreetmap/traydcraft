@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["apps/api", "crates/*"]
+members = ["apps/*", "crates/*"]
 
 [workspace.package]
 version = "0.1.0"
@@ -16,6 +16,7 @@ traydcraft-products = { path = "crates/products" }
 traydcraft-sales = { path = "crates/sales" }
 traydcraft-documents = { path = "crates/documents" }
 traydcraft-engineering = { path = "crates/engineering" }
+traydcraft-helpdesk = { path = "crates/helpdesk" }
 
 anyhow = "1"
 axum = { version = "0.8", features = ["macros"] }

@@ -44,6 +44,8 @@ pub struct Line {
     pub unit: String,
     pub unit_price: String,
     pub discount: String,
+    /// Net-priced line: the template prints its own word for "net".
+    pub net: bool,
     pub vat_rate: String,
     pub total: String,
 }
@@ -97,7 +99,7 @@ pub fn document(company: &Company, q: &Quotation) -> Doc {
                 // The document shows one combined discount (rebate and line discount), consistent
                 // with the net line total. Net-priced lines are marked as such.
                 let combined = if l.pricing_type == "net" {
-                    "net".to_string()
+                    String::new()
                 } else if !l.rebate_percent.is_zero() || !l.line_discount_percent.is_zero() {
                     let hundred = rust_decimal::Decimal::ONE_HUNDRED;
                     let factor = (hundred - l.rebate_percent) * (hundred - l.line_discount_percent)
@@ -113,6 +115,7 @@ pub fn document(company: &Company, q: &Quotation) -> Doc {
                     unit: l.unit.clone(),
                     unit_price: format_unit_price(l.list_unit_price),
                     discount: combined,
+                    net: l.pricing_type == "net",
                     vat_rate: format!("{} %", format_number(l.vat_rate)),
                     total: format_amount(l.line_total),
                 }

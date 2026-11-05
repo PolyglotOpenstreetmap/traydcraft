@@ -3,24 +3,32 @@
 #let d = json("data.json")
 
 #let labels = (
-  nl: (title: "Offerte", number: "Nummer", revision: "Revisie", date: "Datum", valid: "Geldig tot",
+  nl: (net: "netto", title: "Offerte", number: "Nummer", revision: "Revisie", date: "Datum", valid: "Geldig tot",
        vat: "BTW", code: "Code", description: "Omschrijving", qty: "Aantal", price: "Eenheidsprijs",
        discount: "Korting", total: "Totaal", subtotal: "Totaal excl. BTW", vat_on: "BTW op",
        grand: "Totaal incl. BTW", notes: "Opmerkingen", draft: "CONCEPT", page: "Pagina"),
-  fr: (title: "Offre de prix", number: "Numéro", revision: "Révision", date: "Date", valid: "Valable jusqu'au",
+  fr: (net: "net", title: "Offre de prix", number: "Numéro", revision: "Révision", date: "Date", valid: "Valable jusqu'au",
        vat: "TVA", code: "Code", description: "Description", qty: "Quantité", price: "Prix unitaire",
        discount: "Remise", total: "Total", subtotal: "Total HTVA", vat_on: "TVA sur",
        grand: "Total TVAC", notes: "Remarques", draft: "BROUILLON", page: "Page"),
-  en: (title: "Quotation", number: "Number", revision: "Revision", date: "Date", valid: "Valid until",
+  en: (net: "net", title: "Quotation", number: "Number", revision: "Revision", date: "Date", valid: "Valid until",
        vat: "VAT", code: "Code", description: "Description", qty: "Qty", price: "Unit price",
        discount: "Discount", total: "Total", subtotal: "Total excl. VAT", vat_on: "VAT on",
        grand: "Total incl. VAT", notes: "Notes", draft: "DRAFT", page: "Page"),
+  de: (net: "netto", title: "Angebot", number: "Nummer", revision: "Revision", date: "Datum", valid: "Gültig bis",
+       vat: "MwSt.", code: "Artikel", description: "Beschreibung", qty: "Menge", price: "Einzelpreis",
+       discount: "Rabatt", total: "Gesamt", subtotal: "Summe netto", vat_on: "MwSt. auf",
+       grand: "Gesamtbetrag brutto", notes: "Bemerkungen", draft: "ENTWURF", page: "Seite"),
+  es: (net: "neto", title: "Presupuesto", number: "Número", revision: "Revisión", date: "Fecha", valid: "Válido hasta",
+       vat: "IVA", code: "Código", description: "Descripción", qty: "Cantidad", price: "Precio unitario",
+       discount: "Descuento", total: "Total", subtotal: "Base imponible", vat_on: "IVA sobre",
+       grand: "Total IVA incl.", notes: "Observaciones", draft: "BORRADOR", page: "Página"),
 )
 #let l = labels.at(d.language, default: labels.en)
 #let cur = if d.currency == "EUR" { "€" } else { d.currency }
 
 #set document(title: l.title + " " + d.number)
-#set text(size: 9.5pt, lang: if d.language in ("nl", "fr") { d.language } else { "en" })
+#set text(size: 9.5pt, lang: if d.language in ("nl", "fr", "de", "es") { d.language } else { "en" })
 #set page(
   paper: "a4",
   margin: (x: 18mm, top: 18mm, bottom: 22mm),
@@ -77,7 +85,7 @@
     [*#l.code*], [*#l.description*], [*#l.qty*], [*#l.price*], [*#l.discount*], [*#l.vat*], [*#l.total*],
   ),
   ..d.lines.map(x => (
-    x.code, x.description, [#x.quantity #x.unit], [#cur #x.unit_price], x.discount, x.vat_rate, [#cur #x.total],
+    x.code, x.description, [#x.quantity #x.unit], [#cur #x.unit_price], if x.net { l.net } else { x.discount }, x.vat_rate, [#cur #x.total],
   )).flatten()
 )
 

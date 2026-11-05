@@ -6,6 +6,7 @@ import '../../app/api.dart';
 import '../../shared/actions.dart';
 import '../../shared/format.dart';
 import 'opportunity_form.dart';
+import '../../l10n/l10n.dart';
 
 final _opportunityProvider = FutureProvider.autoDispose
     .family<Opportunity, String>(
@@ -108,11 +109,15 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                     '${o.number}  ${o.title}',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  Chip(label: Text(o.stage.json ?? '')),
+                  Chip(
+                    label: Text(
+                      context.l10n.opportunityStage(o.stage.json ?? ''),
+                    ),
+                  ),
                   if (canWrite)
                     OutlinedButton.icon(
                       icon: const Icon(Icons.edit),
-                      label: const Text('Edit'),
+                      label: Text(context.l10n.edit),
                       onPressed: () async {
                         if (await showOpportunityForm(
                               context,
@@ -126,7 +131,7 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                   if (canQuote && !closed)
                     FilledButton.icon(
                       icon: const Icon(Icons.request_quote_outlined),
-                      label: const Text('New quotation'),
+                      label: Text(context.l10n.newQuotation),
                       onPressed: () async {
                         await context.push(
                           '/quotations/new?customer=${o.customerId}&opportunity=${o.id}',
@@ -139,19 +144,22 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
               const SizedBox(height: 16),
               Wrap(
                 children: [
-                  InfoItem('Customer', o.customerName),
-                  InfoItem('Owner', o.ownerName),
-                  InfoItem('Expected value', money(o.expectedValue)),
-                  InfoItem('Probability', '${o.probability} %'),
-                  InfoItem('Expected close', date(o.expectedClose)),
+                  InfoItem(context.l10n.customer, o.customerName),
+                  InfoItem(context.l10n.owner, o.ownerName),
+                  InfoItem(context.l10n.expectedValue, money(o.expectedValue)),
+                  InfoItem(context.l10n.probability, '${o.probability} %'),
+                  InfoItem(context.l10n.expectedClose, date(o.expectedClose)),
                   if (o.lostReason != null)
-                    InfoItem('Lost reason', o.lostReason!),
+                    InfoItem(context.l10n.lostReason, o.lostReason!),
                 ],
               ),
               if (o.notes.isNotEmpty) Text(o.notes),
               if (canWrite) ...[
                 const SizedBox(height: 16),
-                Text('Stage', style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                  context.l10n.stage,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -160,7 +168,10 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                     SegmentedButton<OpportunityStage>(
                       segments: [
                         for (final s in _openStages)
-                          ButtonSegment(value: s, label: Text(s.json!)),
+                          ButtonSegment(
+                            value: s,
+                            label: Text(context.l10n.opportunityStage(s.json!)),
+                          ),
                       ],
                       selected: {if (_openStages.contains(o.stage)) o.stage},
                       emptySelectionAllowed: true,
@@ -171,7 +182,7 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                       onPressed: o.stage == OpportunityStage.won
                           ? null
                           : () => setStage(OpportunityStage.won),
-                      child: const Text('Won'),
+                      child: Text(context.l10n.won),
                     ),
                     FilledButton.tonal(
                       onPressed: o.stage == OpportunityStage.lost
@@ -179,8 +190,8 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                           : () async {
                               final reason = await askText(
                                 context,
-                                title: 'Mark as lost',
-                                label: 'Reason',
+                                title: context.l10n.markAsLost,
+                                label: context.l10n.reason,
                               );
                               if (reason != null && reason.isNotEmpty) {
                                 await setStage(
@@ -189,14 +200,14 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                                 );
                               }
                             },
-                      child: const Text('Lost'),
+                      child: Text(context.l10n.lost),
                     ),
                   ],
                 ),
               ],
               const SizedBox(height: 24),
               Text(
-                'Quotations',
+                context.l10n.quotations,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               ref
@@ -205,9 +216,9 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                     loading: () => const LinearProgressIndicator(),
                     error: (e, _) => Text(errorMessage(e)),
                     data: (page) => page.items.isEmpty
-                        ? const Padding(
+                        ? Padding(
                             padding: EdgeInsets.all(8),
-                            child: Text('No quotations yet.'),
+                            child: Text(context.l10n.noQuotations),
                           )
                         : Column(
                             children: [
@@ -217,7 +228,7 @@ class _OpportunityScreenState extends ConsumerState<OpportunityScreen> {
                                     '${q.number}  rev. ${q.revision}',
                                   ),
                                   subtitle: Text(
-                                    '${q.status.json} · ${date(q.quoteDate)}',
+                                    '${context.l10n.quotationStatus(q.status.json ?? '')} · ${date(q.quoteDate)}',
                                   ),
                                   trailing: Text(
                                     money(q.subtotal, currency: q.currency),

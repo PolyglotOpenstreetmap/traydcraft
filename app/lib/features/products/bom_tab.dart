@@ -5,6 +5,7 @@ import '../../app/api.dart';
 import '../../shared/actions.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
+import '../../l10n/l10n.dart';
 
 /// An editable line of a draft BOM.
 class _EditLine {
@@ -116,7 +117,7 @@ class _BomTabState extends ConsumerState<BomTab> {
       final s = parseDecimalInput(l.scrap.text.isEmpty ? '0' : l.scrap.text);
       if (q == null || s == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Line ${i + 1}: enter valid numbers.')),
+          SnackBar(content: Text(context.l10n.enterValidNumbersLine(i + 1))),
         );
         return false;
       }
@@ -135,7 +136,7 @@ class _BomTabState extends ConsumerState<BomTab> {
         id: _bom!.id,
         body: BomInput(notes: _notes.text, lines: lines),
       ),
-      success: 'Draft saved',
+      success: context.l10n.draftSaved,
     );
     if (ok) setState(() => _setBom(saved));
     return ok;
@@ -147,7 +148,7 @@ class _BomTabState extends ConsumerState<BomTab> {
     final ok = await runAction(
       context,
       () => _api.engineering.activateBom(id: _bom!.id),
-      success: 'Revision activated',
+      success: context.l10n.revisionActivated,
     );
     if (ok) {
       _explosion = null;
@@ -188,7 +189,7 @@ class _BomTabState extends ConsumerState<BomTab> {
           runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            if (_revisions.isEmpty) const Text('No bill of materials yet.'),
+            if (_revisions.isEmpty) Text(context.l10n.noBom),
             if (_revisions.isNotEmpty)
               DropdownButton<String>(
                 value: _bom?.id,
@@ -197,7 +198,11 @@ class _BomTabState extends ConsumerState<BomTab> {
                     DropdownMenuItem(
                       value: r.id,
                       child: Text(
-                        'Revision ${r.revision} · ${r.status} · ${r.lineCount} lines',
+                        context.l10n.revisionItem(
+                          r.revision,
+                          context.l10n.bomStatus(r.status),
+                          r.lineCount,
+                        ),
                       ),
                     ),
                 ],
@@ -207,18 +212,18 @@ class _BomTabState extends ConsumerState<BomTab> {
               OutlinedButton.icon(
                 onPressed: _newRevision,
                 icon: const Icon(Icons.add),
-                label: const Text('New revision'),
+                label: Text(context.l10n.newRevision),
               ),
             if (canWrite && _isDraft) ...[
               OutlinedButton.icon(
                 onPressed: _saveDraft,
                 icon: const Icon(Icons.save),
-                label: const Text('Save draft'),
+                label: Text(context.l10n.saveDraft),
               ),
               FilledButton.icon(
                 onPressed: _activate,
                 icon: const Icon(Icons.check),
-                label: const Text('Activate'),
+                label: Text(context.l10n.activate),
               ),
             ],
           ],
@@ -229,7 +234,7 @@ class _BomTabState extends ConsumerState<BomTab> {
             Text(
               _bom!.status == 'active'
                   ? 'Active since ${date(_bom!.activatedAt)}. Changes go through a new revision.'
-                  : 'Obsolete revision (read-only).',
+                  : context.l10n.obsoleteRevision,
               style: theme.textTheme.bodySmall,
             ),
           const SizedBox(height: 8),
@@ -241,7 +246,7 @@ class _BomTabState extends ConsumerState<BomTab> {
               child: SizedBox(
                 width: 420,
                 child: SearchPicker<Product>(
-                  label: 'Add component',
+                  label: context.l10n.addComponent,
                   clearOnSelect: true,
                   display: (p) => '${p.code} · ${p.name}',
                   search: (q) async =>
@@ -272,13 +277,15 @@ class _BomTabState extends ConsumerState<BomTab> {
             const SizedBox(height: 8),
             TextField(
               controller: _notes,
-              decoration: const InputDecoration(labelText: 'Revision notes'),
+              decoration: InputDecoration(
+                labelText: context.l10n.revisionNotes,
+              ),
             ),
           ],
         ],
         const Divider(height: 40),
         Text(
-          'Material requirements (active revision)',
+          context.l10n.materialRequirements,
           style: theme.textTheme.titleMedium,
         ),
         const SizedBox(height: 8),
@@ -289,19 +296,22 @@ class _BomTabState extends ConsumerState<BomTab> {
               child: TextField(
                 controller: _explodeQty,
                 decoration: InputDecoration(
-                  labelText: 'Quantity',
+                  labelText: context.l10n.quantity,
                   suffixText: widget.product.unit,
                 ),
                 onSubmitted: (_) => _explode(),
               ),
             ),
             const SizedBox(width: 12),
-            OutlinedButton(onPressed: _explode, child: const Text('Explode')),
+            OutlinedButton(
+              onPressed: _explode,
+              child: Text(context.l10n.explode),
+            ),
           ],
         ),
         const SizedBox(height: 12),
         if (_explosion == null)
-          const Text('No active bill of materials.')
+          Text(context.l10n.noActiveBom)
         else
           _explosionView(theme, _explosion!),
       ],
@@ -325,10 +335,10 @@ class _BomTabState extends ConsumerState<BomTab> {
           children: [
             for (final h in [
               '#',
-              'Component',
-              'Description',
-              'Quantity',
-              'Scrap %',
+              context.l10n.component,
+              context.l10n.description,
+              context.l10n.quantity,
+              context.l10n.scrapPercent,
               '',
             ])
               Padding(
@@ -352,16 +362,16 @@ class _BomTabState extends ConsumerState<BomTab> {
                     Flexible(child: Text(l.name)),
                     if (!editable &&
                         bom.lines.elementAtOrNull(i)?.componentHasBom == true)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(left: 6),
-                        child: Chip(label: Text('subassembly')),
+                        child: Chip(label: Text(context.l10n.subassembly)),
                       ),
                     if (!editable &&
                         bom.lines.elementAtOrNull(i)?.componentTracking ==
                             'serial')
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(left: 6),
-                        child: Chip(label: Text('serial')),
+                        child: Chip(label: Text(context.l10n.serial)),
                       ),
                   ],
                 ),
@@ -438,7 +448,10 @@ class _BomTabState extends ConsumerState<BomTab> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Totals to buy or make', style: theme.textTheme.labelLarge),
+            Text(
+              context.l10n.totalsToBuyOrMake,
+              style: theme.textTheme.labelLarge,
+            ),
             for (final r in e.requirements)
               Padding(
                 padding: const EdgeInsets.only(top: 4),

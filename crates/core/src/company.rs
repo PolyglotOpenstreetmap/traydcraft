@@ -23,12 +23,14 @@ pub struct Company {
     pub email: Option<String>,
     pub phone: Option<String>,
     pub iban: Option<String>,
+    pub default_language: String,
 }
 
 pub async fn get_company<'e>(db: impl PgExecutor<'e>, id: Uuid) -> Result<Company, sqlx::Error> {
     sqlx::query_as(
         "SELECT id, name, vat_number, street, postal_code, city, country_code::text AS country_code,
-                currency::text AS currency, email, phone, iban
+                currency::text AS currency, email, phone, iban,
+                default_language::text AS default_language
          FROM core.companies WHERE id = $1",
     )
     .bind(id)
@@ -83,6 +85,34 @@ async fn me(State(state): State<AppState>, user: CurrentUser) -> AppResult<Json<
     }))
 }
 
+/// A colleague in the active company (for assigning tickets, owners, ...).
+#[derive(Debug, Serialize, FromRow, ToSchema)]
+pub struct CompanyUser {
+    pub id: Uuid,
+    pub display_name: String,
+    pub email: String,
+    pub roles: Vec<String>,
+}
+
+#[utoipa::path(get, path = "/users", tag = "core", responses((status = 200, body = Vec<CompanyUser>)))]
+async fn list_users(
+    State(state): State<AppState>,
+    user: CurrentUser,
+) -> AppResult<Json<Vec<CompanyUser>>> {
+    Ok(Json(
+        sqlx::query_as(
+            "SELECT u.id, u.display_name, u.email, uc.roles FROM core.users u
+             JOIN core.user_companies uc ON uc.user_id = u.id
+             WHERE uc.company_id = $1 AND u.active ORDER BY u.display_name",
+        )
+        .bind(user.company_id)
+        .fetch_all(&state.db)
+        .await?,
+    ))
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
-    OpenApiRouter::new().routes(routes!(me))
+    OpenApiRouter::new()
+        .routes(routes!(me))
+        .routes(routes!(list_users))
 }

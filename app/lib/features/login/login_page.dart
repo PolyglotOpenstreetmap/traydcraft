@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/api.dart';
 import '../../app/session.dart';
+import '../../l10n/l10n.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -69,16 +70,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   const SizedBox(height: 24),
                   TextField(
                     controller: _server,
-                    decoration: const InputDecoration(labelText: 'Server'),
+                    decoration: InputDecoration(labelText: context.l10n.server),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   SegmentedButton<bool>(
-                    segments: const [
+                    segments: [
                       ButtonSegment(
                         value: false,
-                        label: Text('Development user'),
+                        label: Text(context.l10n.developmentUser),
                       ),
-                      ButtonSegment(value: true, label: Text('Access token')),
+                      ButtonSegment(
+                        value: true,
+                        label: Text(context.l10n.accessToken),
+                      ),
                     ],
                     selected: {_useToken},
                     onSelectionChanged: (s) =>
@@ -89,16 +93,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     TextField(
                       controller: _token,
                       obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'OIDC access token',
+                      decoration: InputDecoration(
+                        labelText: context.l10n.oidcAccessToken,
                       ),
                     )
                   else
                     TextField(
                       controller: _user,
-                      decoration: const InputDecoration(
-                        labelText: 'E-mail',
-                        helperText: 'Server must run with AUTH_MODE=dev',
+                      decoration: InputDecoration(
+                        labelText: context.l10n.email,
+                        helperText: context.l10n.devModeHelp,
                       ),
                       onSubmitted: (_) => _signIn(),
                     ),
@@ -114,7 +118,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   const SizedBox(height: 20),
                   FilledButton(
                     onPressed: _busy ? null : _signIn,
-                    child: const Text('Sign in'),
+                    child: Text(context.l10n.signIn),
                   ),
                 ],
               ),

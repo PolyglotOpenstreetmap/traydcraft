@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/api.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
+import '../../l10n/l10n.dart';
 
 /// Create or edit an opportunity. Returns the saved opportunity, or null when cancelled.
 Future<Opportunity?> showOpportunityForm(
@@ -43,9 +44,7 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
         ? null
         : int.tryParse(_probability.text.trim());
     if (_title.text.trim().isEmpty || _customerId == null || value == null) {
-      setState(
-        () => _error = 'Title, customer and a valid value are required.',
-      );
+      setState(() => _error = context.l10n.titleCustomerValueRequired);
       return;
     }
     final body = OpportunityInput(
@@ -71,7 +70,7 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
   Widget build(BuildContext context) {
     const gap = SizedBox(height: 12, width: 12);
     return AlertDialog(
-      title: Text(o == null ? 'New opportunity' : o!.number),
+      title: Text(o == null ? context.l10n.newOpportunity : o!.number),
       content: SizedBox(
         width: 520,
         child: Column(
@@ -79,12 +78,12 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'Title'),
+              decoration: InputDecoration(labelText: context.l10n.title),
             ),
             gap,
             if (o == null)
               SearchPicker<Customer>(
-                label: 'Customer',
+                label: context.l10n.customer,
                 display: (c) => '${c.code} · ${c.name}',
                 search: (q) async =>
                     (await ref
@@ -100,7 +99,7 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
             else
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Customer: $_customerLabel'),
+                child: Text(context.l10n.customerNamed(_customerLabel ?? '')),
               ),
             gap,
             Row(
@@ -108,8 +107,8 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
                 Expanded(
                   child: TextField(
                     controller: _value,
-                    decoration: const InputDecoration(
-                      labelText: 'Expected value (€)',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.expectedValueEur,
                     ),
                   ),
                 ),
@@ -118,9 +117,9 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
                   width: 140,
                   child: TextField(
                     controller: _probability,
-                    decoration: const InputDecoration(
-                      labelText: 'Probability %',
-                      hintText: 'by stage',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.probabilityPercent,
+                      hintText: context.l10n.byStage,
                     ),
                   ),
                 ),
@@ -131,8 +130,8 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
               contentPadding: EdgeInsets.zero,
               title: Text(
                 _close == null
-                    ? 'No expected close date'
-                    : 'Expected close ${date(_close)}',
+                    ? context.l10n.noExpectedClose
+                    : context.l10n.expectedCloseDate(date(_close)),
               ),
               trailing: const Icon(Icons.calendar_today),
               onTap: () async {
@@ -148,7 +147,7 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
             TextField(
               controller: _notes,
               maxLines: 3,
-              decoration: const InputDecoration(labelText: 'Notes'),
+              decoration: InputDecoration(labelText: context.l10n.notes),
             ),
             if (_error != null) ...[
               gap,
@@ -163,9 +162,9 @@ class _OpportunityFormState extends ConsumerState<OpportunityForm> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('Save')),
+        FilledButton(onPressed: _save, child: Text(context.l10n.save)),
       ],
     );
   }

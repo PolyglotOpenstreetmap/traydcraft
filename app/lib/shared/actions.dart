@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app/api.dart';
+import '../l10n/l10n.dart';
 
 /// Runs a server action and shows its error, if any, as a snack bar. Returns true on success.
 Future<bool> runAction(
@@ -45,7 +46,7 @@ Future<String?> askText(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(context, controller.text.trim()),

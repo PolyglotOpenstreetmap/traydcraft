@@ -13,6 +13,7 @@ class Company {
     required this.city,
     required this.countryCode,
     required this.currency,
+    required this.defaultLanguage,
     required this.id,
     required this.name,
     required this.postalCode,
@@ -29,6 +30,8 @@ class Company {
   @JsonKey(name: 'country_code')
   final String countryCode;
   final String currency;
+  @JsonKey(name: 'default_language')
+  final String defaultLanguage;
   @JsonKey(includeIfNull: false)
   final String? email;
   @JsonKey(includeIfNull: false)

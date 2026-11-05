@@ -9,6 +9,7 @@ import 'bom_tab.dart';
 import 'prices_tab.dart';
 import 'product_form.dart';
 import 'serials_tab.dart';
+import '../../l10n/l10n.dart';
 
 final productProvider = FutureProvider.autoDispose.family<Product, String>(
   (ref, id) => ref.watch(apiProvider).products.getProduct(id: id),
@@ -35,9 +36,9 @@ class ProductScreen extends ConsumerWidget {
               p.productType == 'configurable';
           final serial = p.tracking == 'serial';
           final tabs = [
-            const Tab(text: 'Prices'),
-            if (hasBom) const Tab(text: 'Bill of materials'),
-            if (serial) const Tab(text: 'Serial numbers'),
+            Tab(text: context.l10n.prices),
+            if (hasBom) Tab(text: context.l10n.billOfMaterials),
+            if (serial) Tab(text: context.l10n.serialNumbers),
           ];
           return DefaultTabController(
             length: tabs.length,
@@ -63,7 +64,7 @@ class ProductScreen extends ConsumerWidget {
                       if (canWrite)
                         OutlinedButton.icon(
                           icon: const Icon(Icons.edit),
-                          label: const Text('Edit'),
+                          label: Text(context.l10n.edit),
                           onPressed: () async {
                             if (await showProductForm(context, product: p) !=
                                 null) {
@@ -78,15 +79,27 @@ class ProductScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: Wrap(
                     children: [
-                      InfoItem('Type', p.productType),
-                      InfoItem('Unit', p.unit),
-                      InfoItem('VAT', '${number(p.vatRate)} %'),
-                      InfoItem('Tracking', serial ? 'serial numbers' : 'none'),
-                      InfoItem('Family', p.familyCode ?? ''),
-                      InfoItem('Pricing', p.pricingType),
-                      InfoItem('Status', p.active ? 'active' : 'inactive'),
+                      InfoItem(
+                        context.l10n.type,
+                        context.l10n.productType(p.productType),
+                      ),
+                      InfoItem(context.l10n.unit, p.unit),
+                      InfoItem(context.l10n.vat, '${number(p.vatRate)} %'),
+                      InfoItem(
+                        context.l10n.tracking,
+                        serial ? 'serial numbers' : 'none',
+                      ),
+                      InfoItem(context.l10n.family, p.familyCode ?? ''),
+                      InfoItem(
+                        context.l10n.pricing,
+                        context.l10n.pricingType(p.pricingType),
+                      ),
+                      InfoItem(
+                        context.l10n.status,
+                        p.active ? 'active' : 'inactive',
+                      ),
                       if (p.description.isNotEmpty)
-                        InfoItem('Description', p.description),
+                        InfoItem(context.l10n.description, p.description),
                     ],
                   ),
                 ),

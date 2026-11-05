@@ -1,0 +1,655 @@
+{
+  "@@locale": "en",
+  "accepted": "Accepted",
+  "accessToken": "Access token",
+  "account": "Account",
+  "actions": "Actions",
+  "activate": "Activate",
+  "active": "Active",
+  "activeSince": "Active since {date}. Changes go through a new revision.",
+  "@activeSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "addComponent": "Add component",
+  "addComponentBySerial": "Add component by serial number (in stock)",
+  "addNote": "Add note",
+  "addProduct": "Add product",
+  "addRebate": "Add rebate",
+  "addedBy": "added {date} by {name}",
+  "@addedBy": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "agreed": "Agreed",
+  "all": "All",
+  "allProducts": "All products",
+  "allStatuses": "All statuses",
+  "always": "always",
+  "andMore": "… and {count} more",
+  "@andMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "answerFallback": "No {ticketLanguage} text yet: the {usedLanguage} text was used. Translate it before sending.",
+  "@answerFallback": {
+    "placeholders": {
+      "ticketLanguage": {
+        "type": "String"
+      },
+      "usedLanguage": {
+        "type": "String"
+      }
+    }
+  },
+  "appLanguage": "Language",
+  "appTitle": "traydcraft",
+  "apply": "Apply",
+  "automatic": "Automatic",
+  "billOfMaterials": "Bill of materials",
+  "bomActive": "active",
+  "bomObsolete": "obsolete",
+  "bomRev": "BOM rev.",
+  "bomRevision": "BOM revision",
+  "builtInto": "Built into",
+  "bulkKeepsQuotes": "Quotations before this date keep using the current prices",
+  "bulkPriceChange": "Bulk price change",
+  "byStage": "by stage",
+  "canStillKeep": "You can still keep the agreed prices.",
+  "cancel": "Cancel",
+  "cancelled": "cancelled",
+  "category": "Category",
+  "categoryComplaint": "complaint",
+  "categoryLead": "lead (new business)",
+  "categoryOrderConfirmation": "order confirmation",
+  "categoryOther": "other",
+  "categoryProductionQuestion": "production question",
+  "categoryQuestion": "question",
+  "categoryQuoteChange": "quote change",
+  "categoryService": "service / repair",
+  "cc": "Cc",
+  "change": "Change",
+  "chooseCustomerAndLine": "Choose a customer and add at least one valid line.",
+  "chooseRebateTarget": "Choose a product or family and enter a percentage.",
+  "chooseZonePrice": "Choose a zone and enter a price.",
+  "city": "City",
+  "close": "Close",
+  "code": "Code",
+  "codeNameVatRequired": "Code, name and VAT rate are required.",
+  "component": "Component",
+  "componentHistory": "Component history",
+  "componentSince": "{product} · since {date}",
+  "@componentSince": {
+    "placeholders": {
+      "product": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "componentsAsBuilt": "Components (as built)",
+  "confirm": "confirm",
+  "confirmed": "confirmed",
+  "conflictsOnDate": "{count} already have a price on this date",
+  "@conflictsOnDate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "contactName": "Contact name",
+  "convertHelp": "Does the customer want changes? Make a new revision of the quotation first, link it here, then convert.",
+  "convertToOrder": "Convert to order",
+  "countOf": "{count} of {total}",
+  "@countOf": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "country": "Country",
+  "create": "Create",
+  "createLead": "Create lead",
+  "current": "Current",
+  "customer": "Customer",
+  "customerLanguage": "Customer language",
+  "customerNamed": "Customer: {name}",
+  "@customerNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "customerOptional": "Customer (optional)",
+  "customerReference": "Customer reference",
+  "customers": "Customers",
+  "date": "Date",
+  "deliveryFailed": "not sent",
+  "deliveryQueued": "waiting to send",
+  "deliverySent": "sent",
+  "description": "Description",
+  "devModeHelp": "Server must run with AUTH_MODE=dev",
+  "developmentUser": "Development user",
+  "deviceLanguage": "Device language",
+  "difference": "Difference",
+  "draftSaved": "Draft saved",
+  "edit": "Edit",
+  "email": "E-mail",
+  "enterChange": "Enter the change, e.g. 4.5 for +4.5 %.",
+  "enterValidNumbersLine": "Line {line}: enter valid numbers.",
+  "@enterValidNumbersLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "expectedClose": "Expected close",
+  "expectedCloseDate": "Expected close {date}",
+  "@expectedCloseDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expectedValue": "Expected value",
+  "expectedValueEur": "Expected value (€)",
+  "expectedValueOptional": "Expected value (optional)",
+  "explode": "Explode",
+  "families": "Families",
+  "family": "Family",
+  "familyNamed": "Family {code}",
+  "@familyNamed": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "from": "From",
+  "generalRebateInfo": "General rebate on all products: {percent} % (net-priced products are never discounted).",
+  "@generalRebateInfo": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "generalRebatePercent": "General rebate %",
+  "helpdesk": "Helpdesk",
+  "inactive": "inactive",
+  "indicativeLine": "{description} (indicative, to confirm)",
+  "@indicativeLine": {
+    "placeholders": {
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "indicativeToConfirm": "{count} indicative price(s) to confirm before the quotation can be sent: enter the agreed price in the list price field.",
+  "@indicativeToConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "insertPreparedAnswer": "Insert prepared answer",
+  "internalNote": "Internal note",
+  "internalQuestionHelp": "Internal question. Ask the customer in {language} with a reply, then post the answer for your colleague as an internal note.",
+  "@internalQuestionHelp": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "internalTicket": "Internal ticket",
+  "internalTicketHelp": "A question between colleagues; nothing is sent to the customer.",
+  "keepAgreedPrices": "Keep agreed prices",
+  "language": "Language",
+  "leadCreated": "Lead created",
+  "lineDiscount": "Line disc.",
+  "listPrice": "List price",
+  "loadMore": "Load more",
+  "lost": "Lost",
+  "lostReason": "Lost reason",
+  "markAsLost": "Mark as lost",
+  "markAsSent": "Mark as sent",
+  "materialRequirements": "Material requirements (active revision)",
+  "message": "Message",
+  "myTickets": "My tickets",
+  "name": "Name",
+  "netPrice": "Net price",
+  "newAnswer": "New answer",
+  "newCustomer": "New customer",
+  "newFamily": "New family",
+  "newItem": "New",
+  "newLabel": "New",
+  "newOpportunity": "New opportunity",
+  "newPrice": "New price",
+  "newPricesValidFrom": "New prices valid from {date}",
+  "@newPricesValidFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "newProduct": "New product",
+  "newQuotation": "New quotation",
+  "newRevision": "New revision",
+  "newRevisionOf": "New revision of {number}",
+  "@newRevisionOf": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "newTicket": "New ticket",
+  "noActiveBom": "No active bill of materials.",
+  "noBom": "No bill of materials yet.",
+  "noCustomerLinked": "No customer linked",
+  "noExpectedClose": "No expected close date",
+  "noLines": "No lines yet.",
+  "noPrices": "No prices yet.",
+  "noQuotations": "No quotations yet.",
+  "noRebates": "No product or family rebates.",
+  "noSerialComponents": "No serialised components.",
+  "none": "None",
+  "notClosed": "Not closed",
+  "noteAdded": "Note added",
+  "notes": "Notes",
+  "number": "Number",
+  "numberRequired": "Number",
+  "obsoleteRevision": "Obsolete revision (read-only).",
+  "oidcAccessToken": "OIDC access token",
+  "ok": "OK",
+  "openEnded": "open",
+  "openOnly": "Open only",
+  "openOpportunity": "Open opportunity",
+  "opportunities": "Opportunities",
+  "opportunity": "Opportunity",
+  "opportunityOptional": "Opportunity (optional)",
+  "order": "Order",
+  "orderCreated": "Order created",
+  "orders": "Orders",
+  "owner": "Owner",
+  "paymentDays": "Payment days",
+  "pdf": "PDF",
+  "phone": "Phone",
+  "placeholdersHelp": "Placeholders (click to insert in the current language):",
+  "postalCode": "Postal code",
+  "preparedAnswers": "Prepared answers",
+  "preparedAnswersHelp": "Reusable answers to recurring questions, one text per language. Placeholders such as «quotation.number» are filled in for the ticket; the text can still be edited before sending.",
+  "preview": "Preview",
+  "priceListOf": "Price list of {date}",
+  "@priceListOf": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "priceListValidOn": "Price list valid on",
+  "priceZone": "Price zone",
+  "pricedOnPriceListOf": "Priced on the price list of {date}",
+  "@pricedOnPriceListOf": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "prices": "Prices",
+  "pricesCreated": "{count} prices created, valid from {date}",
+  "@pricesCreated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pricesWillChange": "{count} prices will change",
+  "@pricesWillChange": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pricing": "Pricing",
+  "pricingIndicative": "indicative",
+  "pricingIndicativeHelp": "Indicative (confirm per quote)",
+  "pricingList": "list price",
+  "pricingListHelp": "List price (rebates apply)",
+  "pricingNet": "net",
+  "pricingNetHelp": "Net price (never discounted)",
+  "priority": "Priority",
+  "priorityHigh": "high",
+  "priorityLow": "low",
+  "priorityNormal": "normal",
+  "priorityUrgent": "urgent",
+  "probability": "Probability",
+  "probabilityPercent": "Probability %",
+  "probabilityShort": "Prob.",
+  "product": "Product",
+  "productCount": "{count} products",
+  "@productCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "productFamilies": "Product families",
+  "productFamily": "Product family",
+  "productRebates": "Product rebates",
+  "productTypeConfigurable": "configurable",
+  "productTypeManufactured": "manufactured",
+  "productTypePurchased": "purchased",
+  "productTypeService": "service",
+  "products": "Products",
+  "quantity": "Quantity",
+  "question": "Question",
+  "questionToSales": "Question to sales",
+  "questionToSalesHelp": "{salesperson} gets this question and asks the customer in their language.",
+  "@questionToSalesHelp": {
+    "placeholders": {
+      "salesperson": {
+        "type": "String"
+      }
+    }
+  },
+  "quotation": "Quotation",
+  "quotations": "Quotations",
+  "reason": "Reason",
+  "rebate": "Rebate",
+  "rebateFor": "{target}: {percent} %",
+  "@rebateFor": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "rebatePercent": "Rebate %",
+  "rebateSourceFamily": "family",
+  "rebateSourceGeneral": "general",
+  "rebateSourceProduct": "product",
+  "rebatesOf": "Rebates · {customer}",
+  "@rebatesOf": {
+    "placeholders": {
+      "customer": {
+        "type": "String"
+      }
+    }
+  },
+  "registerProduct": "Register {product}",
+  "@registerProduct": {
+    "placeholders": {
+      "product": {
+        "type": "String"
+      }
+    }
+  },
+  "registerUnit": "Register unit",
+  "registered": "Registered",
+  "rejected": "Rejected",
+  "remove": "Remove",
+  "removeAndScrap": "Remove and scrap",
+  "removeBackToStock": "Remove, back to stock",
+  "removedBy": "removed {date} by {name}",
+  "@removedBy": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "replyQueued": "Reply queued for sending",
+  "replyToCustomer": "Reply to customer",
+  "repricingFailed": "Today's prices could not be calculated: {error}",
+  "@repricingFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "required": "Required",
+  "retry": "Retry",
+  "revisionActivated": "Revision activated",
+  "revisionItem": "Revision {revision} · {status} · {lines} lines",
+  "@revisionItem": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      },
+      "status": {
+        "type": "String"
+      },
+      "lines": {
+        "type": "int"
+      }
+    }
+  },
+  "revisionNotes": "Revision notes",
+  "revisionPriceLists": "Agreed prices: price list of {agreed}. Current prices: price list of {current}.",
+  "@revisionPriceLists": {
+    "placeholders": {
+      "agreed": {
+        "type": "String"
+      },
+      "current": {
+        "type": "String"
+      }
+    }
+  },
+  "roundTo": "Round to",
+  "salesperson": "Salesperson",
+  "save": "Save",
+  "saveChanges": "Save changes",
+  "saveDraft": "Save draft",
+  "saved": "Saved",
+  "savedNumber": "Saved {number}",
+  "@savedNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "scrapPercent": "Scrap %",
+  "search": "Search",
+  "send": "Send",
+  "serial": "serial",
+  "serialBuiltIn": "built in",
+  "serialDelivered": "delivered",
+  "serialInStock": "in stock",
+  "serialInstalled": "installed",
+  "serialNumber": "Serial number",
+  "serialNumbers": "Serial numbers",
+  "serialNumbersHelp": "Every unit gets its own serial number and history",
+  "serialScrapped": "scrapped",
+  "server": "Server",
+  "signIn": "Sign in",
+  "signOut": "Sign out",
+  "singleProduct": "Single product",
+  "skippedWithoutPrice": "{count} product/zone combinations have no price and are skipped",
+  "@skippedWithoutPrice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stage": "Stage",
+  "stageLead": "lead",
+  "stageLost": "lost",
+  "stageNegotiation": "negotiation",
+  "stageProposal": "proposal",
+  "stageQualified": "qualified",
+  "stageWon": "won",
+  "status": "Status",
+  "statusAccepted": "accepted",
+  "statusAfterwards": "Status afterwards",
+  "statusDraft": "draft",
+  "statusRejected": "rejected",
+  "statusSent": "sent",
+  "statusSuperseded": "superseded",
+  "street": "Street",
+  "structureRevision": "Structure (revision {revision})",
+  "@structureRevision": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      }
+    }
+  },
+  "subassembly": "subassembly",
+  "subject": "Subject",
+  "subjectOptional": "Subject (optional)",
+  "suggested": "Suggested: {value}",
+  "@suggested": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "text": "Text",
+  "ticketDetails": "Ticket details",
+  "ticketStatusClosed": "closed",
+  "ticketStatusNew": "new",
+  "ticketStatusOpen": "open",
+  "ticketStatusPendingCustomer": "waiting for customer",
+  "ticketStatusPendingInternal": "waiting for colleague",
+  "title": "Title",
+  "titleCustomerValueRequired": "Title, customer and a valid value are required.",
+  "to": "To",
+  "total": "Total",
+  "totalChange": "Total excl. VAT: {from} → {to} ({difference})",
+  "@totalChange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "difference": {
+        "type": "String"
+      }
+    }
+  },
+  "totalExclVat": "Total excl. VAT",
+  "totalInclVat": "Total incl. VAT",
+  "totalsToBuyOrMake": "Totals to buy or make",
+  "tracking": "Tracking",
+  "twoLetters": "2 letters",
+  "type": "Type",
+  "unassigned": "Unassigned",
+  "unchanged": "Unchanged",
+  "unit": "Unit",
+  "unitPrice": "Unit price",
+  "unitPriceExclVat": "Unit price (excl. VAT)",
+  "until": "Until",
+  "updateToCurrentPrices": "Update to current prices",
+  "updated": "Updated",
+  "useAnotherPriceListDate": "Use another price list date",
+  "validFrom": "Valid from",
+  "validFromDate": "Valid from {date}",
+  "@validFromDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "validUntil": "valid until {date}",
+  "@validUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "value": "Value",
+  "vat": "VAT",
+  "vatNumber": "VAT number",
+  "vatOn": "VAT {rate} % on {base}",
+  "@vatOn": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      },
+      "base": {
+        "type": "String"
+      }
+    }
+  },
+  "vatPercent": "VAT %",
+  "weighted": "weighted {amount}",
+  "@weighted": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "whatWasAsked": "What was asked?",
+  "won": "Won",
+  "writeIn": "Write in {language}",
+  "@writeIn": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "zone": "Zone",
+  "zoneAndRebate": "Zone {zone} · general rebate {percent} %",
+  "@zoneAndRebate": {
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "zonesNoneAll": "Zones (none selected = all)"
+}

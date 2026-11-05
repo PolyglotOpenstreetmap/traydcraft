@@ -5,6 +5,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/company_user.dart';
 import '../models/me.dart';
 
 part 'core_client.g.dart';
@@ -15,4 +16,7 @@ abstract class CoreClient {
 
   @GET('/api/v1/me')
   Future<Me> me();
+
+  @GET('/api/v1/users')
+  Future<List<CompanyUser>> listUsers();
 }

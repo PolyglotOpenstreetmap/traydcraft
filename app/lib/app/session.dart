@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -80,4 +81,32 @@ class SessionNotifier extends Notifier<Session> {
 
 final sessionProvider = NotifierProvider<SessionNotifier, Session>(
   SessionNotifier.new,
+);
+
+/// The app's language; null follows the device language.
+class LocaleNotifier extends Notifier<Locale?> {
+  static const _key = 'locale';
+
+  @override
+  Locale? build() {
+    SharedPreferences.getInstance().then((p) {
+      final code = p.getString(_key);
+      if (code != null) state = Locale(code);
+    });
+    return null;
+  }
+
+  Future<void> set(Locale? locale) async {
+    state = locale;
+    final p = await SharedPreferences.getInstance();
+    if (locale == null) {
+      await p.remove(_key);
+    } else {
+      await p.setString(_key, locale.languageCode);
+    }
+  }
+}
+
+final localeProvider = NotifierProvider<LocaleNotifier, Locale?>(
+  LocaleNotifier.new,
 );

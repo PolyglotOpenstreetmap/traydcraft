@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../app/api.dart';
+import '../l10n/l10n.dart';
 
 /// Column of a generic entity list.
 class EntityColumn<T> {
@@ -36,7 +37,7 @@ class EntityList<T> extends StatefulWidget {
     required this.columns,
     this.onOpen,
     this.onCreate,
-    this.createLabel = 'New',
+    this.createLabel,
     this.filters,
     this.actions = const [],
   });
@@ -46,7 +47,7 @@ class EntityList<T> extends StatefulWidget {
   final List<EntityColumn<T>> columns;
   final Future<bool?> Function(T item)? onOpen;
   final Future<bool?> Function()? onCreate;
-  final String createLabel;
+  final String? createLabel;
   final Widget? filters;
 
   /// Extra buttons next to the create button.
@@ -132,7 +133,7 @@ class EntityListState<T> extends State<EntityList<T>> {
                 FilledButton.icon(
                   onPressed: () => _after(widget.onCreate!()),
                   icon: const Icon(Icons.add),
-                  label: Text(widget.createLabel),
+                  label: Text(widget.createLabel ?? context.l10n.newItem),
                 ),
             ],
           ),
@@ -143,9 +144,9 @@ class EntityListState<T> extends State<EntityList<T>> {
                 child: TextField(
                   controller: _search,
                   onChanged: _onSearchChanged,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     prefixIcon: Icon(Icons.search),
-                    hintText: 'Search',
+                    hintText: context.l10n.search,
                   ),
                 ),
               ),
@@ -154,7 +155,7 @@ class EntityListState<T> extends State<EntityList<T>> {
                 widget.filters!,
               ],
               const SizedBox(width: 12),
-              Text('${_items.length} of $_total'),
+              Text(context.l10n.countOf(_items.length, _total)),
             ],
           ),
           const SizedBox(height: 8),
@@ -162,7 +163,7 @@ class EntityListState<T> extends State<EntityList<T>> {
             MaterialBanner(
               content: Text(_error!),
               actions: [
-                TextButton(onPressed: reload, child: const Text('Retry')),
+                TextButton(onPressed: reload, child: Text(context.l10n.retry)),
               ],
             ),
           if (_loading) const LinearProgressIndicator(),
@@ -238,7 +239,7 @@ class EntityListState<T> extends State<EntityList<T>> {
       child: _items.length < _total
           ? TextButton(
               onPressed: _loading ? null : () => _fetch(reset: false),
-              child: const Text('Load more'),
+              child: Text(context.l10n.loadMore),
             )
           : const SizedBox.shrink(),
     ),

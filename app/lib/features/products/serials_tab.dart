@@ -6,6 +6,7 @@ import '../../shared/actions.dart';
 import '../../shared/entity_list.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
+import '../../l10n/l10n.dart';
 
 /// Serialised units of a product.
 class SerialsTab extends ConsumerStatefulWidget {
@@ -24,7 +25,7 @@ class _SerialsTabState extends ConsumerState<SerialsTab> {
         ref.watch(meProvider).value?.permissions.contains('serials.write') ??
         false;
     return EntityList<SerialUnit>(
-      title: 'Serial numbers',
+      title: context.l10n.serialNumbers,
       load: (q, offset, limit) async {
         final page = await api.engineering.listSerials(
           productId: widget.product.id,
@@ -35,19 +36,33 @@ class _SerialsTabState extends ConsumerState<SerialsTab> {
         return (page.items, page.total);
       },
       columns: [
-        EntityColumn('Serial number', (s) => s.serialNumber, flex: 2),
-        EntityColumn('Status', (s) => s.status),
-        EntityColumn('BOM rev.', (s) => s.bomRevision?.toString() ?? ''),
-        EntityColumn('Built into', (s) => s.parentSerialNumber ?? '', flex: 2),
-        EntityColumn('Customer', (s) => s.customerName ?? '', flex: 2),
+        EntityColumn(context.l10n.serialNumber, (s) => s.serialNumber, flex: 2),
+        EntityColumn(
+          context.l10n.status,
+          (s) => context.l10n.serialStatus(s.status),
+        ),
+        EntityColumn(
+          context.l10n.bomRev,
+          (s) => s.bomRevision?.toString() ?? '',
+        ),
+        EntityColumn(
+          context.l10n.builtInto,
+          (s) => s.parentSerialNumber ?? '',
+          flex: 2,
+        ),
+        EntityColumn(
+          context.l10n.customer,
+          (s) => s.customerName ?? '',
+          flex: 2,
+        ),
       ],
-      createLabel: 'Register unit',
+      createLabel: context.l10n.registerUnit,
       onCreate: canWrite
           ? () async {
               final serial = await askText(
                 context,
-                title: 'Register ${widget.product.code}',
-                label: 'Serial number',
+                title: context.l10n.registerProduct(widget.product.code),
+                label: context.l10n.serialNumber,
               );
               if (serial == null || serial.isEmpty || !context.mounted) {
                 return false;
@@ -160,13 +175,22 @@ class _SerialUnitDialogState extends ConsumerState<SerialUnitDialog> {
             children: [
               Wrap(
                 children: [
-                  InfoItem('Product', u.productName),
-                  InfoItem('Status', u.status),
-                  InfoItem('BOM revision', u.bomRevision?.toString() ?? ''),
-                  InfoItem('Customer', u.customerName ?? ''),
+                  InfoItem(context.l10n.product, u.productName),
+                  InfoItem(
+                    context.l10n.status,
+                    context.l10n.serialStatus(u.status),
+                  ),
+                  InfoItem(
+                    context.l10n.bomRevision,
+                    u.bomRevision?.toString() ?? '',
+                  ),
+                  InfoItem(context.l10n.customer, u.customerName ?? ''),
                   if (builtIn)
-                    InfoItem('Built into', u.parentSerialNumber ?? ''),
-                  InfoItem('Registered', date(u.createdAt)),
+                    InfoItem(
+                      context.l10n.builtInto,
+                      u.parentSerialNumber ?? '',
+                    ),
+                  InfoItem(context.l10n.registered, date(u.createdAt)),
                 ],
               ),
               if (canWrite && !builtIn && u.status != 'scrapped')
@@ -178,16 +202,19 @@ class _SerialUnitDialogState extends ConsumerState<SerialUnitDialog> {
                     ))
                       OutlinedButton(
                         onPressed: () => _changeStatus(s),
-                        child: Text('→ $s'),
+                        child: Text('→ ${context.l10n.serialStatus(s)}'),
                       ),
                   ],
                 ),
               const Divider(height: 32),
-              Text('Components (as built)', style: theme.textTheme.titleMedium),
+              Text(
+                context.l10n.componentsAsBuilt,
+                style: theme.textTheme.titleMedium,
+              ),
               if (d.components.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8),
-                  child: Text('No serialised components.'),
+                  child: Text(context.l10n.noSerialComponents),
                 ),
               for (final c in d.components)
                 Padding(
@@ -197,20 +224,23 @@ class _SerialUnitDialogState extends ConsumerState<SerialUnitDialog> {
                     leading: const Icon(Icons.memory_outlined),
                     title: Text('${c.productCode} · ${c.serialNumber}'),
                     subtitle: Text(
-                      '${c.productName} · since ${date(c.addedAt)}',
+                      context.l10n.componentSince(
+                        c.productName,
+                        date(c.addedAt),
+                      ),
                     ),
                     trailing: canWrite && c.parentId == u.id
                         ? PopupMenuButton<String>(
-                            tooltip: 'Remove',
-                            icon: const Icon(Icons.link_off),
-                            itemBuilder: (_) => const [
+                            tooltip: context.l10n.remove,
+                            icon: Icon(Icons.link_off),
+                            itemBuilder: (_) => [
                               PopupMenuItem(
                                 value: 'in_stock',
-                                child: Text('Remove, back to stock'),
+                                child: Text(context.l10n.removeBackToStock),
                               ),
                               PopupMenuItem(
                                 value: 'scrapped',
-                                child: Text('Remove and scrap'),
+                                child: Text(context.l10n.removeAndScrap),
                               ),
                             ],
                             onSelected: (status) => _apply(
@@ -227,7 +257,7 @@ class _SerialUnitDialogState extends ConsumerState<SerialUnitDialog> {
               if (canWrite && u.status != 'scrapped') ...[
                 const SizedBox(height: 8),
                 SearchPicker<SerialUnit>(
-                  label: 'Add component by serial number (in stock)',
+                  label: context.l10n.addComponentBySerial,
                   clearOnSelect: true,
                   display: (s) => '${s.productCode} · ${s.serialNumber}',
                   search: (q) async => (await _api.engineering.listSerials(
@@ -245,14 +275,17 @@ class _SerialUnitDialogState extends ConsumerState<SerialUnitDialog> {
               ],
               if (d.history.any((h) => h.removedAt != null)) ...[
                 const Divider(height: 32),
-                Text('Component history', style: theme.textTheme.titleMedium),
+                Text(
+                  context.l10n.componentHistory,
+                  style: theme.textTheme.titleMedium,
+                ),
                 for (final h in d.history)
                   ListTile(
                     dense: true,
                     title: Text('${h.productCode} · ${h.serialNumber}'),
                     subtitle: Text(
-                      'added ${date(h.addedAt)} by ${h.addedByName}'
-                      '${h.removedAt == null ? '' : ' · removed ${date(h.removedAt)} by ${h.removedByName ?? ''}'}',
+                      '${context.l10n.addedBy(date(h.addedAt), h.addedByName)}'
+                      '${h.removedAt == null ? '' : ' · ${context.l10n.removedBy(date(h.removedAt), h.removedByName ?? '')}'}',
                     ),
                   ),
               ],
@@ -263,7 +296,7 @@ class _SerialUnitDialogState extends ConsumerState<SerialUnitDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, _changed),
-          child: const Text('Close'),
+          child: Text(context.l10n.close),
         ),
       ],
     );
@@ -275,11 +308,11 @@ class _CustomerPicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => AlertDialog(
-    title: const Text('Customer'),
+    title: Text(context.l10n.customer),
     content: SizedBox(
       width: 420,
       child: SearchPicker<Customer>(
-        label: 'Customer',
+        label: context.l10n.customer,
         display: (c) => '${c.code} · ${c.name}',
         search: (q) async =>
             (await ref.read(apiProvider).crm.listCustomers(q: q, limit: 20))
@@ -290,7 +323,7 @@ class _CustomerPicker extends ConsumerWidget {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancel'),
+        child: Text(context.l10n.cancel),
       ),
     ],
   );

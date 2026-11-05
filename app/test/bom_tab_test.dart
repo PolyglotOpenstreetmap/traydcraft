@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:traydcraft_app/app/api.dart';
 import 'package:traydcraft_app/features/products/bom_tab.dart';
+import 'package:traydcraft_app/l10n/app_localizations.dart';
 
 const _product = Product(
   id: 'p-unit',
@@ -145,6 +146,7 @@ class _FakeApi implements HttpClientAdapter {
           'city': '',
           'country_code': 'BE',
           'currency': 'EUR',
+          'default_language': 'nl',
         },
       },
       _ => null,
@@ -184,7 +186,10 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [dioProvider.overrideWithValue(dio)],
-          child: const MaterialApp(
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: BomTab(product: _product)),
           ),
         ),

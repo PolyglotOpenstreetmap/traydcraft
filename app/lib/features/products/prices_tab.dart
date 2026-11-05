@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/api.dart';
 import '../../shared/format.dart';
+import '../../l10n/l10n.dart';
 
 final _pricesProvider = FutureProvider.autoDispose
     .family<List<ZonePriceEntry>, String>(
@@ -28,8 +29,8 @@ class PricesTab extends ConsumerWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: FilledButton.tonalIcon(
-              icon: const Icon(Icons.add),
-              label: const Text('New price'),
+              icon: Icon(Icons.add),
+              label: Text(context.l10n.newPrice),
               onPressed: () async {
                 final added = await showDialog<bool>(
                   context: context,
@@ -40,18 +41,21 @@ class PricesTab extends ConsumerWidget {
             ),
           ),
         prices.when(
-          loading: () => const LinearProgressIndicator(),
+          loading: () => LinearProgressIndicator(),
           error: (e, _) => Text(errorMessage(e)),
           data: (list) => list.isEmpty
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(8),
-                  child: Text('No prices yet.'),
+                  child: Text(context.l10n.noPrices),
                 )
               : DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Zone')),
-                    DataColumn(label: Text('Valid from')),
-                    DataColumn(label: Text('Unit price'), numeric: true),
+                  columns: [
+                    DataColumn(label: Text(context.l10n.zone)),
+                    DataColumn(label: Text(context.l10n.validFrom)),
+                    DataColumn(
+                      label: Text(context.l10n.unitPrice),
+                      numeric: true,
+                    ),
                   ],
                   rows: [
                     for (final p in list)
@@ -87,7 +91,7 @@ class _NewPriceState extends ConsumerState<_NewPrice> {
   Future<void> _save() async {
     final price = parseDecimalInput(_price.text);
     if (_zoneId == null || price == null) {
-      setState(() => _error = 'Choose a zone and enter a price.');
+      setState(() => _error = context.l10n.chooseZonePrice);
       return;
     }
     try {
@@ -112,13 +116,13 @@ class _NewPriceState extends ConsumerState<_NewPrice> {
   Widget build(BuildContext context) {
     final zones = ref.watch(priceZonesProvider).value ?? const [];
     return AlertDialog(
-      title: const Text('New price'),
+      title: Text(context.l10n.newPrice),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           DropdownButtonFormField<String>(
             initialValue: _zoneId,
-            decoration: const InputDecoration(labelText: 'Zone'),
+            decoration: InputDecoration(labelText: context.l10n.zone),
             items: [
               for (final z in zones)
                 DropdownMenuItem(
@@ -131,14 +135,14 @@ class _NewPriceState extends ConsumerState<_NewPrice> {
           const SizedBox(height: 12),
           TextField(
             controller: _price,
-            decoration: const InputDecoration(
-              labelText: 'Unit price (excl. VAT)',
+            decoration: InputDecoration(
+              labelText: context.l10n.unitPriceExclVat,
             ),
           ),
           const SizedBox(height: 12),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text('Valid from ${date(_from)}'),
+            title: Text(context.l10n.validFromDate(date(_from))),
             trailing: const Icon(Icons.calendar_today),
             onTap: () async {
               final d = await showDatePicker(
@@ -160,9 +164,9 @@ class _NewPriceState extends ConsumerState<_NewPrice> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('Save')),
+        FilledButton(onPressed: _save, child: Text(context.l10n.save)),
       ],
     );
   }

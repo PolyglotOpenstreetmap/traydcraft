@@ -85,10 +85,16 @@ impl CustomerInput {
         if self.code.trim().is_empty() || self.name.trim().is_empty() {
             return Err(AppError::Validation("code and name are required".into()));
         }
-        if self.country_code.len() != 2 || self.language.len() != 2 {
+        if self.country_code.len() != 2 {
             return Err(AppError::Validation(
-                "country_code and language must be 2-letter codes".into(),
+                "country_code must be a 2-letter code".into(),
             ));
+        }
+        if !traydcraft_core::is_language(&self.language.to_lowercase()) {
+            return Err(AppError::Validation(format!(
+                "language must be one of {}",
+                traydcraft_core::LANGUAGES.join(", ")
+            )));
         }
         if self.discount_percent < Decimal::ZERO || self.discount_percent > Decimal::ONE_HUNDRED {
             return Err(AppError::Validation(

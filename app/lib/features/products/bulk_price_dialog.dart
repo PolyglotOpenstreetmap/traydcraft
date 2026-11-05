@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/api.dart';
 import '../../shared/format.dart';
 import 'families_dialog.dart';
+import '../../l10n/l10n.dart';
 
 /// Bulk price change: choose zones, family, % or amount, rounding and start date;
 /// preview the result; then apply. Applying adds new dated prices; history is untouched.
@@ -28,7 +29,7 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
   BulkPriceChangeInput? _input() {
     final value = parseDecimalInput(_value.text);
     if (value == null) {
-      setState(() => _error = 'Enter the change, e.g. 4.5 for +4.5 %.');
+      setState(() => _error = context.l10n.enterChange);
       return null;
     }
     return BulkPriceChangeInput(
@@ -58,7 +59,10 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${result.applied} prices created, valid from ${date(result.validFrom)}',
+              context.l10n.pricesCreated(
+                result.applied,
+                date(result.validFrom),
+              ),
             ),
           ),
         );
@@ -82,7 +86,7 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
     final theme = Theme.of(context);
     final p = _preview;
     return AlertDialog(
-      title: const Text('Bulk price change'),
+      title: Text(context.l10n.bulkPriceChange),
       content: SizedBox(
         width: 760,
         child: SingleChildScrollView(
@@ -90,7 +94,7 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Zones (none selected = all)',
+                context.l10n.zonesNoneAll,
                 style: theme.textTheme.labelLarge,
               ),
               Wrap(
@@ -116,13 +120,13 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
                   Expanded(
                     child: DropdownButtonFormField<String?>(
                       initialValue: _familyId,
-                      decoration: const InputDecoration(
-                        labelText: 'Product family',
+                      decoration: InputDecoration(
+                        labelText: context.l10n.productFamily,
                       ),
                       items: [
-                        const DropdownMenuItem<String?>(
+                        DropdownMenuItem<String?>(
                           value: null,
-                          child: Text('All products'),
+                          child: Text(context.l10n.allProducts),
                         ),
                         for (final f in families)
                           DropdownMenuItem<String?>(
@@ -157,7 +161,7 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
                     child: TextField(
                       controller: _value,
                       decoration: InputDecoration(
-                        labelText: 'Change',
+                        labelText: context.l10n.change,
                         hintText: _kind == ChangeKind.percent ? '4.5' : '10',
                       ),
                       onChanged: (_) => _changed(),
@@ -168,7 +172,9 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
                     width: 120,
                     child: DropdownButtonFormField<String>(
                       initialValue: _rounding,
-                      decoration: const InputDecoration(labelText: 'Round to'),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.roundTo,
+                      ),
                       items: const [
                         DropdownMenuItem(value: '0.01', child: Text('0,01')),
                         DropdownMenuItem(value: '0.05', child: Text('0,05')),
@@ -185,11 +191,9 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: Text('New prices valid from ${date(_from)}'),
-                subtitle: const Text(
-                  'Quotations before this date keep using the current prices',
-                ),
-                trailing: const Icon(Icons.calendar_today),
+                title: Text(context.l10n.newPricesValidFrom(date(_from))),
+                subtitle: Text(context.l10n.bulkKeepsQuotes),
+                trailing: Icon(Icons.calendar_today),
                 onTap: () async {
                   final d = await showDatePicker(
                     context: context,
@@ -206,19 +210,29 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
               if (_error != null)
                 Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
               if (p != null) ...[
-                const Divider(),
+                Divider(),
                 Text(
-                  '${p.lines.length} prices will change'
-                  '${p.withoutPrice > 0 ? ' · ${p.withoutPrice} product/zone combinations have no price and are skipped' : ''}'
-                  '${p.conflicts > 0 ? ' · ${p.conflicts} already have a price on this date' : ''}',
+                  [
+                    context.l10n.pricesWillChange(p.lines.length),
+                    if (p.withoutPrice > 0)
+                      context.l10n.skippedWithoutPrice(p.withoutPrice),
+                    if (p.conflicts > 0)
+                      context.l10n.conflictsOnDate(p.conflicts),
+                  ].join(' · '),
                   style: theme.textTheme.titleSmall,
                 ),
                 DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Product')),
-                    DataColumn(label: Text('Zone')),
-                    DataColumn(label: Text('Current'), numeric: true),
-                    DataColumn(label: Text('New'), numeric: true),
+                  columns: [
+                    DataColumn(label: Text(context.l10n.product)),
+                    DataColumn(label: Text(context.l10n.zone)),
+                    DataColumn(
+                      label: Text(context.l10n.current),
+                      numeric: true,
+                    ),
+                    DataColumn(
+                      label: Text(context.l10n.newItem),
+                      numeric: true,
+                    ),
                   ],
                   rows: [
                     for (final l in p.lines.take(200))
@@ -238,7 +252,7 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
                   ],
                 ),
                 if (p.lines.length > 200)
-                  Text('… and ${p.lines.length - 200} more'),
+                  Text(context.l10n.andMore(p.lines.length - 200)),
               ],
             ],
           ),
@@ -247,17 +261,17 @@ class _BulkPriceDialogState extends ConsumerState<BulkPriceDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         OutlinedButton(
           onPressed: _busy ? null : () => _run(false),
-          child: const Text('Preview'),
+          child: Text(context.l10n.preview),
         ),
         FilledButton(
           onPressed: _busy || p == null || p.lines.isEmpty || p.conflicts > 0
               ? null
               : () => _run(true),
-          child: const Text('Apply'),
+          child: Text(context.l10n.apply),
         ),
       ],
     );

@@ -11,7 +11,7 @@ COPY apps apps
 COPY crates crates
 COPY migrations migrations
 COPY seed seed
-RUN cargo build --release -p traydcraft-api
+RUN cargo build --release -p traydcraft-api -p traydcraft-worker
 
 FROM debian:trixie-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
 WORKDIR /app
 COPY --from=typst /usr/local/cargo/bin/typst /usr/local/bin/typst
 COPY --from=build /src/target/release/traydcraft-api /usr/local/bin/traydcraft-api
+COPY --from=build /src/target/release/traydcraft-worker /usr/local/bin/traydcraft-worker
 COPY templates templates
 USER traydcraft
 ENV BIND_ADDR=0.0.0.0:8080 TEMPLATE_DIR=/app/templates TYPST_BIN=/usr/local/bin/typst

@@ -388,20 +388,18 @@ async fn get_opportunity(
     Ok(Json(load(&mut conn, user.company_id, id).await?))
 }
 
-#[utoipa::path(post, path = "/opportunities", tag = "crm", request_body = OpportunityInput,
-    responses((status = 201, body = Opportunity), (status = 422, body = ErrorBody)))]
-async fn create_opportunity(
-    State(state): State<AppState>,
-    user: CurrentUser,
-    Json(input): Json<OpportunityInput>,
-) -> AppResult<(StatusCode, Json<Opportunity>)> {
+/// Creates an opportunity in the caller's transaction (also used when a ticket becomes a lead).
+pub async fn create(
+    conn: &mut PgConnection,
+    user: &CurrentUser,
+    input: &OpportunityInput,
+) -> AppResult<Opportunity> {
     user.require(Permission::OpportunitiesWrite)?;
     input.validate()?;
     let owner = input.owner_user_id.unwrap_or(user.user_id);
-    let mut tx = state.db.begin().await?;
-    ensure_owner_in_company(&mut tx, user.company_id, owner).await?;
+    ensure_owner_in_company(conn, user.company_id, owner).await?;
     let year = Utc::now().year();
-    let n = numbering::next_number(&mut tx, user.company_id, "opportunity", year).await?;
+    let n = numbering::next_number(conn, user.company_id, "opportunity", year).await?;
     let number = format!("O{year}-{n:05}");
     let id = new_id();
     sqlx::query(
@@ -419,18 +417,29 @@ async fn create_opportunity(
     .bind(input.probability.unwrap_or(OpportunityStage::Lead.default_probability()))
     .bind(input.expected_close)
     .bind(&input.notes)
-    .execute(&mut *tx)
+    .execute(&mut *conn)
     .await?;
     audit::record(
-        &mut tx,
-        &user,
+        conn,
+        user,
         "opportunity",
         id,
         "created",
         serde_json::json!({ "number": number }),
     )
     .await?;
-    let opp = load(&mut tx, user.company_id, id).await?;
+    load(conn, user.company_id, id).await
+}
+
+#[utoipa::path(post, path = "/opportunities", tag = "crm", request_body = OpportunityInput,
+    responses((status = 201, body = Opportunity), (status = 422, body = ErrorBody)))]
+async fn create_opportunity(
+    State(state): State<AppState>,
+    user: CurrentUser,
+    Json(input): Json<OpportunityInput>,
+) -> AppResult<(StatusCode, Json<Opportunity>)> {
+    let mut tx = state.db.begin().await?;
+    let opp = create(&mut tx, &user, &input).await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(opp)))
 }

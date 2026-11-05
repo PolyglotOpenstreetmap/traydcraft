@@ -4,19 +4,22 @@ import 'package:go_router/go_router.dart';
 
 import 'api.dart';
 import 'session.dart';
+import '../l10n/l10n.dart';
 
 class _Dest {
   const _Dest(this.path, this.label, this.icon);
   final String path;
-  final String label;
+  final String Function(AppLocalizations l) label;
   final IconData icon;
 }
 
-const _destinations = [
-  _Dest('/opportunities', 'Opportunities', Icons.trending_up),
-  _Dest('/quotations', 'Quotations', Icons.request_quote_outlined),
-  _Dest('/customers', 'Customers', Icons.business_outlined),
-  _Dest('/products', 'Products', Icons.inventory_2_outlined),
+final _destinations = [
+  _Dest('/opportunities', (l) => l.opportunities, Icons.trending_up),
+  _Dest('/quotations', (l) => l.quotations, Icons.request_quote_outlined),
+  _Dest('/orders', (l) => l.orders, Icons.inventory_outlined),
+  _Dest('/helpdesk', (l) => l.helpdesk, Icons.support_agent),
+  _Dest('/customers', (l) => l.customers, Icons.business_outlined),
+  _Dest('/products', (l) => l.products, Icons.inventory_2_outlined),
 ];
 
 /// Navigation frame: a side rail on desktop/tablet, a bottom bar on phones.
@@ -36,7 +39,7 @@ class AppShell extends ConsumerWidget {
     void go(int i) => context.go(_destinations[i].path);
 
     final userMenu = PopupMenuButton<String>(
-      tooltip: 'Account',
+      tooltip: context.l10n.account,
       icon: const Icon(Icons.account_circle_outlined),
       itemBuilder: (_) => [
         PopupMenuItem(
@@ -50,10 +53,30 @@ class AppShell extends ConsumerWidget {
             ),
           ),
         ),
-        const PopupMenuItem(value: 'signout', child: Text('Sign out')),
+        const PopupMenuDivider(),
+        PopupMenuItem(enabled: false, child: Text(context.l10n.appLanguage)),
+        CheckedPopupMenuItem(
+          value: 'lang:',
+          checked: ref.watch(localeProvider) == null,
+          child: Text(context.l10n.deviceLanguage),
+        ),
+        for (final code in languageCodes)
+          CheckedPopupMenuItem(
+            value: 'lang:$code',
+            checked: ref.watch(localeProvider)?.languageCode == code,
+            child: Text(languageName(code)),
+          ),
+        const PopupMenuDivider(),
+        PopupMenuItem(value: 'signout', child: Text(context.l10n.signOut)),
       ],
       onSelected: (v) {
         if (v == 'signout') ref.read(sessionProvider.notifier).signOut();
+        if (v.startsWith('lang:')) {
+          final code = v.substring(5);
+          ref
+              .read(localeProvider.notifier)
+              .set(code.isEmpty ? null : Locale(code));
+        }
       },
     );
 
@@ -82,7 +105,7 @@ class AppShell extends ConsumerWidget {
                 for (final d in _destinations)
                   NavigationRailDestination(
                     icon: Icon(d.icon),
-                    label: Text(d.label),
+                    label: Text(d.label(context.l10n)),
                   ),
               ],
             ),
@@ -103,7 +126,10 @@ class AppShell extends ConsumerWidget {
         onDestinationSelected: go,
         destinations: [
           for (final d in _destinations)
-            NavigationDestination(icon: Icon(d.icon), label: d.label),
+            NavigationDestination(
+              icon: Icon(d.icon),
+              label: d.label(context.l10n),
+            ),
         ],
       ),
     );

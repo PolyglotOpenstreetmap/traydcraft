@@ -5,6 +5,9 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/convert_input.dart';
+import '../models/order.dart';
+import '../models/order_page.dart';
 import '../models/pricing_preview.dart';
 import '../models/pricing_preview_input.dart';
 import '../models/quotation.dart';
@@ -18,6 +21,20 @@ part 'sales_client.g.dart';
 @RestApi()
 abstract class SalesClient {
   factory SalesClient(Dio dio, {String? baseUrl}) = _SalesClient;
+
+  /// [q] - Searches order number, quotation number, customer name and customer reference.
+  @GET('/api/v1/orders')
+  Future<OrderPage> listOrders({
+    @Query('q') String? q,
+    @Query('customer_id') String? customerId,
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+  });
+
+  @GET('/api/v1/orders/{id}')
+  Future<Order> getOrder({
+    @Path('id') required String id,
+  });
 
   /// Prices lines for a customer without saving. The app calls this while the user edits,.
   /// so every number on screen comes from the server's pricing engine.
@@ -57,6 +74,13 @@ abstract class SalesClient {
   @POST('/api/v1/quotations/{id}/accept')
   Future<Quotation> acceptQuotation({
     @Path('id') required String id,
+  });
+
+  /// Converts a sent or accepted quotation revision into a sales order.
+  @POST('/api/v1/quotations/{id}/convert')
+  Future<Order> convert({
+    @Path('id') required String id,
+    @Body() required ConvertInput body,
   });
 
   @GET('/api/v1/quotations/{id}/pdf')

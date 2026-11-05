@@ -6,6 +6,7 @@ import '../../shared/actions.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
 import '../products/families_dialog.dart';
+import '../../l10n/l10n.dart';
 
 /// A customer's product- and family-specific rebates. The general rebate is in the customer form.
 /// For a product the most specific valid rebate wins: product, then family, then general.
@@ -35,7 +36,7 @@ class _RebatesDialogState extends ConsumerState<RebatesDialog> {
   }
 
   String _period(CustomerRebate r) {
-    if (r.validFrom == null && r.validTo == null) return 'always';
+    if (r.validFrom == null && r.validTo == null) return context.l10n.always;
     return '${r.validFrom == null ? '…' : date(r.validFrom)} – ${r.validTo == null ? '…' : date(r.validTo)}';
   }
 
@@ -47,7 +48,7 @@ class _RebatesDialogState extends ConsumerState<RebatesDialog> {
     final c = widget.customer;
     final list = _rebates;
     return AlertDialog(
-      title: Text('Rebates · ${c.name}'),
+      title: Text(context.l10n.rebatesOf(c.name)),
       content: SizedBox(
         width: 620,
         child: list == null
@@ -61,7 +62,7 @@ class _RebatesDialogState extends ConsumerState<RebatesDialog> {
                     '(net-priced products are never discounted).',
                   ),
                   const SizedBox(height: 8),
-                  if (list.isEmpty) const Text('No product or family rebates.'),
+                  if (list.isEmpty) Text(context.l10n.noRebates),
                   for (final r in list)
                     ListTile(
                       leading: Icon(
@@ -80,7 +81,7 @@ class _RebatesDialogState extends ConsumerState<RebatesDialog> {
                       ),
                       trailing: canWrite
                           ? IconButton(
-                              tooltip: 'Remove',
+                              tooltip: context.l10n.remove,
                               icon: const Icon(Icons.delete_outline),
                               onPressed: () async {
                                 await runAction(
@@ -102,7 +103,7 @@ class _RebatesDialogState extends ConsumerState<RebatesDialog> {
         if (canWrite)
           TextButton.icon(
             icon: const Icon(Icons.add),
-            label: const Text('Add rebate'),
+            label: Text(context.l10n.addRebate),
             onPressed: () async {
               final added = await showDialog<bool>(
                 context: context,
@@ -113,7 +114,7 @@ class _RebatesDialogState extends ConsumerState<RebatesDialog> {
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Close'),
+          child: Text(context.l10n.close),
         ),
       ],
     );
@@ -183,16 +184,22 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
         ref.watch(familiesProvider).value ?? const <ProductFamily>[];
     const gap = SizedBox(height: 12);
     return AlertDialog(
-      title: const Text('Add rebate'),
+      title: Text(context.l10n.addRebate),
       content: SizedBox(
         width: 460,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SegmentedButton<String>(
-              segments: const [
-                ButtonSegment(value: 'family', label: Text('Product family')),
-                ButtonSegment(value: 'product', label: Text('Single product')),
+              segments: [
+                ButtonSegment(
+                  value: 'family',
+                  label: Text(context.l10n.productFamily),
+                ),
+                ButtonSegment(
+                  value: 'product',
+                  label: Text(context.l10n.singleProduct),
+                ),
               ],
               selected: {_scope},
               onSelectionChanged: (s) => setState(() => _scope = s.first),
@@ -201,7 +208,7 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
             if (_scope == 'family')
               DropdownButtonFormField<String>(
                 initialValue: _familyId,
-                decoration: const InputDecoration(labelText: 'Family'),
+                decoration: InputDecoration(labelText: context.l10n.family),
                 items: [
                   for (final f in families)
                     DropdownMenuItem(
@@ -213,7 +220,7 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
               )
             else
               SearchPicker<Product>(
-                label: 'Product',
+                label: context.l10n.product,
                 display: (p) => '${p.code} · ${p.name}',
                 search: (q) async =>
                     (await ref
@@ -228,7 +235,9 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
             gap,
             TextField(
               controller: _percent,
-              decoration: const InputDecoration(labelText: 'Rebate %'),
+              decoration: InputDecoration(
+                labelText: context.l10n.rebatePercent,
+              ),
             ),
             gap,
             Row(
@@ -240,7 +249,9 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
                       setState(() => _from = d);
                     },
                     child: Text(
-                      _from == null ? 'From: always' : 'From ${date(_from)}',
+                      _from == null
+                          ? '${context.l10n.from}: ${context.l10n.always}'
+                          : '${context.l10n.from} ${date(_from)}',
                     ),
                   ),
                 ),
@@ -252,7 +263,9 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
                       setState(() => _to = d);
                     },
                     child: Text(
-                      _to == null ? 'Until: open' : 'Until ${date(_to)}',
+                      _to == null
+                          ? '${context.l10n.until}: ${context.l10n.openEnded}'
+                          : '${context.l10n.until} ${date(_to)}',
                     ),
                   ),
                 ),
@@ -261,7 +274,7 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
             gap,
             TextField(
               controller: _notes,
-              decoration: const InputDecoration(labelText: 'Notes'),
+              decoration: InputDecoration(labelText: context.l10n.notes),
             ),
             if (_error != null) ...[
               gap,
@@ -276,9 +289,9 @@ class _NewRebateState extends ConsumerState<_NewRebate> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('Save')),
+        FilledButton(onPressed: _save, child: Text(context.l10n.save)),
       ],
     );
   }

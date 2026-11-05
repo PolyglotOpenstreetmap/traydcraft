@@ -4,19 +4,48 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/api.dart';
 import '../../shared/format.dart';
 import 'rebates_dialog.dart';
+import '../../l10n/l10n.dart';
 
 /// Shows the customer form; returns true when saved.
 Future<bool?> showCustomerForm(
   BuildContext context, {
   Customer? customer,
   bool readOnly = false,
-}) => showDialog<bool>(
+}) async =>
+    await showDialog<Customer>(
+      context: context,
+      builder: (_) => CustomerForm(customer: customer, readOnly: readOnly),
+    ) !=
+    null;
+
+/// A new customer pre-filled from e.g. a helpdesk ticket. Returns the created customer.
+Future<Customer?> showNewCustomerForm(
+  BuildContext context, {
+  String? name,
+  String? email,
+  String? language,
+}) => showDialog<Customer>(
   context: context,
-  builder: (_) => CustomerForm(customer: customer, readOnly: readOnly),
+  builder: (_) => CustomerForm(
+    initialName: name,
+    initialEmail: email,
+    initialLanguage: language,
+  ),
 );
 
 class CustomerForm extends ConsumerStatefulWidget {
-  const CustomerForm({super.key, this.customer, this.readOnly = false});
+  const CustomerForm({
+    super.key,
+    this.customer,
+    this.readOnly = false,
+    this.initialName,
+    this.initialEmail,
+    this.initialLanguage,
+  });
+
+  final String? initialName;
+  final String? initialEmail;
+  final String? initialLanguage;
 
   final Customer? customer;
   final bool readOnly;
@@ -29,9 +58,11 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
   final _form = GlobalKey<FormState>();
   late final c = widget.customer;
   late final _code = TextEditingController(text: c?.code);
-  late final _name = TextEditingController(text: c?.name);
+  late final _name = TextEditingController(text: c?.name ?? widget.initialName);
   late final _vat = TextEditingController(text: c?.vatNumber);
-  late final _email = TextEditingController(text: c?.email);
+  late final _email = TextEditingController(
+    text: c?.email ?? widget.initialEmail,
+  );
   late final _phone = TextEditingController(text: c?.phone);
   late final _street = TextEditingController(text: c?.street);
   late final _postal = TextEditingController(text: c?.postalCode);
@@ -43,7 +74,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
   late final _terms = TextEditingController(
     text: '${c?.paymentTermsDays ?? 30}',
   );
-  late String _language = c?.language ?? 'nl';
+  late String _language = c?.language ?? widget.initialLanguage ?? 'nl';
   late String? _zoneId = c?.priceZoneId;
   bool _saving = false;
   String? _error;
@@ -74,12 +105,10 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
     );
     try {
       final crm = ref.read(apiProvider).crm;
-      if (c == null) {
-        await crm.createCustomer(body: input);
-      } else {
-        await crm.updateCustomer(id: c!.id, body: input);
-      }
-      if (mounted) Navigator.pop(context, true);
+      final saved = c == null
+          ? await crm.createCustomer(body: input)
+          : await crm.updateCustomer(id: c!.id, body: input);
+      if (mounted) Navigator.pop(context, saved);
     } catch (e) {
       setState(() => _error = errorMessage(e));
     } finally {
@@ -98,7 +127,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
     decoration: InputDecoration(labelText: label),
     validator: (v) {
       final s = (v ?? '').trim();
-      if (required && s.isEmpty) return 'Required';
+      if (required && s.isEmpty) return context.l10n.required;
       return check?.call(s);
     },
   );
@@ -108,7 +137,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
     final zones = ref.watch(priceZonesProvider);
     const gap = SizedBox(width: 12, height: 12);
     return AlertDialog(
-      title: Text(c == null ? 'New customer' : c!.name),
+      title: Text(c == null ? context.l10n.newCustomer : c!.name),
       content: SizedBox(
         width: 560,
         child: Form(
@@ -121,37 +150,43 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                   children: [
                     SizedBox(
                       width: 140,
-                      child: _field(_code, 'Code', required: true),
+                      child: _field(_code, context.l10n.code, required: true),
                     ),
                     gap,
-                    Expanded(child: _field(_name, 'Name', required: true)),
+                    Expanded(
+                      child: _field(_name, context.l10n.name, required: true),
+                    ),
                   ],
                 ),
                 gap,
                 Row(
                   children: [
-                    Expanded(child: _field(_vat, 'VAT number')),
+                    Expanded(child: _field(_vat, context.l10n.vatNumber)),
                     gap,
-                    Expanded(child: _field(_email, 'E-mail')),
+                    Expanded(child: _field(_email, context.l10n.email)),
                     gap,
-                    Expanded(child: _field(_phone, 'Phone')),
+                    Expanded(child: _field(_phone, context.l10n.phone)),
                   ],
                 ),
                 gap,
-                _field(_street, 'Street'),
+                _field(_street, context.l10n.street),
                 gap,
                 Row(
                   children: [
-                    SizedBox(width: 110, child: _field(_postal, 'Postal code')),
+                    SizedBox(
+                      width: 110,
+                      child: _field(_postal, context.l10n.postalCode),
+                    ),
                     gap,
-                    Expanded(child: _field(_city, 'City')),
+                    Expanded(child: _field(_city, context.l10n.city)),
                     gap,
                     SizedBox(
                       width: 80,
                       child: _field(
                         _country,
-                        'Country',
-                        check: (s) => s.length == 2 ? null : '2 letters',
+                        context.l10n.country,
+                        check: (s) =>
+                            s.length == 2 ? null : context.l10n.twoLetters,
                       ),
                     ),
                     gap,
@@ -159,13 +194,15 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                       width: 110,
                       child: DropdownButtonFormField<String>(
                         initialValue: _language,
-                        decoration: const InputDecoration(
-                          labelText: 'Language',
+                        decoration: InputDecoration(
+                          labelText: context.l10n.appLanguage,
                         ),
                         items: const [
                           DropdownMenuItem(value: 'nl', child: Text('NL')),
                           DropdownMenuItem(value: 'fr', child: Text('FR')),
                           DropdownMenuItem(value: 'en', child: Text('EN')),
+                          DropdownMenuItem(value: 'de', child: Text('DE')),
+                          DropdownMenuItem(value: 'es', child: Text('ES')),
                         ],
                         onChanged: widget.readOnly
                             ? null
@@ -181,8 +218,8 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                       child: zones.when(
                         data: (list) => DropdownButtonFormField<String>(
                           initialValue: _zoneId,
-                          decoration: const InputDecoration(
-                            labelText: 'Price zone',
+                          decoration: InputDecoration(
+                            labelText: context.l10n.priceZone,
                           ),
                           items: [
                             for (final z in list)
@@ -194,7 +231,8 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                           onChanged: widget.readOnly
                               ? null
                               : (v) => setState(() => _zoneId = v),
-                          validator: (v) => v == null ? 'Required' : null,
+                          validator: (v) =>
+                              v == null ? context.l10n.required : null,
                         ),
                         loading: () => const LinearProgressIndicator(),
                         error: (e, _) => Text(errorMessage(e)),
@@ -205,10 +243,10 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                       width: 110,
                       child: _field(
                         _discount,
-                        'General rebate %',
+                        context.l10n.generalRebatePercent,
                         check: (s) =>
                             parseDecimalInput(s.isEmpty ? '0' : s) == null
-                            ? 'Number'
+                            ? context.l10n.numberRequired
                             : null,
                       ),
                     ),
@@ -217,8 +255,10 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
                       width: 120,
                       child: _field(
                         _terms,
-                        'Payment days',
-                        check: (s) => int.tryParse(s) == null ? 'Number' : null,
+                        context.l10n.paymentDays,
+                        check: (s) => int.tryParse(s) == null
+                            ? context.l10n.numberRequired
+                            : null,
                       ),
                     ),
                   ],
@@ -241,7 +281,7 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
         if (c != null)
           TextButton.icon(
             icon: const Icon(Icons.percent),
-            label: const Text('Product rebates'),
+            label: Text(context.l10n.productRebates),
             onPressed: () => showDialog<void>(
               context: context,
               builder: (_) => RebatesDialog(customer: c!),
@@ -249,12 +289,14 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(widget.readOnly ? 'Close' : 'Cancel'),
+          child: Text(
+            widget.readOnly ? context.l10n.close : context.l10n.cancel,
+          ),
         ),
         if (!widget.readOnly)
           FilledButton(
             onPressed: _saving ? null : _save,
-            child: const Text('Save'),
+            child: Text(context.l10n.save),
           ),
       ],
     );

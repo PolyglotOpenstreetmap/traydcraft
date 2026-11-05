@@ -48,10 +48,19 @@ pub enum Permission {
     RebatesWrite,
     /// Price a quotation on an earlier price list than its quote date.
     PricesBackdate,
+    HelpdeskRead,
+    /// Create tickets, write internal notes, change status and links.
+    HelpdeskWrite,
+    /// Send e-mails to customers.
+    HelpdeskReply,
+    /// Manage prepared answers.
+    AnswersWrite,
+    OrdersRead,
+    OrdersWrite,
 }
 
 impl Permission {
-    pub const ALL: [Permission; 15] = [
+    pub const ALL: [Permission; 21] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -67,6 +76,12 @@ impl Permission {
         Permission::SerialsWrite,
         Permission::RebatesWrite,
         Permission::PricesBackdate,
+        Permission::HelpdeskRead,
+        Permission::HelpdeskWrite,
+        Permission::HelpdeskReply,
+        Permission::AnswersWrite,
+        Permission::OrdersRead,
+        Permission::OrdersWrite,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -86,6 +101,12 @@ impl Permission {
             Permission::SerialsWrite => "serials.write",
             Permission::RebatesWrite => "rebates.write",
             Permission::PricesBackdate => "prices.backdate",
+            Permission::HelpdeskRead => "helpdesk.read",
+            Permission::HelpdeskWrite => "helpdesk.write",
+            Permission::HelpdeskReply => "helpdesk.reply",
+            Permission::AnswersWrite => "answers.write",
+            Permission::OrdersRead => "orders.read",
+            Permission::OrdersWrite => "orders.write",
         }
     }
 }
@@ -95,7 +116,9 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
     use Permission::*;
     match role {
         "admin" => true,
-        "sales_manager" => role_grants("sales", p) || matches!(p, RebatesWrite | PricesBackdate),
+        "sales_manager" => {
+            role_grants("sales", p) || matches!(p, RebatesWrite | PricesBackdate | AnswersWrite)
+        }
         "sales" => matches!(
             p,
             CustomersRead
@@ -107,6 +130,39 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | OpportunitiesWrite
                 | BomRead
                 | SerialsRead
+                | HelpdeskRead
+                | HelpdeskWrite
+                | HelpdeskReply
+                | OrdersRead
+                | OrdersWrite
+        ),
+        // First-line customer service: answers e-mails, maintains prepared answers.
+        "support" => matches!(
+            p,
+            CustomersRead
+                | ProductsRead
+                | QuotationsRead
+                | OpportunitiesRead
+                | OpportunitiesWrite
+                | BomRead
+                | SerialsRead
+                | HelpdeskRead
+                | HelpdeskWrite
+                | HelpdeskReply
+                | AnswersWrite
+                | OrdersRead
+        ),
+        // Production asks questions through internal notes; sales talks to the customer.
+        "production" => matches!(
+            p,
+            CustomersRead
+                | ProductsRead
+                | BomRead
+                | SerialsRead
+                | SerialsWrite
+                | OrdersRead
+                | HelpdeskRead
+                | HelpdeskWrite
         ),
         "product_manager" => matches!(
             p,
@@ -120,6 +176,8 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | BomWrite
                 | SerialsRead
                 | SerialsWrite
+                | OrdersRead
+                | HelpdeskRead
         ),
         "viewer" => matches!(
             p,
@@ -129,6 +187,8 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | OpportunitiesRead
                 | BomRead
                 | SerialsRead
+                | HelpdeskRead
+                | OrdersRead
         ),
         _ => false,
     }
@@ -395,6 +455,13 @@ mod tests {
             assert!(!role_grants("sales", p));
         }
         assert!(role_grants("sales_manager", Permission::QuotationsWrite));
+    }
+
+    #[test]
+    fn production_cannot_email_customers() {
+        assert!(role_grants("production", Permission::HelpdeskWrite));
+        assert!(!role_grants("production", Permission::HelpdeskReply));
+        assert!(role_grants("sales", Permission::HelpdeskReply));
     }
 
     #[test]

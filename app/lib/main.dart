@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app/router.dart';
+import 'l10n/l10n.dart';
 import 'app/session.dart';
 
 Future<void> main() async {
@@ -32,6 +33,10 @@ class TraydcraftApp extends ConsumerWidget {
         ),
       ),
       routerConfig: ref.watch(routerProvider),
+      locale: ref.watch(localeProvider),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      onGenerateTitle: (context) => 'traydcraft',
     );
   }
 }

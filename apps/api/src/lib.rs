@@ -24,8 +24,9 @@ pub const DEV_SEED_SQL: &str = include_str!("../../../seed/dev_seed.sql");
         (name = "core", description = "Users and companies"),
         (name = "crm", description = "Customers and opportunities"),
         (name = "products", description = "Products, price zones and price lists"),
-        (name = "sales", description = "Quotations and pricing"),
+        (name = "sales", description = "Quotations, pricing and orders"),
         (name = "engineering", description = "Bills of materials and serial numbers"),
+        (name = "helpdesk", description = "Tickets, e-mail and prepared answers"),
     )
 )]
 struct ApiDoc;
@@ -53,7 +54,8 @@ fn api() -> (Router<AppState>, OpenApiDoc) {
         .merge(traydcraft_crm::router())
         .merge(traydcraft_products::router())
         .merge(traydcraft_sales::router())
-        .merge(traydcraft_engineering::router());
+        .merge(traydcraft_engineering::router())
+        .merge(traydcraft_helpdesk::router());
     OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api/v1", v1)
         .split_for_parts()

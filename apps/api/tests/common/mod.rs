@@ -68,3 +68,27 @@ pub async fn call(
 pub fn dec(v: &Value) -> Decimal {
     v.as_str().expect("decimal as string").parse().unwrap()
 }
+
+/// Sends a raw (non-JSON) body, e.g. an e-mail to the import endpoint.
+pub async fn call_raw(
+    app: &axum::Router,
+    user: &str,
+    uri: &str,
+    content_type: &str,
+    body: Vec<u8>,
+) -> (StatusCode, Value) {
+    let req = Request::builder()
+        .method(Method::POST)
+        .uri(uri)
+        .header("x-dev-user", user)
+        .header("content-type", content_type)
+        .body(Body::from(body))
+        .unwrap();
+    let res = app.clone().oneshot(req).await.unwrap();
+    let status = res.status();
+    let bytes = res.into_body().collect().await.unwrap().to_bytes();
+    (
+        status,
+        serde_json::from_slice(&bytes).unwrap_or(Value::Null),
+    )
+}

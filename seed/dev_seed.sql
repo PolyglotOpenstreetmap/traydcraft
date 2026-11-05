@@ -162,3 +162,212 @@ INSERT INTO crm.customer_rebates (id, company_id, customer_id, scope, product_id
 INSERT INTO pricing.zone_prices (id, company_id, zone_id, product_id, unit_price, valid_from)
 SELECT gen_random_uuid(), company_id, zone_id, product_id, round(unit_price * 0.96, 2), DATE '2025-01-01'
 FROM pricing.zone_prices WHERE valid_from = DATE '2026-01-01';
+
+-- Helpdesk users: first-line support and production (production asks questions via internal notes).
+INSERT INTO core.users (id, email, display_name) VALUES
+    ('00000000-0000-7000-8000-000000000105', 'support@example.com', 'Support Agent'),
+    ('00000000-0000-7000-8000-000000000106', 'production@example.com', 'Production Planner');
+INSERT INTO core.user_companies (user_id, company_id, roles, is_default) VALUES
+    ('00000000-0000-7000-8000-000000000105', '00000000-0000-7000-8000-000000000001', '{support}', true),
+    ('00000000-0000-7000-8000-000000000106', '00000000-0000-7000-8000-000000000001', '{production}', true);
+
+-- Prepared answers in the five languages.
+INSERT INTO helpdesk.prepared_answers (id, company_id, code, name, category) VALUES
+    ('00000000-0000-7000-8000-000000000a01', '00000000-0000-7000-8000-000000000001', 'order-confirmed', 'Order confirmation', 'Orders'),
+    ('00000000-0000-7000-8000-000000000a02', '00000000-0000-7000-8000-000000000001', 'quote-sent', 'Quotation sent', 'Quotations'),
+    ('00000000-0000-7000-8000-000000000a03', '00000000-0000-7000-8000-000000000001', 'production-question', 'Question from production', 'Orders'),
+    ('00000000-0000-7000-8000-000000000a04', '00000000-0000-7000-8000-000000000001', 'delivery-time', 'Delivery time', 'General');
+
+INSERT INTO helpdesk.prepared_answer_texts (answer_id, language, subject, body) VALUES
+-- order-confirmed
+('00000000-0000-7000-8000-000000000a01', 'nl', 'Orderbevestiging {{order.number}}',
+'Beste {{contact.name}},
+
+Hartelijk dank voor uw bestelling. Wij bevestigen order {{order.number}} (uw referentie: {{order.reference}}) op basis van offerte {{quotation.number}} revisie {{quotation.revision}}, voor een totaalbedrag van {{quotation.total}} incl. btw.
+
+U ontvangt de leverdatum zodra de productie gepland is.
+
+Met vriendelijke groeten,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a01', 'fr', 'Confirmation de commande {{order.number}}',
+'Bonjour {{contact.name}},
+
+Nous vous remercions pour votre commande. Nous confirmons la commande {{order.number}} (votre référence : {{order.reference}}) sur la base de l''offre {{quotation.number}} révision {{quotation.revision}}, pour un montant total de {{quotation.total}} TVAC.
+
+Nous vous communiquerons la date de livraison dès que la production sera planifiée.
+
+Cordialement,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a01', 'en', 'Order confirmation {{order.number}}',
+'Dear {{contact.name}},
+
+Thank you for your order. We confirm order {{order.number}} (your reference: {{order.reference}}) based on quotation {{quotation.number}} revision {{quotation.revision}}, for a total of {{quotation.total}} incl. VAT.
+
+We will let you know the delivery date as soon as production is scheduled.
+
+Kind regards,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a01', 'de', 'Auftragsbestätigung {{order.number}}',
+'Sehr geehrte(r) {{contact.name}},
+
+vielen Dank für Ihren Auftrag. Wir bestätigen den Auftrag {{order.number}} (Ihre Referenz: {{order.reference}}) auf Grundlage des Angebots {{quotation.number}} Revision {{quotation.revision}} über insgesamt {{quotation.total}} inkl. MwSt.
+
+Den Liefertermin teilen wir Ihnen mit, sobald die Produktion eingeplant ist.
+
+Mit freundlichen Grüßen
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a01', 'es', 'Confirmación de pedido {{order.number}}',
+'Estimado/a {{contact.name}}:
+
+Muchas gracias por su pedido. Confirmamos el pedido {{order.number}} (su referencia: {{order.reference}}) según el presupuesto {{quotation.number}} revisión {{quotation.revision}}, por un total de {{quotation.total}} IVA incluido.
+
+Le comunicaremos la fecha de entrega en cuanto la producción esté planificada.
+
+Atentamente,
+{{agent.name}}
+{{company.name}}'),
+-- quote-sent
+('00000000-0000-7000-8000-000000000a02', 'nl', 'Offerte {{quotation.number}}',
+'Beste {{contact.name}},
+
+In bijlage vindt u onze offerte {{quotation.number}}. Wij horen graag of deze aan uw verwachtingen voldoet. Voor vragen of aanpassingen kunt u eenvoudig op deze e-mail antwoorden.
+
+Met vriendelijke groeten,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a02', 'fr', 'Offre {{quotation.number}}',
+'Bonjour {{contact.name}},
+
+Veuillez trouver ci-joint notre offre {{quotation.number}}. N''hésitez pas à répondre à cet e-mail pour toute question ou modification.
+
+Cordialement,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a02', 'en', 'Quotation {{quotation.number}}',
+'Dear {{contact.name}},
+
+Please find our quotation {{quotation.number}} attached. If you have any questions or would like changes, simply reply to this e-mail.
+
+Kind regards,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a02', 'de', 'Angebot {{quotation.number}}',
+'Sehr geehrte(r) {{contact.name}},
+
+anbei erhalten Sie unser Angebot {{quotation.number}}. Bei Fragen oder Änderungswünschen antworten Sie einfach auf diese E-Mail.
+
+Mit freundlichen Grüßen
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a02', 'es', 'Presupuesto {{quotation.number}}',
+'Estimado/a {{contact.name}}:
+
+Adjuntamos nuestro presupuesto {{quotation.number}}. Si tiene alguna pregunta o desea algún cambio, basta con responder a este correo.
+
+Atentamente,
+{{agent.name}}
+{{company.name}}'),
+-- production-question
+('00000000-0000-7000-8000-000000000a03', 'nl', 'Vraag over uw order {{order.number}}',
+'Beste {{contact.name}},
+
+Bij de voorbereiding van de productie van uw order {{order.number}} hebben wij nog een vraag:
+
+[vraag]
+
+Alvast bedankt voor uw antwoord, zodat wij de productie zonder vertraging kunnen voortzetten.
+
+Met vriendelijke groeten,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a03', 'fr', 'Question concernant votre commande {{order.number}}',
+'Bonjour {{contact.name}},
+
+En préparant la production de votre commande {{order.number}}, nous avons encore une question :
+
+[question]
+
+Merci d''avance pour votre réponse, afin que nous puissions poursuivre la production sans retard.
+
+Cordialement,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a03', 'en', 'Question about your order {{order.number}}',
+'Dear {{contact.name}},
+
+While preparing production of your order {{order.number}}, we have one more question:
+
+[question]
+
+Thank you in advance for your answer, so that we can continue production without delay.
+
+Kind regards,
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a03', 'de', 'Rückfrage zu Ihrem Auftrag {{order.number}}',
+'Sehr geehrte(r) {{contact.name}},
+
+bei der Vorbereitung der Fertigung Ihres Auftrags {{order.number}} haben wir noch eine Frage:
+
+[Frage]
+
+Vielen Dank im Voraus für Ihre Antwort, damit wir die Fertigung ohne Verzögerung fortsetzen können.
+
+Mit freundlichen Grüßen
+{{agent.name}}
+{{company.name}}'),
+('00000000-0000-7000-8000-000000000a03', 'es', 'Consulta sobre su pedido {{order.number}}',
+'Estimado/a {{contact.name}}:
+
+Al preparar la fabricación de su pedido {{order.number}}, nos ha surgido una pregunta:
+
+[pregunta]
+
+Le agradecemos de antemano su respuesta, para poder continuar la fabricación sin retrasos.
+
+Atentamente,
+{{agent.name}}
+{{company.name}}'),
+-- delivery-time
+('00000000-0000-7000-8000-000000000a04', 'nl', '',
+'Beste {{contact.name}},
+
+Onze standaard levertermijn bedraagt 6 tot 8 weken na orderbevestiging. Voor dringende leveringen bekijken wij graag de mogelijkheden.
+
+Met vriendelijke groeten,
+{{agent.name}}'),
+('00000000-0000-7000-8000-000000000a04', 'fr', '',
+'Bonjour {{contact.name}},
+
+Notre délai de livraison standard est de 6 à 8 semaines après confirmation de commande. Pour les livraisons urgentes, nous examinons volontiers les possibilités.
+
+Cordialement,
+{{agent.name}}'),
+('00000000-0000-7000-8000-000000000a04', 'en', '',
+'Dear {{contact.name}},
+
+Our standard delivery time is 6 to 8 weeks after order confirmation. For urgent deliveries we are happy to look at the options.
+
+Kind regards,
+{{agent.name}}'),
+('00000000-0000-7000-8000-000000000a04', 'de', '',
+'Sehr geehrte(r) {{contact.name}},
+
+unsere Standardlieferzeit beträgt 6 bis 8 Wochen nach Auftragsbestätigung. Für eilige Lieferungen prüfen wir gerne die Möglichkeiten.
+
+Mit freundlichen Grüßen
+{{agent.name}}'),
+('00000000-0000-7000-8000-000000000a04', 'es', '',
+'Estimado/a {{contact.name}}:
+
+Nuestro plazo de entrega estándar es de 6 a 8 semanas tras la confirmación del pedido. Para entregas urgentes, estudiaremos las posibilidades con gusto.
+
+Atentamente,
+{{agent.name}}');
+
+-- A German customer for the demo (Gamma is in Germany).
+UPDATE crm.customers SET language = 'de' WHERE code = 'C0003';

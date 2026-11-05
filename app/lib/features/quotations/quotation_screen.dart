@@ -9,6 +9,7 @@ import 'package:printing/printing.dart';
 import '../../app/api.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
+import '../../l10n/l10n.dart';
 
 /// An editable line of a draft. Prices are never computed here: they come from
 /// the server's pricing preview, matched by position.
@@ -193,7 +194,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
       if (qty == null ||
           disc == null ||
           (l.isIndicative && l.price.text.trim().isNotEmpty && price == null)) {
-        _previewError = 'Line ${i + 1}: enter valid numbers.';
+        _previewError = context.l10n.enterValidNumbersLine(i + 1);
         return null;
       }
       inputs.add(
@@ -261,7 +262,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
   Future<void> _save() => _run(() async {
     final inputs = _lineInputs();
     if (_customer == null || inputs == null || inputs.isEmpty) {
-      throw 'Choose a customer and add at least one valid line.';
+      throw context.l10n.chooseCustomerAndLine;
     }
     final body = QuotationInput(
       customerId: _customer!.id,
@@ -275,8 +276,9 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         : await _api.sales.updateQuotation(id: _id!, body: body);
     _apply(q);
     if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Saved ${q.number}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.savedNumber(q.number))),
+      );
     }
   });
 
@@ -302,7 +304,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
   Future<void> _pickPriceDate() async {
     final d = await showDatePicker(
       context: context,
-      helpText: 'Price list valid on',
+      helpText: context.l10n.priceListValidOn,
       initialDate: _priceDate ?? _q?.quoteDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
@@ -356,11 +358,16 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
                     ),
                     Text(
                       q == null
-                          ? 'New quotation'
+                          ? context.l10n.newQuotation
                           : '${q.number}  rev. ${q.revision}',
                       style: theme.textTheme.headlineSmall,
                     ),
-                    if (q != null) Chip(label: Text(q.status.json ?? '')),
+                    if (q != null)
+                      Chip(
+                        label: Text(
+                          context.l10n.quotationStatus(q.status.json ?? ''),
+                        ),
+                      ),
                     if (_busy)
                       const SizedBox(
                         width: 20,
@@ -406,7 +413,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         FilledButton.icon(
           onPressed: _busy ? null : _save,
           icon: const Icon(Icons.save),
-          label: const Text('Save draft'),
+          label: Text(context.l10n.saveDraft),
         ),
       if (q != null)
         OutlinedButton.icon(
@@ -420,27 +427,27 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
               ? null
               : () => _transition((id) => _api.sales.sendQuotation(id: id)),
           icon: const Icon(Icons.send),
-          label: const Text('Mark as sent'),
+          label: Text(context.l10n.markAsSent),
         ),
       if (s == QuotationStatus.sent) ...[
         OutlinedButton(
           onPressed: _busy
               ? null
               : () => _transition((id) => _api.sales.acceptQuotation(id: id)),
-          child: const Text('Accepted'),
+          child: Text(context.l10n.accepted),
         ),
         OutlinedButton(
           onPressed: _busy
               ? null
               : () => _transition((id) => _api.sales.rejectQuotation(id: id)),
-          child: const Text('Rejected'),
+          child: Text(context.l10n.rejected),
         ),
       ],
       if (s == QuotationStatus.sent || s == QuotationStatus.rejected)
         OutlinedButton.icon(
           onPressed: _busy ? null : _revise,
           icon: const Icon(Icons.edit_note),
-          label: const Text('New revision'),
+          label: Text(context.l10n.newRevision),
         ),
     ];
   }
@@ -454,7 +461,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
           Expanded(
             child: SearchPicker<Customer>(
               key: ValueKey(_customer?.id),
-              label: 'Customer',
+              label: context.l10n.customer,
               initial: _customer,
               display: (c) => '${c.code} · ${c.name}',
               search: (q) async =>
@@ -467,7 +474,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
-                'Zone ${_customer!.priceZoneCode ?? '—'} · general rebate ${number(_customer!.discountPercent ?? '0')} %\n'
+                '${context.l10n.zoneAndRebate(_customer!.priceZoneCode ?? '—', number(_customer!.discountPercent ?? '0'))}\n'
                 '${_customer!.street}, ${_customer!.postalCode} ${_customer!.city}',
               ),
             ),
@@ -480,15 +487,20 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
           child: DropdownButtonFormField<String?>(
             key: ValueKey('opp-${_customer!.id}-${_opportunities.length}'),
             initialValue: _opportunityId,
-            decoration: const InputDecoration(
-              labelText: 'Opportunity (optional)',
+            decoration: InputDecoration(
+              labelText: context.l10n.opportunityOptional,
             ),
             items: [
-              const DropdownMenuItem<String?>(value: null, child: Text('None')),
+              DropdownMenuItem<String?>(
+                value: null,
+                child: Text(context.l10n.none),
+              ),
               for (final o in _opportunities)
                 DropdownMenuItem<String?>(
                   value: o.id,
-                  child: Text('${o.number} · ${o.title} (${o.stage.json})'),
+                  child: Text(
+                    '${o.number} · ${o.title} (${context.l10n.opportunityStage(o.stage.json ?? '')})',
+                  ),
                 ),
             ],
             onChanged: (v) => setState(() => _opportunityId = v),
@@ -501,12 +513,19 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
-            'Price list of ${date(preview?.priceDate ?? _priceDate ?? _q?.quoteDate ?? DateTime.now())}',
+            context.l10n.priceListOf(
+              date(
+                preview?.priceDate ??
+                    _priceDate ??
+                    _q?.quoteDate ??
+                    DateTime.now(),
+              ),
+            ),
           ),
           TextButton.icon(
             onPressed: _pickPriceDate,
             icon: const Icon(Icons.history),
-            label: const Text('Use another price list date'),
+            label: Text(context.l10n.useAnotherPriceListDate),
           ),
         ],
       ),
@@ -514,8 +533,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         MaterialBanner(
           leading: const Icon(Icons.info_outline),
           content: Text(
-            '${preview!.unconfirmedLines} indicative price(s) to confirm before the quotation can be sent: '
-            'enter the agreed price in the list price field.',
+            context.l10n.indicativeToConfirm(preview!.unconfirmedLines),
           ),
           actions: const [SizedBox.shrink()],
         ),
@@ -535,14 +553,16 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
                       hint: number(
                         preview?.lines.elementAtOrNull(i)?.listUnitPrice,
                       ),
-                      label: l.price.text.trim().isEmpty ? 'confirm' : null,
+                      label: l.price.text.trim().isEmpty
+                          ? context.l10n.confirm
+                          : null,
                     )
                   : Text(
                       money(preview?.lines.elementAtOrNull(i)?.listUnitPrice),
                     ),
               rebate: _rebateText(preview?.lines.elementAtOrNull(i)),
               discount: l.isNet
-                  ? const Text('net')
+                  ? Text(context.l10n.pricingNet)
                   : _numField(l.discount, '%'),
               netPrice: money(preview?.lines.elementAtOrNull(i)?.netUnitPrice),
               total: money(preview?.lines.elementAtOrNull(i)?.lineTotal),
@@ -559,7 +579,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         child: SizedBox(
           width: 420,
           child: SearchPicker<Product>(
-            label: 'Add product',
+            label: context.l10n.addProduct,
             clearOnSelect: true,
             display: (p) => '${p.code} · ${p.name}',
             search: (q) async => (await _api.products.listProducts(
@@ -595,7 +615,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
       TextField(
         controller: _notes,
         maxLines: 3,
-        decoration: const InputDecoration(labelText: 'Notes'),
+        decoration: InputDecoration(labelText: context.l10n.notes),
       ),
     ];
   }
@@ -628,7 +648,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
   String _rebateText(QuotationLine? l) {
     if (l == null) return '';
     if (l.rebateSource == 'net') return 'net';
-    return '${number(l.rebatePercent)} % ${l.rebateSource}';
+    return '${number(l.rebatePercent)} % ${context.l10n.rebateSource(l.rebateSource)}';
   }
 
   List<Widget> _readOnly(Quotation q, ThemeData theme) => [
@@ -637,12 +657,12 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
       '${q.customerStreet}, ${q.customerPostalCode} ${q.customerCity} ${q.customerCountryCode}',
     ),
     Text(
-      'Zone ${q.priceZoneCode} · general rebate ${number(q.customerDiscountPercent)} % · '
-      '${date(q.quoteDate)} – valid until ${date(q.validUntil)}',
+      '${context.l10n.zoneAndRebate(q.priceZoneCode, number(q.customerDiscountPercent))} · '
+      '${date(q.quoteDate)} – ${context.l10n.validUntil(date(q.validUntil))}',
     ),
     if (q.priceDate != q.quoteDate)
       Text(
-        'Priced on the price list of ${date(q.priceDate)}',
+        context.l10n.pricedOnPriceListOf(date(q.priceDate)),
         style: TextStyle(color: theme.colorScheme.tertiary),
       ),
     if (q.opportunityId != null)
@@ -650,7 +670,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         alignment: Alignment.centerLeft,
         child: TextButton.icon(
           icon: const Icon(Icons.trending_up),
-          label: const Text('Open opportunity'),
+          label: Text(context.l10n.openOpportunity),
           onPressed: () => context.push('/opportunities/${q.opportunityId}'),
         ),
       ),
@@ -667,7 +687,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
             rebate: _rebateText(l),
             discount: Text(
               l.pricingType == 'net'
-                  ? 'net'
+                  ? context.l10n.pricingNet
                   : '${number(l.lineDiscountPercent)} %',
             ),
             netPrice: money(l.netUnitPrice, currency: q.currency),
@@ -679,7 +699,7 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
     _totals(theme, q.subtotal, q.vatGroups, q.total, q.currency),
     if (q.notes.isNotEmpty) ...[
       const SizedBox(height: 16),
-      Text('Notes', style: theme.textTheme.labelLarge),
+      Text(context.l10n.notes, style: theme.textTheme.labelLarge),
       Text(q.notes),
     ],
   ];
@@ -711,14 +731,14 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
         children: [
           Row(
             children: [
-              cell(0, h('Code')),
-              cell(1, h('Description')),
-              cell(2, h('Quantity'), right: true),
-              cell(3, h('List price'), right: true),
-              cell(4, h('Rebate'), right: true),
-              cell(5, h('Line disc.'), right: true),
-              cell(6, h('Net price'), right: true),
-              cell(7, h('Total'), right: true),
+              cell(0, h(context.l10n.code)),
+              cell(1, h(context.l10n.description)),
+              cell(2, h(context.l10n.quantity), right: true),
+              cell(3, h(context.l10n.listPrice), right: true),
+              cell(4, h(context.l10n.rebate), right: true),
+              cell(5, h(context.l10n.lineDiscount), right: true),
+              cell(6, h(context.l10n.netPrice), right: true),
+              cell(7, h(context.l10n.total), right: true),
             ],
           ),
           const Divider(),
@@ -747,9 +767,9 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
               ),
             ),
           if (rows.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(8),
-              child: Text('No lines yet.'),
+              child: Text(context.l10n.noLines),
             ),
         ],
       ),
@@ -768,15 +788,21 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
       width: 340,
       child: Column(
         children: [
-          _totalRow('Total excl. VAT', money(subtotal, currency: currency)),
+          _totalRow(
+            context.l10n.totalExclVat,
+            money(subtotal, currency: currency),
+          ),
           for (final g in vat)
             _totalRow(
-              'VAT ${number(g.vatRate)} % on ${money(g.baseValue, currency: currency)}',
+              context.l10n.vatOn(
+                number(g.vatRate),
+                money(g.baseValue, currency: currency),
+              ),
               money(g.vat, currency: currency),
             ),
           const Divider(),
           _totalRow(
-            'Total incl. VAT',
+            context.l10n.totalInclVat,
             money(total, currency: currency),
             style: theme.textTheme.titleMedium,
           ),
@@ -829,7 +855,7 @@ class RevisionDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return AlertDialog(
-      title: Text('New revision of ${quotation.number}'),
+      title: Text(context.l10n.newRevisionOf(quotation.number)),
       content: SizedBox(
         width: 760,
         child: FutureBuilder<RepricingComparison>(
@@ -837,8 +863,7 @@ class RevisionDialog extends ConsumerWidget {
           builder: (context, snap) {
             if (snap.hasError) {
               return Text(
-                'Today\'s prices could not be calculated: ${errorMessage(snap.error!)}\n'
-                'You can still keep the agreed prices.',
+                '${context.l10n.repricingFailed(errorMessage(snap.error!))}\n${context.l10n.canStillKeep}',
               );
             }
             final c = snap.data;
@@ -854,8 +879,10 @@ class RevisionDialog extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Agreed prices: price list of ${date(c.oldPriceDate)}. '
-                    'Current prices: price list of ${date(c.newPriceDate)}.',
+                    context.l10n.revisionPriceLists(
+                      date(c.oldPriceDate),
+                      date(c.newPriceDate),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Table(
@@ -865,11 +892,11 @@ class RevisionDialog extends ConsumerWidget {
                       TableRow(
                         children: [
                           for (final t in [
-                            'Code',
-                            'Description',
-                            'Agreed',
-                            'Current',
-                            'Difference',
+                            context.l10n.code,
+                            context.l10n.description,
+                            context.l10n.agreed,
+                            context.l10n.current,
+                            context.l10n.difference,
                           ])
                             Padding(
                               padding: const EdgeInsets.all(6),
@@ -888,7 +915,7 @@ class RevisionDialog extends ConsumerWidget {
                               padding: const EdgeInsets.all(6),
                               child: Text(
                                 l.needsConfirmation
-                                    ? '${l.description} (indicative, to confirm)'
+                                    ? context.l10n.indicativeLine(l.description)
                                     : l.description,
                               ),
                             ),
@@ -920,8 +947,11 @@ class RevisionDialog extends ConsumerWidget {
                   ),
                   const Divider(),
                   Text(
-                    'Total excl. VAT: ${money(c.oldSubtotal)} → ${money(c.newSubtotal)} '
-                    '(${money(c.difference)})',
+                    context.l10n.totalChange(
+                      money(c.oldSubtotal),
+                      money(c.newSubtotal),
+                      money(c.difference),
+                    ),
                     style: theme.textTheme.titleSmall?.merge(
                       _diffStyle(theme, c.difference),
                     ),
@@ -935,15 +965,15 @@ class RevisionDialog extends ConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
         OutlinedButton(
           onPressed: () => Navigator.pop(context, RevisionPricing.keep),
-          child: const Text('Keep agreed prices'),
+          child: Text(context.l10n.keepAgreedPrices),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(context, RevisionPricing.current),
-          child: const Text('Update to current prices'),
+          child: Text(context.l10n.updateToCurrentPrices),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:traydcraft_app/shared/entity_list.dart';
+import 'package:traydcraft_app/l10n/app_localizations.dart';
 
 void main() {
   testWidgets('loads, searches and pages', (tester) async {
@@ -15,6 +16,9 @@ void main() {
     final queries = <String?>[];
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: EntityList<String>(
             title: 'Things',

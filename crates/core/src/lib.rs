@@ -14,6 +14,13 @@ pub use state::{AppState, DocumentConfig};
 
 /// New primary keys are UUIDv7: globally unique (safe to generate offline on
 /// mobile devices) and time-ordered (index friendly).
+/// Languages used for customer communication.
+pub const LANGUAGES: [&str; 5] = ["nl", "fr", "en", "de", "es"];
+
+pub fn is_language(code: &str) -> bool {
+    LANGUAGES.contains(&code)
+}
+
 pub fn new_id() -> uuid::Uuid {
     uuid::Uuid::now_v7()
 }

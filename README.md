@@ -9,7 +9,8 @@ our own processes.
 
 > Status: **vertical slice**. Customers and opportunities, products with families and five price
 > zones, customer rebates (product / family / general), net and indicative prices, bulk price
-> changes, quotations with revisions and server-side pricing (incl. earlier price lists), PDF output, multi-level bills of materials
+> changes, quotations with revisions and server-side pricing (incl. earlier price lists), sales
+> orders, a helpdesk (e-mail tickets, prepared answers in five languages, production questions), PDF output, multi-level bills of materials
 > with revisions, serial numbers with as-built genealogy, generated Dart API client and a Flutter app.
 > See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the target architecture and roadmap.
 
@@ -23,6 +24,8 @@ crates/crm/          customers, per-company commercial terms, opportunities
 crates/products/     products, price zones, price history
 crates/sales/        quotations: drafts, snapshots, revisions, PDF data
 crates/engineering/  BOM revisions, explosion, serial units and genealogy
+crates/helpdesk/     tickets from e-mail, threading, prepared answers, outbox, IMAP
+apps/worker/         background worker: IMAP polling and sending the e-mail outbox
 crates/documents/    Typst PDF rendering, Belgian number formatting
 migrations/          SQLx migrations (one PostgreSQL schema per module)
 templates/           Typst document templates (nl / fr / en)
@@ -50,10 +53,18 @@ cargo run -p traydcraft-api
 
 The API listens on `http://localhost:8080`; interactive API docs are at `/docs`.
 With `SEED_DEV_DATA=true` a demo company is created with users `admin@example.com`,
-`sales@example.com`, `manager@example.com` (sales manager) and `viewer@example.com`
+`sales@example.com`, `manager@example.com` (sales manager), `support@example.com`,
+`production@example.com` and `viewer@example.com`
 (development authentication only).
 
-Flutter app:
+Worker (helpdesk e-mail). By default outgoing mail is written to `./outbox` as `.eml` files;
+set `MAIL_TRANSPORT=smtp` and `SMTP_*`, and `IMAP_*` to fetch incoming mail (see `.env.example`):
+
+```bash
+cargo run -p traydcraft-worker
+```
+
+Flutter app (in Dutch, French, English, German or Spanish; choose in the account menu):
 
 ```bash
 cd app

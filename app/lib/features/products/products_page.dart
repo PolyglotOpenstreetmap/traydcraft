@@ -8,6 +8,7 @@ import '../../shared/format.dart';
 import 'bulk_price_dialog.dart';
 import 'families_dialog.dart';
 import 'product_form.dart';
+import '../../l10n/l10n.dart';
 
 class ProductsPage extends ConsumerWidget {
   const ProductsPage({super.key});
@@ -22,7 +23,7 @@ class ProductsPage extends ConsumerWidget {
         ref.watch(meProvider).value?.permissions.contains('products.write') ??
         false;
     return EntityList<Product>(
-      title: 'Products',
+      title: context.l10n.products,
       load: (q, offset, limit) async {
         final page = await api.products.listProducts(
           q: q,
@@ -32,22 +33,34 @@ class ProductsPage extends ConsumerWidget {
         return (page.items, page.total);
       },
       columns: [
-        EntityColumn('Code', (p) => p.code),
-        EntityColumn('Name', (p) => p.name, flex: 3),
-        EntityColumn('Family', (p) => p.familyCode ?? ''),
-        EntityColumn('Type', (p) => p.productType),
+        EntityColumn(context.l10n.code, (p) => p.code),
+        EntityColumn(context.l10n.name, (p) => p.name, flex: 3),
+        EntityColumn(context.l10n.family, (p) => p.familyCode ?? ''),
         EntityColumn(
-          'Pricing',
-          (p) => p.pricingType == 'list' ? '' : p.pricingType,
+          context.l10n.type,
+          (p) => context.l10n.productType(p.productType),
         ),
-        EntityColumn('Tracking', (p) => p.tracking == 'serial' ? 'serial' : ''),
-        EntityColumn('Unit', (p) => p.unit),
-        EntityColumn('VAT', (p) => '${number(p.vatRate)} %', numeric: true),
+        EntityColumn(
+          context.l10n.pricing,
+          (p) => p.pricingType == 'list'
+              ? ''
+              : context.l10n.pricingType(p.pricingType),
+        ),
+        EntityColumn(
+          context.l10n.tracking,
+          (p) => p.tracking == 'serial' ? context.l10n.serial : '',
+        ),
+        EntityColumn(context.l10n.unit, (p) => p.unit),
+        EntityColumn(
+          context.l10n.vat,
+          (p) => '${number(p.vatRate)} %',
+          numeric: true,
+        ),
       ],
       actions: [
         OutlinedButton.icon(
           icon: const Icon(Icons.category_outlined),
-          label: const Text('Families'),
+          label: Text(context.l10n.families),
           onPressed: () => showDialog<void>(
             context: context,
             builder: (_) => const FamiliesDialog(),
@@ -56,14 +69,14 @@ class ProductsPage extends ConsumerWidget {
         if (canChangePrices)
           OutlinedButton.icon(
             icon: const Icon(Icons.trending_up),
-            label: const Text('Bulk price change'),
+            label: Text(context.l10n.bulkPriceChange),
             onPressed: () => showDialog<bool>(
               context: context,
               builder: (_) => const BulkPriceDialog(),
             ),
           ),
       ],
-      createLabel: 'New product',
+      createLabel: context.l10n.newProduct,
       onCreate: canWrite
           ? () async => await showProductForm(context) != null
           : null,

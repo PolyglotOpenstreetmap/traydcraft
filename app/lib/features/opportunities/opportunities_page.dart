@@ -6,6 +6,7 @@ import '../../app/api.dart';
 import '../../shared/entity_list.dart';
 import '../../shared/format.dart';
 import 'opportunity_form.dart';
+import '../../l10n/l10n.dart';
 
 final pipelineProvider = FutureProvider.autoDispose<List<PipelineStage>>(
   (ref) => ref.watch(apiProvider).crm.pipeline(),
@@ -53,7 +54,7 @@ class _OpportunitiesPageState extends ConsumerState<OpportunitiesPage> {
         Expanded(
           child: EntityList<Opportunity>(
             key: _list,
-            title: 'Opportunities',
+            title: context.l10n.opportunities,
             load: (q, offset, limit) async {
               final page = await api.crm.listOpportunities(
                 q: q,
@@ -65,7 +66,7 @@ class _OpportunitiesPageState extends ConsumerState<OpportunitiesPage> {
               return (page.items, page.total);
             },
             filters: FilterChip(
-              label: const Text('Open only'),
+              label: Text(context.l10n.openOnly),
               selected: _openOnly,
               onSelected: (v) {
                 setState(() => _openOnly = v);
@@ -73,20 +74,31 @@ class _OpportunitiesPageState extends ConsumerState<OpportunitiesPage> {
               },
             ),
             columns: [
-              EntityColumn('Number', (o) => o.number),
-              EntityColumn('Title', (o) => o.title, flex: 3),
-              EntityColumn('Customer', (o) => o.customerName, flex: 3),
-              EntityColumn('Stage', (o) => o.stage.json ?? ''),
-              EntityColumn('Close', (o) => date(o.expectedClose)),
+              EntityColumn(context.l10n.numberRequired, (o) => o.number),
+              EntityColumn(context.l10n.title, (o) => o.title, flex: 3),
               EntityColumn(
-                'Value',
+                context.l10n.customer,
+                (o) => o.customerName,
+                flex: 3,
+              ),
+              EntityColumn(
+                context.l10n.stage,
+                (o) => context.l10n.opportunityStage(o.stage.json ?? ''),
+              ),
+              EntityColumn(context.l10n.close, (o) => date(o.expectedClose)),
+              EntityColumn(
+                context.l10n.value,
                 (o) => money(o.expectedValue),
                 numeric: true,
                 flex: 2,
               ),
-              EntityColumn('Prob.', (o) => '${o.probability} %', numeric: true),
+              EntityColumn(
+                context.l10n.probabilityShort,
+                (o) => '${o.probability} %',
+                numeric: true,
+              ),
             ],
-            createLabel: 'New opportunity',
+            createLabel: context.l10n.newOpportunity,
             onCreate: canWrite
                 ? () async {
                     final created = await showOpportunityForm(context);
@@ -138,7 +150,7 @@ class _Pipeline extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${s.stage.json}  (${s.count})',
+                            '${context.l10n.opportunityStage(s.stage.json ?? '')}  (${s.count})',
                             style: theme.textTheme.labelLarge,
                           ),
                           Text(
@@ -146,7 +158,7 @@ class _Pipeline extends ConsumerWidget {
                             style: theme.textTheme.titleMedium,
                           ),
                           Text(
-                            'weighted ${money(s.weightedValue)}',
+                            context.l10n.weighted(money(s.weightedValue)),
                             style: theme.textTheme.bodySmall,
                           ),
                         ],

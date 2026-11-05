@@ -21,7 +21,8 @@ Rust API (Axum) — modular monolith
   core · crm · products/pricing · sales · (inventory · production · service · helpdesk · finance)
         │  SQLx, one transaction per business operation
 PostgreSQL — one database, one schema per module
-  + object storage (documents, photos)  + background worker (outbox: e-mail, PDF, Peppol, Exact sync)
+  + object storage (documents, photos)
+  + worker (apps/worker): IMAP polling, e-mail outbox; later PDF, Peppol, Exact sync
 ```
 
 * **Modular monolith** ([ADR 0001](adr/0001-modular-monolith.md)): one deployable, modules as crates.
@@ -44,7 +45,7 @@ PostgreSQL — one database, one schema per module
 | core | slice | companies, users, memberships/roles, numbering, audit |
 | crm | slice | customers, per-company terms (zone, general rebate, payment terms), product/family rebates, opportunities / pipeline |
 | products / pricing | slice | products, families, pricing types (list/net/indicative), price zones, dated zone prices, bulk price changes ([ADR 0012](adr/0012-rebates-price-dates-and-price-changes.md)) |
-| sales | slice | quotations and lines (snapshots, price date, revisions keeping or updating prices), linked to opportunities |
+| sales | slice | quotations (snapshots, price date, revisions keeping or updating prices), linked to opportunities; sales orders from an accepted revision |
 | documents | slice | PDF rendering (Typst) |
 | engineering | slice | BOM revisions (multi-level via subassemblies), explosion, serial units and as-built genealogy ([ADR 0011](adr/0011-bom-revisions-and-serial-genealogy.md)); routings and configurator planned |
 | purchasing | planned | suppliers, purchase orders, receipts |
@@ -53,7 +54,7 @@ PostgreSQL — one database, one schema per module
 | quality | planned | inspections, non-conformances, traceability |
 | service | planned | installed assets (builds on serial units), repairs, warranties |
 | field service | planned | planning board, mobile app with offline sync ([ADR 0006](adr/0006-offline-sync.md)) |
-| helpdesk | planned | tickets, SLA, e-mail-to-ticket, portal |
+| helpdesk | slice | e-mail-to-ticket (IMAP) with threading and matching, replies via outbox (SMTP), prepared answers in 5 languages, leads / orders / production questions from tickets ([ADR 0013](adr/0013-helpdesk-email-and-languages.md)); SLA and portal planned |
 | finance | planned | invoices, credit notes, Peppol via access point, Exact integration |
 
 ## Conventions
@@ -72,7 +73,7 @@ PostgreSQL — one database, one schema per module
 2. **Engineering & inventory** — BOM revisions and serial numbers (done); next: routings, configurator, warehouses, stock ledger, purchasing.
 3. **Manufacturing** — MRP for MTS and MTO, production orders, labour, quality.
 4. **Service** — installed assets, repairs, field service planning, mobile app with offline sync.
-5. **Helpdesk & portal** — tickets, SLA, e-mail integration, customer portal.
+5. **Helpdesk & portal** — tickets from e-mail, prepared answers and orders (done); next: SLA, attachments, customer portal.
 6. **Finance** — invoicing, Peppol, payments, Exact integration.
 
 Each release runs alongside Salesforce/Exact, with one system clearly owning each kind of record

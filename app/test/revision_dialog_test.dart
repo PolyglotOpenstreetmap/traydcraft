@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:traydcraft_app/app/api.dart';
 import 'package:traydcraft_app/features/quotations/quotation_screen.dart';
+import 'package:traydcraft_app/l10n/app_localizations.dart';
 
 class _Fake implements HttpClientAdapter {
   @override
@@ -96,6 +97,9 @@ void main() {
       ProviderScope(
         overrides: [dioProvider.overrideWithValue(dio)],
         child: MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Builder(
             builder: (context) => TextButton(
               onPressed: () async => choice = await showDialog<RevisionPricing>(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:traydcraft_app/shared/search_picker.dart';
+import 'package:traydcraft_app/l10n/app_localizations.dart';
 
 void main() {
   testWidgets('clearOnSelect allows picking several items in a row', (
@@ -10,6 +11,9 @@ void main() {
     const items = ['UNIT-100', 'HOSE-25', 'PUMP-05'];
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: StatefulBuilder(
             builder: (context, setState) => Column(

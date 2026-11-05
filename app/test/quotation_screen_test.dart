@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:traydcraft_app/app/api.dart';
 import 'package:traydcraft_app/features/quotations/quotation_screen.dart';
+import 'package:traydcraft_app/l10n/app_localizations.dart';
 
 const _quotationId = 'q1';
 const _customerId = 'c1';
@@ -146,6 +147,7 @@ class FakeApi implements HttpClientAdapter {
             'city': '',
             'country_code': 'BE',
             'currency': 'EUR',
+            'default_language': 'nl',
           },
         };
       default:
@@ -180,7 +182,12 @@ Future<FakeApi> _pump(WidgetTester tester, String status) async {
   await tester.pumpWidget(
     ProviderScope(
       overrides: [dioProvider.overrideWithValue(dio)],
-      child: const MaterialApp(home: QuotationScreen(id: _quotationId)),
+      child: MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: QuotationScreen(id: _quotationId),
+      ),
     ),
   );
   await tester.pumpAndSettle();

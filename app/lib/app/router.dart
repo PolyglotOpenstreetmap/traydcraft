@@ -3,6 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/customers/customers_page.dart';
+import '../features/helpdesk/answers_page.dart';
+import '../features/helpdesk/ticket_screen.dart';
+import '../features/helpdesk/tickets_page.dart';
+import '../features/orders/order_screen.dart';
+import '../features/orders/orders_page.dart';
 import '../features/login/login_page.dart';
 import '../features/opportunities/opportunities_page.dart';
 import '../features/opportunities/opportunity_screen.dart';
@@ -46,6 +51,20 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/quotations/:id',
             builder: (_, s) => QuotationScreen(id: s.pathParameters['id']),
+          ),
+          GoRoute(path: '/helpdesk', builder: (_, _) => const TicketsPage()),
+          GoRoute(
+            path: '/helpdesk/answers',
+            builder: (_, _) => const AnswersPage(),
+          ),
+          GoRoute(
+            path: '/helpdesk/:id',
+            builder: (_, s) => TicketScreen(id: s.pathParameters['id']!),
+          ),
+          GoRoute(path: '/orders', builder: (_, _) => const OrdersPage()),
+          GoRoute(
+            path: '/orders/:id',
+            builder: (_, s) => OrderScreen(id: s.pathParameters['id']!),
           ),
           GoRoute(path: '/customers', builder: (_, _) => const CustomersPage()),
           GoRoute(path: '/products', builder: (_, _) => const ProductsPage()),

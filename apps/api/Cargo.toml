@@ -13,6 +13,7 @@ path = "src/main.rs"
 traydcraft-core.workspace = true
 traydcraft-crm.workspace = true
 traydcraft-engineering.workspace = true
+traydcraft-helpdesk.workspace = true
 traydcraft-products.workspace = true
 traydcraft-sales.workspace = true
 anyhow.workspace = true
@@ -28,6 +29,7 @@ utoipa-axum.workspace = true
 utoipa-scalar.workspace = true
 
 [dev-dependencies]
+tempfile.workspace = true
 chrono.workspace = true
 http-body-util = "0.1"
 rust_decimal.workspace = true

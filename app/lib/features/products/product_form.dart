@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/api.dart';
 import '../../shared/format.dart';
 import 'families_dialog.dart';
+import '../../l10n/l10n.dart';
 
 const productTypes = ['purchased', 'manufactured', 'configurable', 'service'];
 
@@ -39,7 +40,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
   Future<void> _save() async {
     final vat = parseDecimalInput(_vat.text);
     if (_code.text.trim().isEmpty || _name.text.trim().isEmpty || vat == null) {
-      setState(() => _error = 'Code, name and VAT rate are required.');
+      setState(() => _error = context.l10n.codeNameVatRequired);
       return;
     }
     final body = ProductInput(
@@ -69,7 +70,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
   Widget build(BuildContext context) {
     const gap = SizedBox(height: 12, width: 12);
     return AlertDialog(
-      title: Text(p == null ? 'New product' : p!.code),
+      title: Text(p == null ? context.l10n.newProduct : p!.code),
       content: SizedBox(
         width: 520,
         child: Column(
@@ -81,14 +82,14 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                   width: 160,
                   child: TextField(
                     controller: _code,
-                    decoration: const InputDecoration(labelText: 'Code'),
+                    decoration: InputDecoration(labelText: context.l10n.code),
                   ),
                 ),
                 gap,
                 Expanded(
                   child: TextField(
                     controller: _name,
-                    decoration: const InputDecoration(labelText: 'Name'),
+                    decoration: InputDecoration(labelText: context.l10n.name),
                   ),
                 ),
               ],
@@ -96,7 +97,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             gap,
             TextField(
               controller: _description,
-              decoration: const InputDecoration(labelText: 'Description'),
+              decoration: InputDecoration(labelText: context.l10n.description),
             ),
             gap,
             Row(
@@ -104,10 +105,13 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _type,
-                    decoration: const InputDecoration(labelText: 'Type'),
+                    decoration: InputDecoration(labelText: context.l10n.type),
                     items: [
                       for (final t in productTypes)
-                        DropdownMenuItem(value: t, child: Text(t)),
+                        DropdownMenuItem(
+                          value: t,
+                          child: Text(context.l10n.productType(t)),
+                        ),
                     ],
                     onChanged: (v) => setState(() => _type = v!),
                   ),
@@ -117,7 +121,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                   width: 90,
                   child: TextField(
                     controller: _unit,
-                    decoration: const InputDecoration(labelText: 'Unit'),
+                    decoration: InputDecoration(labelText: context.l10n.unit),
                   ),
                 ),
                 gap,
@@ -125,7 +129,9 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                   width: 90,
                   child: TextField(
                     controller: _vat,
-                    decoration: const InputDecoration(labelText: 'VAT %'),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.vatPercent,
+                    ),
                   ),
                 ),
               ],
@@ -136,15 +142,15 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                 Expanded(
                   child: DropdownButtonFormField<String?>(
                     initialValue: _familyId,
-                    decoration: const InputDecoration(labelText: 'Family'),
+                    decoration: InputDecoration(labelText: context.l10n.family),
                     items: [
-                      const DropdownMenuItem<String?>(
+                      DropdownMenuItem<String?>(
                         value: null,
-                        child: Text('None'),
+                        child: Text(context.l10n.none),
                       ),
                       for (final f
                           in ref.watch(familiesProvider).value ??
-                              const <ProductFamily>[])
+                              <ProductFamily>[])
                         DropdownMenuItem<String?>(
                           value: f.id,
                           child: Text('${f.code} · ${f.name}'),
@@ -157,19 +163,21 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _pricing,
-                    decoration: const InputDecoration(labelText: 'Pricing'),
-                    items: const [
+                    decoration: InputDecoration(
+                      labelText: context.l10n.pricing,
+                    ),
+                    items: [
                       DropdownMenuItem(
                         value: 'list',
-                        child: Text('List price (rebates apply)'),
+                        child: Text(context.l10n.pricingListHelp),
                       ),
                       DropdownMenuItem(
                         value: 'net',
-                        child: Text('Net price (never discounted)'),
+                        child: Text(context.l10n.pricingNetHelp),
                       ),
                       DropdownMenuItem(
                         value: 'indicative',
-                        child: Text('Indicative (confirm per quote)'),
+                        child: Text(context.l10n.pricingIndicativeHelp),
                       ),
                     ],
                     onChanged: (v) => setState(() => _pricing = v!),
@@ -179,10 +187,8 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Serial numbers'),
-              subtitle: const Text(
-                'Every unit gets its own serial number and history',
-              ),
+              title: Text(context.l10n.serialNumbers),
+              subtitle: Text(context.l10n.serialNumbersHelp),
               value: _serial,
               onChanged: _type == 'service'
                   ? null
@@ -190,7 +196,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Active'),
+              title: Text(context.l10n.active),
               value: _active,
               onChanged: (v) => setState(() => _active = v),
             ),
@@ -205,9 +211,9 @@ class _ProductFormState extends ConsumerState<ProductForm> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.cancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('Save')),
+        FilledButton(onPressed: _save, child: Text(context.l10n.save)),
       ],
     );
   }

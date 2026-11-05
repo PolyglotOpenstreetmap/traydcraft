@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/api.dart';
 import '../../shared/actions.dart';
+import '../../l10n/l10n.dart';
 
 final familiesProvider = FutureProvider<List<ProductFamily>>(
   (ref) => ref.watch(apiProvider).products.listFamilies(),
@@ -22,29 +23,29 @@ class FamiliesDialog extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(f == null ? 'New family' : f.code),
+        title: Text(f == null ? context.l10n.newFamily : f.code),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: code,
-              decoration: const InputDecoration(labelText: 'Code'),
+              decoration: InputDecoration(labelText: context.l10n.code),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: name,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: context.l10n.name),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Save'),
+            child: Text(context.l10n.save),
           ),
         ],
       ),
@@ -71,7 +72,7 @@ class FamiliesDialog extends ConsumerWidget {
         ref.watch(meProvider).value?.permissions.contains('products.write') ??
         false;
     return AlertDialog(
-      title: const Text('Product families'),
+      title: Text(context.l10n.productFamilies),
       content: SizedBox(
         width: 480,
         child: families.when(
@@ -83,7 +84,7 @@ class FamiliesDialog extends ConsumerWidget {
               for (final f in list)
                 ListTile(
                   title: Text('${f.code} · ${f.name}'),
-                  subtitle: Text('${f.productCount} products'),
+                  subtitle: Text(context.l10n.productCount(f.productCount)),
                   trailing: canWrite
                       ? IconButton(
                           icon: const Icon(Icons.edit),
@@ -100,11 +101,11 @@ class FamiliesDialog extends ConsumerWidget {
           TextButton.icon(
             onPressed: () => _edit(context, ref),
             icon: const Icon(Icons.add),
-            label: const Text('New family'),
+            label: Text(context.l10n.newFamily),
           ),
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Close'),
+          child: Text(context.l10n.close),
         ),
       ],
     );
