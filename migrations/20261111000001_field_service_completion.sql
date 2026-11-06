@@ -1,5 +1,5 @@
 -- Field service completion: customer signature, parts used, installed base and warranty,
--- service report tracking, and maintenance contracts that generate planned jobs (ADR 0019).
+-- service report tracking, and maintenance contracts that generate planned jobs (ADR 0020).
 
 -- ---------------------------------------------------------------------------------------------
 -- Warranty on individual units (the installed base, ADR 0011 stays as it is: this only adds facts).
@@ -107,7 +107,7 @@ CREATE TABLE field.job_equipment (
 );
 CREATE INDEX job_equipment_unit_idx ON field.job_equipment (serial_unit_id);
 
--- Record only: no stock is deducted yet (ADR 0019).
+-- Record only: no stock is deducted yet (ADR 0020).
 CREATE TABLE field.job_parts (
     id             uuid PRIMARY KEY,
     job_id         uuid NOT NULL REFERENCES field.jobs(id) ON DELETE CASCADE,

@@ -1,6 +1,6 @@
 //! Maintenance contracts. A contract covers a customer (a site, optionally units) and owns visit
 //! templates: what to do, how often, who goes. The worker calls [`generate_due_visits`], which
-//! creates a planned job `lead_days` before each due date (ADR 0019).
+//! creates a planned job `lead_days` before each due date (ADR 0020).
 
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
