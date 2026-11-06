@@ -18,12 +18,15 @@ class SerialUnit {
     required this.serialNumber,
     required this.status,
     required this.updatedAt,
+    required this.warrantyNote,
+    required this.warrantyStatus,
     this.bomId,
     this.bomRevision,
     this.customerId,
     this.customerName,
     this.parentId,
     this.parentSerialNumber,
+    this.warrantyUntil,
   });
   
   factory SerialUnit.fromJson(Map<String, Object?> json) => _$SerialUnitFromJson(json);
@@ -59,6 +62,16 @@ class SerialUnit {
   final String status;
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+  @JsonKey(name: 'warranty_note')
+  final String warrantyNote;
+
+  /// in_warranty | expired | unknown (no end date recorded)
+  @JsonKey(name: 'warranty_status')
+  final String warrantyStatus;
+
+  /// The end of the warranty, if known.
+  @JsonKey(includeIfNull: false,name: 'warranty_until')
+  final DateTime? warrantyUntil;
 
   Map<String, Object?> toJson() => _$SerialUnitToJson(this);
 }

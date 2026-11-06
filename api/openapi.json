@@ -1057,6 +1057,478 @@
         }
       }
     },
+    "/api/v1/field/contracts": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "list_contracts",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches number, title and customer.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "draft | active | suspended | ended",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "create_contract",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContractInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/contracts/{id}": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "get_contract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "update_contract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContractInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/contracts/{id}/activate": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Starts a draft contract, or resumes a suspended one: planned jobs are generated again.",
+        "operationId": "activate_contract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/contracts/{id}/end": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Ends a contract for good. Jobs already generated stay.",
+        "operationId": "end_contract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/contracts/{id}/jobs": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "summary": "The jobs generated for (or linked to) a contract, newest first.",
+        "operationId": "list_contract_jobs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Job"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/contracts/{id}/suspend": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Pauses a contract: no jobs are generated until it is activated again.",
+        "operationId": "suspend_contract",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/contracts/{id}/upcoming": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "summary": "The visits due from today on, from the active templates, and whether their job exists.",
+        "operationId": "list_contract_upcoming",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "description": "Look ahead to this date (YYYY-MM-DD). Default: twelve months from today (at most 36).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UpcomingVisit"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/customers/{id}/equipment": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "summary": "The installed units of a customer (delivered or installed, not scrapped) with their job history.",
+        "operationId": "list_customer_equipment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerEquipment"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/field/jobs": {
       "get": {
         "tags": [
@@ -1104,6 +1576,19 @@
           {
             "name": "customer_id",
             "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contract_id",
+            "in": "query",
+            "description": "Jobs generated for this maintenance contract.",
             "required": false,
             "schema": {
               "type": [
@@ -1408,6 +1893,231 @@
         }
       }
     },
+    "/api/v1/field/jobs/{id}/equipment": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Links a unit of the job's customer to the job. Linking it twice changes nothing.",
+        "operationId": "add_job_equipment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/equipment/{serial_unit_id}": {
+      "delete": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "remove_job_equipment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serial_unit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/parts": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Records a part used on a job. No stock is deducted.",
+        "operationId": "add_job_part",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/parts/{part_id}": {
+      "delete": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Removes a part. Removing one that is already gone changes nothing.",
+        "operationId": "remove_job_part",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/field/jobs/{id}/photos": {
       "post": {
         "tags": [
@@ -1585,6 +2295,293 @@
             }
           },
           "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/report": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "summary": "The service report of a job as PDF (a watermark marks it as draft until the job is completed).",
+        "operationId": "get_job_report",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "nl, fr, en, de or es. Default: the language of the contact, else of the customer.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/report/send": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "E-mails the service report of a completed job to its contact (or the customer's main address)\nand records when and to whom. Sending again is allowed. Refused (409) when there is no\naddress or the job is not completed.",
+        "operationId": "send_job_report",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/signature": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "summary": "The signature image (PNG).",
+        "operationId": "get_job_signature",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Stores the customer's signature: the request body is a PNG image. A job has one signature;\na new one replaces the old one until the service report is sent.",
+        "operationId": "sign_job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "signer_name",
+            "in": "query",
+            "description": "Who signed, as they wrote it.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "A client-chosen id: uploading the same id again changes nothing.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "image/png": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/signature/declined": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Records that the customer declined to sign. Replaces an earlier signature.",
+        "operationId": "decline_job_signature",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclinedInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -8337,6 +9334,58 @@
         }
       }
     },
+    "/api/v1/serials/{id}/warranty": {
+      "put": {
+        "tags": [
+          "engineering"
+        ],
+        "summary": "Sets the warranty of a unit: until when, and a note (terms, contract).",
+        "operationId": "set_warranty",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarrantyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerialUnitDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tickets": {
       "get": {
         "tags": [
@@ -10774,6 +11823,235 @@
           }
         }
       },
+      "ContractDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ContractSummary"
+          },
+          {
+            "type": "object",
+            "required": [
+              "site_name",
+              "street",
+              "postal_code",
+              "city",
+              "country_code",
+              "notes",
+              "equipment",
+              "visit_templates",
+              "created_at"
+            ],
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "contact_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "uuid"
+              },
+              "contact_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "country_code": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "equipment": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/JobEquipment"
+                }
+              },
+              "notes": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              },
+              "site_name": {
+                "type": "string"
+              },
+              "street": {
+                "type": "string"
+              },
+              "visit_templates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/VisitTemplate"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "ContractInput": {
+        "type": "object",
+        "required": [
+          "customer_id",
+          "title",
+          "start_date"
+        ],
+        "properties": {
+          "auto_renew": {
+            "type": "boolean"
+          },
+          "city": {
+            "type": "string"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "country_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "equipment_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Units of the customer covered by the contract."
+          },
+          "notes": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "resolution_hours": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "response_hours": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "site_name": {
+            "type": "string",
+            "description": "The site covered. Left empty, the customer's address is used."
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "street": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "visit_templates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateInput"
+            },
+            "description": "The complete set of visit templates; templates left out are removed."
+          }
+        }
+      },
+      "ContractSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "customer_id",
+          "customer_name",
+          "title",
+          "status",
+          "start_date",
+          "auto_renew",
+          "open_jobs"
+        ],
+        "properties": {
+          "auto_renew": {
+            "type": "boolean"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "open_jobs": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Generated jobs that are not finished."
+          },
+          "resolution_hours": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "response_hours": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "description": "draft | active | suspended | ended"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "ConvertInput": {
         "type": "object",
         "properties": {
@@ -10936,6 +12214,28 @@
             ]
           }
         }
+      },
+      "CustomerEquipment": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/JobEquipment"
+          },
+          {
+            "type": "object",
+            "required": [
+              "jobs"
+            ],
+            "properties": {
+              "jobs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EquipmentJob"
+                },
+                "description": "The jobs this unit was worked on in, newest first (only those the user may see)."
+              }
+            }
+          }
+        ]
       },
       "CustomerInput": {
         "type": "object",
@@ -11123,6 +12423,22 @@
               "null"
             ],
             "format": "date"
+          }
+        }
+      },
+      "DeclinedInput": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Why the customer did not sign."
+          },
+          "signer_name": {
+            "type": "string",
+            "description": "Who was asked, if known."
           }
         }
       },
@@ -11578,6 +12894,60 @@
           }
         }
       },
+      "EquipmentInput": {
+        "type": "object",
+        "required": [
+          "serial_unit_id"
+        ],
+        "properties": {
+          "serial_unit_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "EquipmentJob": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "title",
+          "kind",
+          "status"
+        ],
+        "properties": {
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "ErrorBody": {
         "type": "object",
         "description": "Error body returned by every endpoint.",
@@ -11789,7 +13159,8 @@
           "completion_notes",
           "technicians",
           "tasks_total",
-          "tasks_done"
+          "tasks_done",
+          "report_sent_to"
         ],
         "properties": {
           "address": {
@@ -11823,6 +13194,20 @@
               "null"
             ]
           },
+          "contract_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The maintenance contract this job was generated for."
+          },
+          "contract_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "country_code": {
             "type": "string"
           },
@@ -11832,6 +13217,14 @@
           },
           "customer_name": {
             "type": "string"
+          },
+          "due_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The day a contract visit is due."
           },
           "id": {
             "type": "string",
@@ -11881,6 +13274,17 @@
               "null"
             ],
             "format": "uuid"
+          },
+          "report_sent_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the service report was last e-mailed to the customer."
+          },
+          "report_sent_to": {
+            "type": "string"
           },
           "scheduled_end": {
             "type": [
@@ -11947,6 +13351,8 @@
           "tasks",
           "work_logs",
           "photos",
+          "equipment",
+          "parts",
           "work_minutes",
           "travel_minutes"
         ],
@@ -11958,14 +13364,39 @@
             },
             "description": "Phone numbers of the person to meet, to call when arriving."
           },
+          "equipment": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobEquipment"
+            },
+            "description": "Equipment (installed units of the customer) worked on."
+          },
           "job": {
             "$ref": "#/components/schemas/Job"
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobPart"
+            },
+            "description": "Parts used (record only; stock is not deducted)."
           },
           "photos": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/JobPhoto"
             }
+          },
+          "signature": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JobSignature",
+                "description": "The customer's signature, or that they declined to sign."
+              }
+            ]
           },
           "tasks": {
             "type": "array",
@@ -11987,6 +13418,50 @@
             "type": "integer",
             "format": "int64",
             "description": "Total minutes of work and of travel logged so far."
+          }
+        }
+      },
+      "JobEquipment": {
+        "type": "object",
+        "required": [
+          "serial_unit_id",
+          "product_code",
+          "product_name",
+          "serial_number",
+          "status",
+          "warranty_note",
+          "warranty_status"
+        ],
+        "properties": {
+          "product_code": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "serial_unit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "warranty_note": {
+            "type": "string"
+          },
+          "warranty_status": {
+            "type": "string",
+            "description": "in_warranty | expired | unknown"
+          },
+          "warranty_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
           }
         }
       },
@@ -12097,6 +13572,73 @@
           }
         }
       },
+      "JobPart": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "quantity",
+          "unit",
+          "billable",
+          "created_at"
+        ],
+        "properties": {
+          "added_by_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "billable": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Chosen by the client."
+          },
+          "product_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "string",
+            "example": "2.000"
+          },
+          "serial_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serial_unit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
       "JobPhoto": {
         "type": "object",
         "required": [
@@ -12123,6 +13665,42 @@
             "description": "The id of the file; fetch it from `/field/jobs/{id}/photos/{photo_id}`."
           },
           "uploader_name": {
+            "type": "string"
+          }
+        }
+      },
+      "JobSignature": {
+        "type": "object",
+        "required": [
+          "signer_name",
+          "declined",
+          "decline_reason",
+          "has_image",
+          "signed_at"
+        ],
+        "properties": {
+          "captured_by_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "decline_reason": {
+            "type": "string"
+          },
+          "declined": {
+            "type": "boolean",
+            "description": "The customer declined to sign."
+          },
+          "has_image": {
+            "type": "boolean",
+            "description": "A signature image is stored: fetch it from `/field/jobs/{id}/signature`."
+          },
+          "signed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "signer_name": {
             "type": "string"
           }
         }
@@ -13027,6 +14605,60 @@
           },
           "total": {
             "type": "string"
+          }
+        }
+      },
+      "PartInput": {
+        "type": "object",
+        "required": [
+          "quantity"
+        ],
+        "properties": {
+          "billable": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Is the part charged to the customer? Default yes."
+          },
+          "description": {
+            "type": "string",
+            "description": "Required for free text; defaults to the product's name."
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Chosen by the client: sending the same id again changes nothing (offline retries)."
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "A product from the catalogue; leave empty for free text."
+          },
+          "quantity": {
+            "type": "string",
+            "example": "2"
+          },
+          "serial_unit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The unit (serial number) the part went into."
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to the product's unit, or `pcs`."
           }
         }
       },
@@ -15503,6 +17135,8 @@
           "serial_number",
           "status",
           "notes",
+          "warranty_note",
+          "warranty_status",
           "created_at",
           "updated_at"
         ],
@@ -15579,6 +17213,21 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "warranty_note": {
+            "type": "string"
+          },
+          "warranty_status": {
+            "type": "string",
+            "description": "in_warranty | expired | unknown (no end date recorded)"
+          },
+          "warranty_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The end of the warranty, if known."
           }
         }
       },
@@ -15951,6 +17600,81 @@
           "user_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "TemplateInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "recurrence"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "anchor_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The first due date; defaults to the start of the contract."
+          },
+          "estimated_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Give the id of an existing template to change it; without one a new template is made."
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "interval_n": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "lead_days": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "recurrence": {
+            "type": "string"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "technician_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "title": {
+            "type": "string"
           }
         }
       },
@@ -16416,6 +18140,51 @@
           }
         }
       },
+      "UpcomingVisit": {
+        "type": "object",
+        "required": [
+          "template_id",
+          "title",
+          "kind",
+          "due_date",
+          "generate_on"
+        ],
+        "properties": {
+          "due_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "generate_on": {
+            "type": "string",
+            "format": "date",
+            "description": "The day the job is (or was) generated."
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The job, once generated."
+          },
+          "job_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "template_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "VatGroup": {
         "type": "object",
         "required": [
@@ -16432,6 +18201,116 @@
           },
           "vat_rate": {
             "type": "string"
+          }
+        }
+      },
+      "VisitTemplate": {
+        "type": "object",
+        "required": [
+          "id",
+          "position",
+          "kind",
+          "title",
+          "instructions",
+          "tasks",
+          "recurrence",
+          "interval_n",
+          "months",
+          "anchor_date",
+          "lead_days",
+          "technicians",
+          "active"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "anchor_date": {
+            "type": "string",
+            "format": "date",
+            "description": "The first due date (and the day of the month for `months_list`)."
+          },
+          "estimated_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "interval_n": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Every N weeks or months."
+          },
+          "kind": {
+            "type": "string"
+          },
+          "lead_days": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The job is generated this many days before the due date."
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "The months (1-12) of a `months_list` recurrence."
+          },
+          "next_due": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The next due date from today on, within the contract's term."
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recurrence": {
+            "type": "string",
+            "description": "weeks | months | months_list"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "technicians": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Technician"
+            }
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "WarrantyInput": {
+        "type": "object",
+        "properties": {
+          "warranty_note": {
+            "type": "string"
+          },
+          "warranty_until": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "The last day of the warranty; empty when unknown."
           }
         }
       },

@@ -5,7 +5,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import 'job.dart';
+import 'job_equipment.dart';
+import 'job_part.dart';
 import 'job_photo.dart';
+import 'job_signature.dart';
 import 'site_phone.dart';
 import 'task.dart';
 import 'work_log.dart';
@@ -16,12 +19,15 @@ part 'job_detail.g.dart';
 class JobDetail {
   const JobDetail({
     required this.contactPhones,
+    required this.equipment,
     required this.job,
+    required this.parts,
     required this.photos,
     required this.tasks,
     required this.travelMinutes,
     required this.workLogs,
     required this.workMinutes,
+    this.signature,
   });
   
   factory JobDetail.fromJson(Map<String, Object?> json) => _$JobDetailFromJson(json);
@@ -29,8 +35,18 @@ class JobDetail {
   /// Phone numbers of the person to meet, to call when arriving.
   @JsonKey(name: 'contact_phones')
   final List<SitePhone> contactPhones;
+
+  /// Equipment (installed units of the customer) worked on.
+  final List<JobEquipment> equipment;
   final Job job;
+
+  /// Parts used (record only; stock is not deducted).
+  final List<JobPart> parts;
   final List<JobPhoto> photos;
+
+  /// The customer's signature, or that they declined to sign.
+  @JsonKey(includeIfNull: false)
+  final JobSignature? signature;
   final List<Task> tasks;
   @JsonKey(name: 'travel_minutes')
   final int travelMinutes;
