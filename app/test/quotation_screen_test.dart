@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:traydcraft_app/app/api.dart';
 import 'package:traydcraft_app/features/quotations/quotation_screen.dart';
 import 'package:traydcraft_app/l10n/app_localizations.dart';
@@ -131,6 +132,37 @@ class FakeApi implements HttpClientAdapter {
           'vat_total': '1548.12',
           'total': '8920.12',
         };
+      case 'POST /api/v1/quotations/$_quotationId/convert':
+        json = {
+          'created_at': '2026-11-06T09:00:00Z',
+          'lines': <Object?>[],
+          'notes': '',
+          'cancel_reason': '',
+          'confirmation_note': '',
+          'revision': 1,
+          'revision_status': 'draft',
+          'revisions': <Object?>[],
+          'vat_total': '774.06',
+          'order': {
+            'id': 'o1',
+            'number': 'O2026-00001',
+            'status': 'draft',
+            'current_revision': 1,
+            'priority': 'normal',
+            'quotation_id': _quotationId,
+            'quotation_number': 'Q2026-00001',
+            'quotation_revision': 1,
+            'customer_id': _customerId,
+            'customer_name': 'Alpha Installaties NV',
+            'customer_reference': 'PO-77',
+            'order_date': '2026-11-06',
+            'salesperson_id': 'u',
+            'salesperson_name': 'Sales',
+            'currency': 'EUR',
+            'subtotal': '3686.00',
+            'total': '4460.06',
+          },
+        };
       case 'GET /api/v1/me':
         json = {
           'user_id': 'u',
@@ -194,6 +226,41 @@ Future<FakeApi> _pump(WidgetTester tester, String status) async {
   return fake;
 }
 
+/// Like [_pump], inside a router so the screen can navigate to the new order.
+Future<FakeApi> _pumpRouted(WidgetTester tester, String status) async {
+  tester.view.physicalSize = const Size(1400, 1000);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+  final fake = FakeApi(status);
+  final dio = Dio(BaseOptions(baseUrl: 'http://test'))
+    ..httpClientAdapter = fake;
+  final router = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        builder: (_, _) => QuotationScreen(id: _quotationId),
+      ),
+      GoRoute(
+        path: '/orders/:id',
+        builder: (_, state) => Text('order page ${state.pathParameters['id']}'),
+      ),
+    ],
+  );
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [dioProvider.overrideWithValue(dio)],
+      child: MaterialApp.router(
+        routerConfig: router,
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+  return fake;
+}
+
 void main() {
   testWidgets('draft totals come from the server pricing preview', (
     tester,
@@ -220,5 +287,52 @@ void main() {
     expect(find.text('New revision'), findsOneWidget);
     expect(find.text('€ 4.460,06'), findsOneWidget);
     expect(fake.requests, isNot(contains('POST /api/v1/pricing/preview')));
+  });
+
+  for (final status in ['sent', 'accepted']) {
+    testWidgets('$status quotation offers Convert to order', (tester) async {
+      await _pump(tester, status);
+      expect(find.text('Convert to order'), findsOneWidget);
+    });
+  }
+
+  for (final status in ['draft', 'rejected']) {
+    testWidgets('$status quotation cannot be converted', (tester) async {
+      await _pump(tester, status);
+      expect(find.text('Convert to order'), findsNothing);
+    });
+  }
+
+  testWidgets('Convert to order sends the reference and opens the order', (
+    tester,
+  ) async {
+    final fake = await _pumpRouted(tester, 'sent');
+    await tester.tap(find.text('Convert to order'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).last, ' PO-77 ');
+    await tester.tap(find.widgetWithText(FilledButton, 'OK'));
+    await tester.pumpAndSettle();
+
+    const key = 'POST /api/v1/quotations/$_quotationId/convert';
+    expect(fake.requests, contains(key));
+    expect((fake.bodies[key] as Map)['customer_reference'], 'PO-77');
+    expect(find.text('order page o1'), findsOneWidget);
+  });
+
+  testWidgets('cancelling the reference dialog creates no order', (
+    tester,
+  ) async {
+    final fake = await _pumpRouted(tester, 'accepted');
+    await tester.tap(find.text('Convert to order'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(
+      fake.requests,
+      isNot(contains('POST /api/v1/quotations/$_quotationId/convert')),
+    );
+    expect(find.text('order page o1'), findsNothing);
   });
 }
