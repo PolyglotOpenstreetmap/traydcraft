@@ -4683,7 +4683,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NoteInput"
+                "$ref": "#/components/schemas/RepairNoteInput"
               }
             }
           },
@@ -10003,6 +10003,17 @@
             "type": "string"
           },
           "warranty": {
+            "type": "string"
+          }
+        }
+      },
+      "RepairNoteInput": {
+        "type": "object",
+        "required": [
+          "note"
+        ],
+        "properties": {
+          "note": {
             "type": "string"
           }
         }

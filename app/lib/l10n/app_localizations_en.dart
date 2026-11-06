@@ -43,13 +43,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addNote => 'Add note';
 
   @override
+  String get addNoteHint => 'Add an internal note';
+
+  @override
   String get addPhone => 'Add phone number';
+
+  @override
+  String get addPhoto => 'Add photo';
 
   @override
   String get addProduct => 'Add product';
 
   @override
   String get addRebate => 'Add rebate';
+
+  @override
+  String get addTask => 'Add task';
 
   @override
   String addedBy(String date, String name) {
@@ -86,6 +95,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get announceRepair => 'Announce a repair';
+
+  @override
+  String get announcedNotReceived => 'Announced, not received yet';
+
+  @override
   String answerFallback(String ticketLanguage, String usedLanguage) {
     return 'No $ticketLanguage text yet: the $usedLanguage text was used. Translate it before sending.';
   }
@@ -100,7 +115,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get apply => 'Apply';
 
   @override
+  String get assignTo => 'Assign to';
+
+  @override
   String get automatic => 'Automatic';
+
+  @override
+  String get backIntoWork => 'Back into work';
 
   @override
   String get billOfMaterials => 'Bill of materials';
@@ -157,6 +178,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancel => 'Cancel';
 
   @override
+  String get cancelJob => 'Cancel job';
+
+  @override
+  String get cancelRepair => 'Cancel repair';
+
+  @override
   String get cancelled => 'cancelled';
 
   @override
@@ -197,6 +224,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose a customer and add at least one valid line.';
 
   @override
+  String get choosePhoto => 'Choose from gallery';
+
+  @override
   String get chooseRebateTarget =>
       'Choose a product or family and enter a percentage.';
 
@@ -214,6 +244,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get codeNameVatRequired => 'Code, name and VAT rate are required.';
+
+  @override
+  String get completeJob => 'Complete job';
+
+  @override
+  String get completionNotes => 'What was done (and anything left open)';
 
   @override
   String get component => 'Component';
@@ -271,6 +307,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createLead => 'Create lead';
 
   @override
+  String get createRepair => 'Create repair';
+
+  @override
   String get current => 'Current';
 
   @override
@@ -311,6 +350,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deliverySent => 'sent';
 
   @override
+  String get department => 'Department';
+
+  @override
+  String get departmentCode => 'Code';
+
+  @override
+  String get departmentMembers => 'Colleagues in this department';
+
+  @override
+  String get departments => 'Departments';
+
+  @override
+  String get departmentsHelp =>
+      'Repairs are routed to these departments. Only colleagues who belong to a department can work on its repairs.';
+
+  @override
   String get description => 'Description';
 
   @override
@@ -333,6 +388,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editContact => 'Edit contact';
+
+  @override
+  String get editDepartment => 'Edit department';
+
+  @override
+  String get editJob => 'Edit job';
 
   @override
   String get email => 'E-mail';
@@ -380,6 +441,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get faultDescription => 'What is wrong';
+
+  @override
   String get firstName => 'First name';
 
   @override
@@ -405,6 +469,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpdesk => 'Helpdesk';
 
   @override
+  String get history => 'History';
+
+  @override
   String get inactive => 'inactive';
 
   @override
@@ -424,6 +491,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get insertPreparedAnswer => 'Insert prepared answer';
 
   @override
+  String get instructions => 'Instructions';
+
+  @override
   String get internalNote => 'Internal note';
 
   @override
@@ -439,7 +509,40 @@ class AppLocalizationsEn extends AppLocalizations {
       'A question between colleagues; nothing is sent to the customer.';
 
   @override
+  String get jobCancelled => 'Cancelled';
+
+  @override
+  String get jobCompleted => 'Completed';
+
+  @override
+  String get jobInProgress => 'In progress';
+
+  @override
+  String get jobKindInspection => 'Inspection';
+
+  @override
+  String get jobKindInstallation => 'Installation';
+
+  @override
+  String get jobKindMaintenance => 'Maintenance';
+
+  @override
+  String get jobKindOther => 'Other';
+
+  @override
+  String get jobKindRepair => 'Repair';
+
+  @override
+  String get jobName => 'Title';
+
+  @override
+  String get jobPlanned => 'Planned';
+
+  @override
   String get jobTitle => 'Job title';
+
+  @override
+  String get jobs => 'Jobs';
 
   @override
   String get keepAgreedPrices => 'Keep agreed prices';
@@ -471,6 +574,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logCall => 'Log call';
 
   @override
+  String get logWork => 'Log work';
+
+  @override
   String get loginLinkInvalid =>
       'This login link has expired or was already used. Request a new one.';
 
@@ -494,6 +600,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markAsSent => 'Mark as sent';
 
   @override
+  String get markCompleted => 'Mark as completed';
+
+  @override
+  String get markReceived => 'Mark as received';
+
+  @override
+  String get markShipped => 'Mark as shipped back';
+
+  @override
+  String get markWaitingCustomer => 'Waiting for customer';
+
+  @override
+  String get markWaitingParts => 'Waiting for parts';
+
+  @override
   String get materialRequirements => 'Material requirements (active revision)';
 
   @override
@@ -508,13 +629,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get myJobs => 'My jobs';
+
+  @override
   String get myProfile => 'My details';
+
+  @override
+  String get myRepairs => 'My repairs';
 
   @override
   String get myTickets => 'My tickets';
 
   @override
   String get name => 'Name';
+
+  @override
+  String get navigate => 'Navigate';
 
   @override
   String get netPrice => 'Net price';
@@ -529,10 +659,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newCustomer => 'New customer';
 
   @override
+  String get newDepartment => 'New department';
+
+  @override
   String get newFamily => 'New family';
 
   @override
   String get newItem => 'New';
+
+  @override
+  String get newJob => 'New job';
 
   @override
   String get newLabel => 'New';
@@ -555,6 +691,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newQuotation => 'New quotation';
 
   @override
+  String get newRepair => 'New repair';
+
+  @override
   String get newRevision => 'New revision';
 
   @override
@@ -564,6 +703,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newTicket => 'New ticket';
+
+  @override
+  String get noAccess =>
+      'Your account has no access to any section yet. Ask an administrator.';
 
   @override
   String get noActiveBom => 'No active bill of materials.';
@@ -584,7 +727,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noExpectedClose => 'No expected close date';
 
   @override
+  String get noJobsAssigned => 'No jobs assigned to you.';
+
+  @override
   String get noLines => 'No lines yet.';
+
+  @override
+  String get noPhotos => 'No photos yet.';
 
   @override
   String get noPrices => 'No prices yet.';
@@ -596,7 +745,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noRebates => 'No product or family rebates.';
 
   @override
+  String get noRepairs => 'No repairs.';
+
+  @override
+  String get noRepairsYet => 'You have no repairs yet.';
+
+  @override
   String get noSerialComponents => 'No serialised components.';
+
+  @override
+  String get noTechnicians => 'Nobody assigned';
 
   @override
   String get noTicketsYet => 'You have no tickets yet.';
@@ -609,6 +767,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notClosed => 'Not closed';
+
+  @override
+  String get notRouted => 'Not routed yet';
+
+  @override
+  String get notScheduled => 'Not scheduled';
 
   @override
   String get noteAdded => 'Note added';
@@ -632,13 +796,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ok => 'OK';
 
   @override
+  String get onSiteContact => 'Person on site';
+
+  @override
   String get openEnded => 'open';
+
+  @override
+  String get openJobsOnly => 'Active only';
 
   @override
   String get openOnly => 'Open only';
 
   @override
   String get openOpportunity => 'Open opportunity';
+
+  @override
+  String openRepairsCount(String count) {
+    return '$count open';
+  }
 
   @override
   String get opportunities => 'Opportunities';
@@ -696,6 +871,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get phoneWork => 'Work';
+
+  @override
+  String photoBy(String name) {
+    return 'by $name';
+  }
+
+  @override
+  String get photos => 'Photos';
+
+  @override
+  String get photosAdded => 'Photos added';
 
   @override
   String get placeholdersHelp =>
@@ -816,6 +1002,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get productDescription => 'Product';
+
+  @override
   String get productFamilies => 'Product families';
 
   @override
@@ -925,6 +1114,63 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get reopenJob => 'Reopen job';
+
+  @override
+  String get repairAnnouncedByTicket =>
+      'The customer announced it (the product has not arrived yet)';
+
+  @override
+  String get repairAnnouncedOk =>
+      'Repair announced. Write the number on the parcel and send the product to us.';
+
+  @override
+  String get repairPhotosHelp =>
+      'Photos of the product and the fault help us a lot.';
+
+  @override
+  String get repairPortalAnnounced => 'Announced, not received yet';
+
+  @override
+  String get repairPortalInRepair => 'In repair';
+
+  @override
+  String get repairPortalReady => 'Repaired, ready to ship';
+
+  @override
+  String get repairPortalWaitingCustomer => 'Waiting for your answer';
+
+  @override
+  String get repairStatusAnnounced => 'Announced';
+
+  @override
+  String get repairStatusCancelled => 'Cancelled';
+
+  @override
+  String get repairStatusCompleted => 'Completed';
+
+  @override
+  String get repairStatusInProgress => 'In progress';
+
+  @override
+  String get repairStatusReceived => 'Received';
+
+  @override
+  String get repairStatusRouted => 'In department queue';
+
+  @override
+  String get repairStatusShipped => 'Shipped back';
+
+  @override
+  String get repairStatusWaitingCustomer => 'Waiting for customer';
+
+  @override
+  String get repairStatusWaitingParts => 'Waiting for parts';
+
+  @override
+  String get repairs => 'Repairs';
+
+  @override
   String get replyQueued => 'Reply queued for sending';
 
   @override
@@ -985,6 +1231,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roundTo => 'Round to';
 
   @override
+  String get routeNote => 'Note for the department';
+
+  @override
+  String get routeRepair => 'Route to department';
+
+  @override
   String get salesperson => 'Salesperson';
 
   @override
@@ -1005,6 +1257,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get scheduledEnd => 'End';
+
+  @override
+  String get scheduledStart => 'Start';
+
+  @override
   String get scrapPercent => 'Scrap %';
 
   @override
@@ -1012,6 +1270,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get send => 'Send';
+
+  @override
+  String get sendBackToTriage => 'Send back to triage';
 
   @override
   String get sendLoginLink => 'Send login link';
@@ -1068,6 +1329,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get singleProduct => 'Single product';
 
   @override
+  String get siteAddress => 'Where to go';
+
+  @override
+  String get siteName => 'Site name';
+
+  @override
   String skippedWithoutPrice(int count) {
     return '$count product/zone combinations have no price and are skipped';
   }
@@ -1094,6 +1361,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stageWon => 'won';
 
   @override
+  String get startJob => 'Start job';
+
+  @override
+  String get startWork => 'Start work';
+
+  @override
   String get status => 'Status';
 
   @override
@@ -1118,6 +1391,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get street => 'Street';
 
   @override
+  String get streetAddress => 'Street and number';
+
+  @override
   String structureRevision(int revision) {
     return 'Structure (revision $revision)';
   }
@@ -1135,6 +1411,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String suggested(String value) {
     return 'Suggested: $value';
   }
+
+  @override
+  String get takePhoto => 'Take a photo';
+
+  @override
+  String get tasks => 'Tasks';
+
+  @override
+  String tasksProgress(String done, String total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String get technicians => 'Technicians';
 
   @override
   String get text => 'Text';
@@ -1168,6 +1458,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ticketWaitingForYou => 'Waiting for your reply';
+
+  @override
+  String timeTotals(String work, String travel) {
+    return 'Work $work · Travel $travel';
+  }
 
   @override
   String get title => 'Title';
@@ -1242,6 +1537,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updated => 'Updated';
 
   @override
+  String get uploadingPhotos => 'Uploading…';
+
+  @override
   String get useAnotherPriceListDate => 'Use another price list date';
 
   @override
@@ -1278,6 +1576,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viaPortal => 'Via the customer portal';
 
   @override
+  String get warranty => 'Warranty';
+
+  @override
+  String get warrantyIn => 'In warranty';
+
+  @override
+  String get warrantyOut => 'Out of warranty';
+
+  @override
+  String get warrantyUnknown => 'Unknown';
+
+  @override
   String weighted(String amount) {
     return 'weighted $amount';
   }
@@ -1292,12 +1602,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get won => 'Won';
 
   @override
+  String get workFrom => 'From';
+
+  @override
+  String get workKindTravel => 'Travel';
+
+  @override
+  String get workKindWork => 'Work';
+
+  @override
+  String get workLogs => 'Time registered';
+
+  @override
+  String get workUntil => 'Until';
+
+  @override
   String writeIn(String language) {
     return 'Write in $language';
   }
 
   @override
   String get yourMessage => 'Your message';
+
+  @override
+  String get yourReference => 'Your reference (RMA or order)';
 
   @override
   String get zone => 'Zone';

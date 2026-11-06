@@ -8,10 +8,10 @@ import 'package:retrofit/retrofit.dart';
 import '../models/department.dart';
 import '../models/department_input.dart';
 import '../models/new_repair_input.dart';
-import '../models/note_input.dart';
 import '../models/repair.dart';
 import '../models/repair_detail.dart';
 import '../models/repair_input.dart';
+import '../models/repair_note_input.dart';
 import '../models/repair_page.dart';
 import '../models/route_input.dart';
 import '../models/status_input.dart';
@@ -76,7 +76,7 @@ abstract class RepairsClient {
   @POST('/api/v1/repairs/{id}/notes')
   Future<RepairDetail> addRepairNote({
     @Path('id') required String id,
-    @Body() required NoteInput body,
+    @Body() required RepairNoteInput body,
   });
 
   /// Adds a photo: the request body is the image itself (JPEG, PNG or WebP, at most 12 MB).

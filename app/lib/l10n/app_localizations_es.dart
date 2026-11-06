@@ -43,13 +43,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addNote => 'Añadir nota';
 
   @override
+  String get addNoteHint => 'Añadir una nota interna';
+
+  @override
   String get addPhone => 'Añadir teléfono';
+
+  @override
+  String get addPhoto => 'Añadir foto';
 
   @override
   String get addProduct => 'Añadir producto';
 
   @override
   String get addRebate => 'Añadir descuento';
+
+  @override
+  String get addTask => 'Añadir tarea';
 
   @override
   String addedBy(String date, String name) {
@@ -86,6 +95,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get announceRepair => 'Anunciar una reparación';
+
+  @override
+  String get announcedNotReceived => 'Anunciada, aún no recibida';
+
+  @override
   String answerFallback(String ticketLanguage, String usedLanguage) {
     return 'Aún no hay texto en $ticketLanguage: se ha usado el texto en $usedLanguage. Tradúzcalo antes de enviarlo.';
   }
@@ -100,7 +115,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get apply => 'Aplicar';
 
   @override
+  String get assignTo => 'Asignar a';
+
+  @override
   String get automatic => 'Automático';
+
+  @override
+  String get backIntoWork => 'Volver a trabajar';
 
   @override
   String get billOfMaterials => 'Lista de materiales';
@@ -157,6 +178,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cancel => 'Cancelar';
 
   @override
+  String get cancelJob => 'Cancelar trabajo';
+
+  @override
+  String get cancelRepair => 'Cancelar reparación';
+
+  @override
   String get cancelled => 'cancelado';
 
   @override
@@ -197,6 +224,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elija un cliente y añada al menos una línea válida.';
 
   @override
+  String get choosePhoto => 'Elegir de la galería';
+
+  @override
   String get chooseRebateTarget =>
       'Elija un producto o familia e indique un porcentaje.';
 
@@ -215,6 +245,12 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get codeNameVatRequired =>
       'El código, el nombre y el tipo de IVA son obligatorios.';
+
+  @override
+  String get completeJob => 'Completar trabajo';
+
+  @override
+  String get completionNotes => 'Qué se hizo (y qué queda pendiente)';
 
   @override
   String get component => 'Componente';
@@ -272,6 +308,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get createLead => 'Crear oportunidad';
 
   @override
+  String get createRepair => 'Crear reparación';
+
+  @override
   String get current => 'Actual';
 
   @override
@@ -312,6 +351,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deliverySent => 'enviado';
 
   @override
+  String get department => 'Departamento';
+
+  @override
+  String get departmentCode => 'Código';
+
+  @override
+  String get departmentMembers => 'Compañeros de este departamento';
+
+  @override
+  String get departments => 'Departamentos';
+
+  @override
+  String get departmentsHelp =>
+      'Las reparaciones se envían a estos departamentos. Solo los compañeros de un departamento pueden trabajar en sus reparaciones.';
+
+  @override
   String get description => 'Descripción';
 
   @override
@@ -334,6 +389,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get editContact => 'Editar contacto';
+
+  @override
+  String get editDepartment => 'Editar departamento';
+
+  @override
+  String get editJob => 'Editar trabajo';
 
   @override
   String get email => 'Correo electrónico';
@@ -382,6 +443,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get faultDescription => 'Qué falla';
+
+  @override
   String get firstName => 'Nombre';
 
   @override
@@ -407,6 +471,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpdesk => 'Atención al cliente';
 
   @override
+  String get history => 'Historial';
+
+  @override
   String get inactive => 'inactivo';
 
   @override
@@ -426,6 +493,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get insertPreparedAnswer => 'Insertar respuesta predefinida';
 
   @override
+  String get instructions => 'Instrucciones';
+
+  @override
   String get internalNote => 'Nota interna';
 
   @override
@@ -441,7 +511,40 @@ class AppLocalizationsEs extends AppLocalizations {
       'Una pregunta entre compañeros; no se envía nada al cliente.';
 
   @override
+  String get jobCancelled => 'Cancelado';
+
+  @override
+  String get jobCompleted => 'Completado';
+
+  @override
+  String get jobInProgress => 'En curso';
+
+  @override
+  String get jobKindInspection => 'Inspección';
+
+  @override
+  String get jobKindInstallation => 'Instalación';
+
+  @override
+  String get jobKindMaintenance => 'Mantenimiento';
+
+  @override
+  String get jobKindOther => 'Otro';
+
+  @override
+  String get jobKindRepair => 'Reparación';
+
+  @override
+  String get jobName => 'Título';
+
+  @override
+  String get jobPlanned => 'Planificado';
+
+  @override
   String get jobTitle => 'Cargo';
+
+  @override
+  String get jobs => 'Trabajos';
 
   @override
   String get keepAgreedPrices => 'Mantener precios acordados';
@@ -473,6 +576,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get logCall => 'Registrar llamada';
 
   @override
+  String get logWork => 'Registrar trabajo';
+
+  @override
   String get loginLinkInvalid =>
       'Este enlace ha caducado o ya se usó. Solicite uno nuevo.';
 
@@ -496,6 +602,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get markAsSent => 'Marcar como enviado';
 
   @override
+  String get markCompleted => 'Marcar como completada';
+
+  @override
+  String get markReceived => 'Marcar como recibida';
+
+  @override
+  String get markShipped => 'Marcar como enviada';
+
+  @override
+  String get markWaitingCustomer => 'Esperando al cliente';
+
+  @override
+  String get markWaitingParts => 'Esperando piezas';
+
+  @override
   String get materialRequirements =>
       'Necesidades de material (revisión activa)';
 
@@ -511,13 +632,22 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get myJobs => 'Mis trabajos';
+
+  @override
   String get myProfile => 'Mis datos';
+
+  @override
+  String get myRepairs => 'Mis reparaciones';
 
   @override
   String get myTickets => 'Mis tickets';
 
   @override
   String get name => 'Nombre';
+
+  @override
+  String get navigate => 'Navegar';
 
   @override
   String get netPrice => 'Precio neto';
@@ -532,10 +662,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newCustomer => 'Nuevo cliente';
 
   @override
+  String get newDepartment => 'Nuevo departamento';
+
+  @override
   String get newFamily => 'Nueva familia';
 
   @override
   String get newItem => 'Nuevo';
+
+  @override
+  String get newJob => 'Nuevo trabajo';
 
   @override
   String get newLabel => 'Nuevo';
@@ -558,6 +694,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newQuotation => 'Nuevo presupuesto';
 
   @override
+  String get newRepair => 'Nueva reparación';
+
+  @override
   String get newRevision => 'Nueva revisión';
 
   @override
@@ -567,6 +706,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get newTicket => 'Nuevo ticket';
+
+  @override
+  String get noAccess =>
+      'Su cuenta aún no tiene acceso a ninguna sección. Consulte a un administrador.';
 
   @override
   String get noActiveBom => 'No hay lista de materiales activa.';
@@ -587,7 +730,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noExpectedClose => 'Sin fecha de cierre prevista';
 
   @override
+  String get noJobsAssigned => 'No tiene trabajos asignados.';
+
+  @override
   String get noLines => 'Aún no hay líneas.';
+
+  @override
+  String get noPhotos => 'Aún no hay fotos.';
 
   @override
   String get noPrices => 'Aún no hay precios.';
@@ -599,7 +748,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noRebates => 'Sin descuentos por producto o familia.';
 
   @override
+  String get noRepairs => 'Sin reparaciones.';
+
+  @override
+  String get noRepairsYet => 'Aún no tiene reparaciones.';
+
+  @override
   String get noSerialComponents => 'Sin componentes con número de serie.';
+
+  @override
+  String get noTechnicians => 'Nadie asignado';
 
   @override
   String get noTicketsYet => 'Aún no tiene tickets.';
@@ -612,6 +770,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get notClosed => 'No cerrados';
+
+  @override
+  String get notRouted => 'Aún sin enviar';
+
+  @override
+  String get notScheduled => 'Sin planificar';
 
   @override
   String get noteAdded => 'Nota añadida';
@@ -635,13 +799,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ok => 'Aceptar';
 
   @override
+  String get onSiteContact => 'Contacto en el lugar';
+
+  @override
   String get openEnded => 'abierto';
+
+  @override
+  String get openJobsOnly => 'Solo activos';
 
   @override
   String get openOnly => 'Solo abiertas';
 
   @override
   String get openOpportunity => 'Abrir oportunidad';
+
+  @override
+  String openRepairsCount(String count) {
+    return '$count abiertas';
+  }
 
   @override
   String get opportunities => 'Oportunidades';
@@ -699,6 +874,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get phoneWork => 'Trabajo';
+
+  @override
+  String photoBy(String name) {
+    return 'por $name';
+  }
+
+  @override
+  String get photos => 'Fotos';
+
+  @override
+  String get photosAdded => 'Fotos añadidas';
 
   @override
   String get placeholdersHelp =>
@@ -820,6 +1006,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get productDescription => 'Producto';
+
+  @override
   String get productFamilies => 'Familias de productos';
 
   @override
@@ -929,6 +1118,63 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get reopenJob => 'Reabrir trabajo';
+
+  @override
+  String get repairAnnouncedByTicket =>
+      'El cliente la anunció (el producto aún no ha llegado)';
+
+  @override
+  String get repairAnnouncedOk =>
+      'Reparación anunciada. Escriba el número en el paquete y envíenos el producto.';
+
+  @override
+  String get repairPhotosHelp =>
+      'Las fotos del producto y de la avería nos ayudan mucho.';
+
+  @override
+  String get repairPortalAnnounced => 'Anunciada, aún no recibida';
+
+  @override
+  String get repairPortalInRepair => 'En reparación';
+
+  @override
+  String get repairPortalReady => 'Reparada, lista para enviar';
+
+  @override
+  String get repairPortalWaitingCustomer => 'Esperando su respuesta';
+
+  @override
+  String get repairStatusAnnounced => 'Anunciada';
+
+  @override
+  String get repairStatusCancelled => 'Cancelada';
+
+  @override
+  String get repairStatusCompleted => 'Completada';
+
+  @override
+  String get repairStatusInProgress => 'En curso';
+
+  @override
+  String get repairStatusReceived => 'Recibida';
+
+  @override
+  String get repairStatusRouted => 'En cola del departamento';
+
+  @override
+  String get repairStatusShipped => 'Enviada de vuelta';
+
+  @override
+  String get repairStatusWaitingCustomer => 'Esperando al cliente';
+
+  @override
+  String get repairStatusWaitingParts => 'Esperando piezas';
+
+  @override
+  String get repairs => 'Reparaciones';
+
+  @override
   String get replyQueued => 'Respuesta en cola de envío';
 
   @override
@@ -989,6 +1235,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get roundTo => 'Redondear a';
 
   @override
+  String get routeNote => 'Nota para el departamento';
+
+  @override
+  String get routeRepair => 'Enviar a departamento';
+
+  @override
   String get salesperson => 'Comercial';
 
   @override
@@ -1009,6 +1261,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get scheduledEnd => 'Fin';
+
+  @override
+  String get scheduledStart => 'Inicio';
+
+  @override
   String get scrapPercent => 'Merma %';
 
   @override
@@ -1016,6 +1274,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get send => 'Enviar';
+
+  @override
+  String get sendBackToTriage => 'Devolver a triaje';
 
   @override
   String get sendLoginLink => 'Enviar enlace de acceso';
@@ -1072,6 +1333,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get singleProduct => 'Producto concreto';
 
   @override
+  String get siteAddress => 'Dónde ir';
+
+  @override
+  String get siteName => 'Nombre del lugar';
+
+  @override
   String skippedWithoutPrice(int count) {
     return '$count combinaciones producto/zona no tienen precio y se omiten';
   }
@@ -1098,6 +1365,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get stageWon => 'ganada';
 
   @override
+  String get startJob => 'Empezar trabajo';
+
+  @override
+  String get startWork => 'Empezar el trabajo';
+
+  @override
   String get status => 'Estado';
 
   @override
@@ -1122,6 +1395,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get street => 'Calle';
 
   @override
+  String get streetAddress => 'Calle y número';
+
+  @override
   String structureRevision(int revision) {
     return 'Estructura (revisión $revision)';
   }
@@ -1139,6 +1415,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String suggested(String value) {
     return 'Sugerencia: $value';
   }
+
+  @override
+  String get takePhoto => 'Hacer una foto';
+
+  @override
+  String get tasks => 'Tareas';
+
+  @override
+  String tasksProgress(String done, String total) {
+    return '$done de $total hechas';
+  }
+
+  @override
+  String get technicians => 'Técnicos';
 
   @override
   String get text => 'Texto';
@@ -1172,6 +1462,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ticketWaitingForYou => 'Esperando su respuesta';
+
+  @override
+  String timeTotals(String work, String travel) {
+    return 'Trabajo $work · Desplazamiento $travel';
+  }
 
   @override
   String get title => 'Título';
@@ -1246,6 +1541,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get updated => 'Actualizado';
 
   @override
+  String get uploadingPhotos => 'Subiendo…';
+
+  @override
   String get useAnotherPriceListDate => 'Usar otra fecha de tarifa';
 
   @override
@@ -1282,6 +1580,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get viaPortal => 'A través del portal de clientes';
 
   @override
+  String get warranty => 'Garantía';
+
+  @override
+  String get warrantyIn => 'En garantía';
+
+  @override
+  String get warrantyOut => 'Fuera de garantía';
+
+  @override
+  String get warrantyUnknown => 'Desconocida';
+
+  @override
   String weighted(String amount) {
     return 'ponderado $amount';
   }
@@ -1296,12 +1606,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String get won => 'Ganada';
 
   @override
+  String get workFrom => 'Desde';
+
+  @override
+  String get workKindTravel => 'Desplazamiento';
+
+  @override
+  String get workKindWork => 'Trabajo';
+
+  @override
+  String get workLogs => 'Tiempo registrado';
+
+  @override
+  String get workUntil => 'Hasta';
+
+  @override
   String writeIn(String language) {
     return 'Escribir en $language';
   }
 
   @override
   String get yourMessage => 'Su mensaje';
+
+  @override
+  String get yourReference => 'Su referencia (RMA o pedido)';
 
   @override
   String get zone => 'Zona';

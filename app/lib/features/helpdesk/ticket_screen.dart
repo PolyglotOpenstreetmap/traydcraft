@@ -9,6 +9,7 @@ import '../../shared/actions.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
 import '../customers/customer_form.dart';
+import '../repairs/repairs_page.dart' show showNewRepairDialog;
 import 'call_dialogs.dart';
 import 'tickets_page.dart';
 
@@ -48,6 +49,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   List<QuotationSummary> _quotations = [];
   List<Opportunity> _opportunities = [];
   List<Contact> _contacts = [];
+  List<Repair> _repairs = [];
 
   // Composer.
   /// The composer mode the user chose; replying also needs the helpdesk.reply permission.
@@ -110,6 +112,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         _quotations = [];
         _opportunities = [];
         _contacts = [];
+        _repairs = [];
       });
       return;
     }
@@ -122,8 +125,12 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     final people = await _api.crm
         .listCustomerContacts(id: c)
         .then((p) => p, onError: (Object _) => <Contact>[]);
+    final repairs = await _api.repairs
+        .listTicketRepairs(id: widget.id)
+        .then((p) => p, onError: (Object _) => <Repair>[]);
     if (mounted) {
       setState(() {
+        _repairs = repairs;
         _quotations = quotes;
         _opportunities = opps;
         _contacts = people;
@@ -803,6 +810,47 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
           spacing: 8,
           runSpacing: 8,
           children: [
+            // A customer who says a product is coming (or arrived) gets a repair, linked here.
+            if (perms.contains('repairs.write') &&
+                t.customerId != null &&
+                !t.internal)
+              OutlinedButton.icon(
+                icon: const Icon(Icons.build_circle_outlined),
+                label: Text(l.createRepair),
+                onPressed: _busy
+                    ? null
+                    : () async {
+                        final d = await showNewRepairDialog(
+                          context,
+                          ticketId: t.id,
+                          customer: Customer.fromJson({
+                            'id': t.customerId,
+                            'code': '',
+                            'name': t.customerName ?? '',
+                            'street': '',
+                            'postal_code': '',
+                            'city': '',
+                            'country_code': 'BE',
+                            'language': t.language,
+                            'active': true,
+                          }),
+                          contactId: t.contactId,
+                          fault: t.subject,
+                        );
+                        if (d != null && context.mounted) {
+                          await _load();
+                          if (context.mounted) {
+                            context.push('/repairs/${d.repair.id}');
+                          }
+                        }
+                      },
+              ),
+            for (final r in _repairs)
+              ActionChip(
+                avatar: const Icon(Icons.build_circle_outlined, size: 18),
+                label: Text('${r.number} · ${l.repairStatus(r.status)}'),
+                onPressed: () => context.push('/repairs/${r.id}'),
+              ),
             if (t.opportunityId != null)
               OutlinedButton.icon(
                 icon: const Icon(Icons.trending_up),

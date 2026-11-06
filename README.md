@@ -26,7 +26,9 @@ crates/products/     products, price zones, price history
 crates/sales/        quotations: drafts, snapshots, revisions, PDF data
 crates/engineering/  BOM revisions, explosion, serial units and genealogy
 crates/helpdesk/     tickets from e-mail and phone, threading, prepared answers, outbox, IMAP
-crates/portal/       customer portal: passwordless login for contacts, their tickets and profile
+crates/portal/       customer portal: passwordless login for contacts, their tickets, repairs and profile
+crates/repairs/      repairs customers send in, workshop departments, routing workflow, photos
+crates/fieldservice/ jobs at customer sites for technicians: tasks, work logs, photos
 apps/worker/         background worker: IMAP polling and sending the e-mail outbox
 crates/documents/    Typst PDF rendering, Belgian number formatting
 migrations/          SQLx migrations (one PostgreSQL schema per module)
@@ -86,6 +88,12 @@ flutter run -d chrome --web-port 8081 -t lib/portal/portal_main.dart \
   --dart-define=PORTAL_API_URL=http://localhost:8080 \
   --dart-define=PORTAL_COMPANY_ID=00000000-0000-7000-8000-000000000001
 ```
+
+Repairs and field service (seed users, all in development authentication): `support@example.com`
+registers and routes repairs; `electronics@example.com` and `mechanic@example.com` work in their
+departments; `admin@example.com` creates departments (Repairs → Departments);
+`dispatcher@example.com` plans jobs and `technician@example.com` sees only their own ("Jobs").
+Photos are JPEG/PNG/WebP up to 12 MB and are stored in the database.
 
 Staff manage the people at a customer under Customers → Contacts, look up a caller with
 "Who is calling?" in the helpdesk, and give a contact portal access in the contact form.

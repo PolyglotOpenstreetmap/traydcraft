@@ -21,9 +21,14 @@ class FakeHttp implements HttpClientAdapter {
     final key = '${o.method} ${o.path}';
     requests.add(key);
     Object? sent;
-    if (body != null) {
-      final raw = utf8.decode(await body.expand((c) => c).toList());
-      if (raw.isNotEmpty) sent = jsonDecode(raw);
+    if ((o.contentType ?? '').contains('json')) {
+      if (body != null) {
+        final bytes = Uint8List.fromList(await body.expand((c) => c).toList());
+        if (bytes.isNotEmpty) sent = jsonDecode(utf8.decode(bytes));
+      }
+    } else {
+      // A photo: keep the bytes the app handed to Dio (draining the stream is not needed).
+      sent = o.data;
     }
     bodies[key] = sent;
     final route = routes[key];
@@ -37,6 +42,15 @@ class FakeHttp implements HttpClientAdapter {
       );
     }
     final json = route(sent);
+    if (json is Uint8List) {
+      return ResponseBody.fromBytes(
+        json,
+        200,
+        headers: {
+          Headers.contentTypeHeader: ['image/jpeg'],
+        },
+      );
+    }
     return ResponseBody.fromString(
       jsonEncode(json),
       json == null ? 204 : 200,
@@ -127,4 +141,57 @@ Map<String, Object?> customerJson() => {
   'country_code': 'BE',
   'language': 'fr',
   'active': true,
+};
+
+/// A tiny JPEG-looking byte string (the app only displays what the server returns).
+final fakeJpeg = Uint8List.fromList([
+  0xFF,
+  0xD8,
+  0xFF,
+  0xE0,
+  0,
+  0x10,
+  0x4A,
+  0x46,
+  0x49,
+  0x46,
+]);
+
+Map<String, Object?> repairJson({
+  String status = 'received',
+  String? department,
+  int photos = 0,
+}) => {
+  'id': 'r1',
+  'number': 'R2026-00001',
+  'status': status,
+  'priority': 'normal',
+  'customer_id': 'c1',
+  'customer_name': 'Alpha Installaties NV',
+  'contact_name': 'Jan Peeters',
+  'product_description': 'Pump 5 kW',
+  'serial_number': 'SN-1',
+  'fault_description': 'Does not start',
+  'customer_reference': 'RMA-77',
+  'warranty': 'unknown',
+  'department_id': department == null ? null : 'd1',
+  'department_name': department,
+  'source': 'staff',
+  'photo_count': photos,
+  'created_at': '2026-11-06T10:00:00Z',
+  'updated_at': '2026-11-06T10:00:00Z',
+};
+
+Map<String, Object?> departmentJson(
+  String id,
+  String name, {
+  List<Map<String, Object?>> members = const [],
+}) => {
+  'id': id,
+  'code': name.toUpperCase().substring(0, 4),
+  'name': name,
+  'sort_order': 1,
+  'active': true,
+  'members': members,
+  'open_repairs': 0,
 };

@@ -241,7 +241,7 @@ class _RepairsClient implements RepairsClient {
   @override
   Future<RepairDetail> addRepairNote({
     required String id,
-    required NoteInput body,
+    required RepairNoteInput body,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};

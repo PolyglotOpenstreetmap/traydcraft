@@ -17,9 +17,12 @@
   "addComponent": "Add component",
   "addComponentBySerial": "Add component by serial number (in stock)",
   "addNote": "Add note",
+  "addNoteHint": "Add an internal note",
   "addPhone": "Add phone number",
+  "addPhoto": "Add photo",
   "addProduct": "Add product",
   "addRebate": "Add rebate",
+  "addTask": "Add task",
   "addedBy": "added {date} by {name}",
   "@addedBy": {
     "placeholders": {
@@ -47,6 +50,8 @@
       }
     }
   },
+  "announceRepair": "Announce a repair",
+  "announcedNotReceived": "Announced, not received yet",
   "answerFallback": "No {ticketLanguage} text yet: the {usedLanguage} text was used. Translate it before sending.",
   "@answerFallback": {
     "placeholders": {
@@ -61,7 +66,9 @@
   "appLanguage": "Language",
   "appTitle": "traydcraft",
   "apply": "Apply",
+  "assignTo": "Assign to",
   "automatic": "Automatic",
+  "backIntoWork": "Back into work",
   "billOfMaterials": "Bill of materials",
   "bomActive": "active",
   "bomObsolete": "obsolete",
@@ -86,6 +93,8 @@
   },
   "canStillKeep": "You can still keep the agreed prices.",
   "cancel": "Cancel",
+  "cancelJob": "Cancel job",
+  "cancelRepair": "Cancel repair",
   "cancelled": "cancelled",
   "category": "Category",
   "categoryComplaint": "complaint",
@@ -99,12 +108,15 @@
   "cc": "Cc",
   "change": "Change",
   "chooseCustomerAndLine": "Choose a customer and add at least one valid line.",
+  "choosePhoto": "Choose from gallery",
   "chooseRebateTarget": "Choose a product or family and enter a percentage.",
   "chooseZonePrice": "Choose a zone and enter a price.",
   "city": "City",
   "close": "Close",
   "code": "Code",
   "codeNameVatRequired": "Code, name and VAT rate are required.",
+  "completeJob": "Complete job",
+  "completionNotes": "What was done (and anything left open)",
   "component": "Component",
   "componentHistory": "Component history",
   "componentSince": "{product} · since {date}",
@@ -148,6 +160,7 @@
   "country": "Country",
   "create": "Create",
   "createLead": "Create lead",
+  "createRepair": "Create repair",
   "current": "Current",
   "customer": "Customer",
   "customerLanguage": "Customer language",
@@ -174,6 +187,11 @@
   "deliveryFailed": "not sent",
   "deliveryQueued": "waiting to send",
   "deliverySent": "sent",
+  "department": "Department",
+  "departmentCode": "Code",
+  "departmentMembers": "Colleagues in this department",
+  "departments": "Departments",
+  "departmentsHelp": "Repairs are routed to these departments. Only colleagues who belong to a department can work on its repairs.",
   "description": "Description",
   "devModeHelp": "Server must run with AUTH_MODE=dev",
   "developmentUser": "Development user",
@@ -182,6 +200,8 @@
   "draftSaved": "Draft saved",
   "edit": "Edit",
   "editContact": "Edit contact",
+  "editDepartment": "Edit department",
+  "editJob": "Edit job",
   "email": "E-mail",
   "emailAddresses": "E-mail addresses (the first is primary)",
   "enterChange": "Enter the change, e.g. 4.5 for +4.5 %.",
@@ -216,6 +236,7 @@
       }
     }
   },
+  "faultDescription": "What is wrong",
   "firstName": "First name",
   "from": "From",
   "fromYou": "You",
@@ -237,6 +258,7 @@
     }
   },
   "helpdesk": "Helpdesk",
+  "history": "History",
   "inactive": "inactive",
   "inactiveContact": "No longer active (left the company)",
   "indicativeLine": "{description} (indicative, to confirm)",
@@ -256,6 +278,7 @@
     }
   },
   "insertPreparedAnswer": "Insert prepared answer",
+  "instructions": "Instructions",
   "internalNote": "Internal note",
   "internalQuestionHelp": "Internal question. Ask the customer in {language} with a reply, then post the answer for your colleague as an internal note.",
   "@internalQuestionHelp": {
@@ -267,7 +290,18 @@
   },
   "internalTicket": "Internal ticket",
   "internalTicketHelp": "A question between colleagues; nothing is sent to the customer.",
+  "jobCancelled": "Cancelled",
+  "jobCompleted": "Completed",
+  "jobInProgress": "In progress",
+  "jobKindInspection": "Inspection",
+  "jobKindInstallation": "Installation",
+  "jobKindMaintenance": "Maintenance",
+  "jobKindOther": "Other",
+  "jobKindRepair": "Repair",
+  "jobName": "Title",
+  "jobPlanned": "Planned",
   "jobTitle": "Job title",
+  "jobs": "Jobs",
   "keepAgreedPrices": "Keep agreed prices",
   "language": "Language",
   "languageSameAsCustomer": "Same as company ({language})",
@@ -284,6 +318,7 @@
   "listPrice": "List price",
   "loadMore": "Load more",
   "logCall": "Log call",
+  "logWork": "Log work",
   "loginLinkInvalid": "This login link has expired or was already used. Request a new one.",
   "loginLinkSent": "If this address may use the portal, a login link is on its way. Check your inbox.",
   "lookUp": "Look up",
@@ -291,6 +326,11 @@
   "lostReason": "Lost reason",
   "markAsLost": "Mark as lost",
   "markAsSent": "Mark as sent",
+  "markCompleted": "Mark as completed",
+  "markReceived": "Mark as received",
+  "markShipped": "Mark as shipped back",
+  "markWaitingCustomer": "Waiting for customer",
+  "markWaitingParts": "Waiting for parts",
   "materialRequirements": "Material requirements (active revision)",
   "message": "Message",
   "messageSent": "Message sent",
@@ -302,15 +342,20 @@
       }
     }
   },
+  "myJobs": "My jobs",
   "myProfile": "My details",
+  "myRepairs": "My repairs",
   "myTickets": "My tickets",
   "name": "Name",
+  "navigate": "Navigate",
   "netPrice": "Net price",
   "newAnswer": "New answer",
   "newContact": "New contact",
   "newCustomer": "New customer",
+  "newDepartment": "New department",
   "newFamily": "New family",
   "newItem": "New",
+  "newJob": "New job",
   "newLabel": "New",
   "newOpportunity": "New opportunity",
   "newPrice": "New price",
@@ -324,6 +369,7 @@
   },
   "newProduct": "New product",
   "newQuotation": "New quotation",
+  "newRepair": "New repair",
   "newRevision": "New revision",
   "newRevisionOf": "New revision of {number}",
   "@newRevisionOf": {
@@ -334,21 +380,29 @@
     }
   },
   "newTicket": "New ticket",
+  "noAccess": "Your account has no access to any section yet. Ask an administrator.",
   "noActiveBom": "No active bill of materials.",
   "noBom": "No bill of materials yet.",
   "noContactLinked": "No contact person linked",
   "noContacts": "No contacts yet.",
   "noCustomerLinked": "No customer linked",
   "noExpectedClose": "No expected close date",
+  "noJobsAssigned": "No jobs assigned to you.",
   "noLines": "No lines yet.",
+  "noPhotos": "No photos yet.",
   "noPrices": "No prices yet.",
   "noQuotations": "No quotations yet.",
   "noRebates": "No product or family rebates.",
+  "noRepairs": "No repairs.",
+  "noRepairsYet": "You have no repairs yet.",
   "noSerialComponents": "No serialised components.",
+  "noTechnicians": "Nobody assigned",
   "noTicketsYet": "You have no tickets yet.",
   "nobodyFound": "Nobody found with this number.",
   "none": "None",
   "notClosed": "Not closed",
+  "notRouted": "Not routed yet",
+  "notScheduled": "Not scheduled",
   "noteAdded": "Note added",
   "notes": "Notes",
   "number": "Number",
@@ -356,9 +410,19 @@
   "obsoleteRevision": "Obsolete revision (read-only).",
   "oidcAccessToken": "OIDC access token",
   "ok": "OK",
+  "onSiteContact": "Person on site",
   "openEnded": "open",
+  "openJobsOnly": "Active only",
   "openOnly": "Open only",
   "openOpportunity": "Open opportunity",
+  "openRepairsCount": "{count} open",
+  "@openRepairsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "opportunities": "Opportunities",
   "opportunity": "Opportunity",
   "opportunityOptional": "Opportunity (optional)",
@@ -378,6 +442,16 @@
   "phoneNumbers": "Phone numbers",
   "phoneOther": "Other",
   "phoneWork": "Work",
+  "photoBy": "by {name}",
+  "@photoBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "photos": "Photos",
+  "photosAdded": "Photos added",
   "placeholdersHelp": "Placeholders (click to insert in the current language):",
   "portalAccess": "Customer portal access",
   "portalScope": "Sees in the portal",
@@ -451,6 +525,7 @@
       }
     }
   },
+  "productDescription": "Product",
   "productFamilies": "Product families",
   "productFamily": "Product family",
   "productRebates": "Product rebates",
@@ -531,6 +606,24 @@
       }
     }
   },
+  "reopenJob": "Reopen job",
+  "repairAnnouncedByTicket": "The customer announced it (the product has not arrived yet)",
+  "repairAnnouncedOk": "Repair announced. Write the number on the parcel and send the product to us.",
+  "repairPhotosHelp": "Photos of the product and the fault help us a lot.",
+  "repairPortalAnnounced": "Announced, not received yet",
+  "repairPortalInRepair": "In repair",
+  "repairPortalReady": "Repaired, ready to ship",
+  "repairPortalWaitingCustomer": "Waiting for your answer",
+  "repairStatusAnnounced": "Announced",
+  "repairStatusCancelled": "Cancelled",
+  "repairStatusCompleted": "Completed",
+  "repairStatusInProgress": "In progress",
+  "repairStatusReceived": "Received",
+  "repairStatusRouted": "In department queue",
+  "repairStatusShipped": "Shipped back",
+  "repairStatusWaitingCustomer": "Waiting for customer",
+  "repairStatusWaitingParts": "Waiting for parts",
+  "repairs": "Repairs",
   "replyQueued": "Reply queued for sending",
   "replyToCustomer": "Reply to customer",
   "repricingFailed": "Today's prices could not be calculated: {error}",
@@ -579,6 +672,8 @@
   "roleTechnical": "Technician",
   "roles": "Roles",
   "roundTo": "Round to",
+  "routeNote": "Note for the department",
+  "routeRepair": "Route to department",
   "salesperson": "Salesperson",
   "save": "Save",
   "saveChanges": "Save changes",
@@ -592,9 +687,12 @@
       }
     }
   },
+  "scheduledEnd": "End",
+  "scheduledStart": "Start",
   "scrapPercent": "Scrap %",
   "search": "Search",
   "send": "Send",
+  "sendBackToTriage": "Send back to triage",
   "sendLoginLink": "Send login link",
   "serial": "serial",
   "serialBuiltIn": "built in",
@@ -619,6 +717,8 @@
   },
   "signingIn": "Signing in…",
   "singleProduct": "Single product",
+  "siteAddress": "Where to go",
+  "siteName": "Site name",
   "skippedWithoutPrice": "{count} product/zone combinations have no price and are skipped",
   "@skippedWithoutPrice": {
     "placeholders": {
@@ -634,6 +734,8 @@
   "stageProposal": "proposal",
   "stageQualified": "qualified",
   "stageWon": "won",
+  "startJob": "Start job",
+  "startWork": "Start work",
   "status": "Status",
   "statusAccepted": "accepted",
   "statusAfterwards": "Status afterwards",
@@ -642,6 +744,7 @@
   "statusSent": "sent",
   "statusSuperseded": "superseded",
   "street": "Street",
+  "streetAddress": "Street and number",
   "structureRevision": "Structure (revision {revision})",
   "@structureRevision": {
     "placeholders": {
@@ -661,6 +764,20 @@
       }
     }
   },
+  "takePhoto": "Take a photo",
+  "tasks": "Tasks",
+  "tasksProgress": "{done} of {total} done",
+  "@tasksProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "technicians": "Technicians",
   "text": "Text",
   "ticketClosed": "Closed",
   "ticketDetails": "Ticket details",
@@ -672,6 +789,17 @@
   "ticketStatusPendingCustomer": "waiting for customer",
   "ticketStatusPendingInternal": "waiting for colleague",
   "ticketWaitingForYou": "Waiting for your reply",
+  "timeTotals": "Work {work} · Travel {travel}",
+  "@timeTotals": {
+    "placeholders": {
+      "work": {
+        "type": "String"
+      },
+      "travel": {
+        "type": "String"
+      }
+    }
+  },
   "title": "Title",
   "titleCustomerValueRequired": "Title, customer and a valid value are required.",
   "titleMr": "Mr.",
@@ -708,6 +836,7 @@
   "until": "Until",
   "updateToCurrentPrices": "Update to current prices",
   "updated": "Updated",
+  "uploadingPhotos": "Uploading…",
   "useAnotherPriceListDate": "Use another price list date",
   "validFrom": "Valid from",
   "validFromDate": "Valid from {date}",
@@ -742,6 +871,10 @@
   },
   "vatPercent": "VAT %",
   "viaPortal": "Via the customer portal",
+  "warranty": "Warranty",
+  "warrantyIn": "In warranty",
+  "warrantyOut": "Out of warranty",
+  "warrantyUnknown": "Unknown",
   "weighted": "weighted {amount}",
   "@weighted": {
     "placeholders": {
@@ -753,6 +886,11 @@
   "whatWasAsked": "What was asked?",
   "whoIsCalling": "Who is calling?",
   "won": "Won",
+  "workFrom": "From",
+  "workKindTravel": "Travel",
+  "workKindWork": "Work",
+  "workLogs": "Time registered",
+  "workUntil": "Until",
   "writeIn": "Write in {language}",
   "@writeIn": {
     "placeholders": {
@@ -762,6 +900,7 @@
     }
   },
   "yourMessage": "Your message",
+  "yourReference": "Your reference (RMA or order)",
   "zone": "Zone",
   "zoneAndRebate": "Zone {zone} · general rebate {percent} %",
   "@zoneAndRebate": {

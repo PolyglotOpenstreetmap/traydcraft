@@ -7,19 +7,49 @@ import 'session.dart';
 import '../l10n/l10n.dart';
 
 class _Dest {
-  const _Dest(this.path, this.label, this.icon);
+  const _Dest(this.path, this.label, this.icon, this.permission);
   final String path;
   final String Function(AppLocalizations l) label;
   final IconData icon;
+
+  /// The permission that makes the section useful; people without it do not see the tab.
+  final String permission;
 }
 
-final _destinations = [
-  _Dest('/opportunities', (l) => l.opportunities, Icons.trending_up),
-  _Dest('/quotations', (l) => l.quotations, Icons.request_quote_outlined),
-  _Dest('/orders', (l) => l.orders, Icons.inventory_outlined),
-  _Dest('/helpdesk', (l) => l.helpdesk, Icons.support_agent),
-  _Dest('/customers', (l) => l.customers, Icons.business_outlined),
-  _Dest('/products', (l) => l.products, Icons.inventory_2_outlined),
+final _allDestinations = [
+  _Dest(
+    '/opportunities',
+    (l) => l.opportunities,
+    Icons.trending_up,
+    'opportunities.read',
+  ),
+  _Dest(
+    '/quotations',
+    (l) => l.quotations,
+    Icons.request_quote_outlined,
+    'quotations.read',
+  ),
+  _Dest('/orders', (l) => l.orders, Icons.inventory_outlined, 'orders.read'),
+  _Dest('/helpdesk', (l) => l.helpdesk, Icons.support_agent, 'helpdesk.read'),
+  _Dest(
+    '/repairs',
+    (l) => l.repairs,
+    Icons.build_circle_outlined,
+    'repairs.read',
+  ),
+  _Dest('/jobs', (l) => l.jobs, Icons.engineering_outlined, 'field.read'),
+  _Dest(
+    '/customers',
+    (l) => l.customers,
+    Icons.business_outlined,
+    'customers.read',
+  ),
+  _Dest(
+    '/products',
+    (l) => l.products,
+    Icons.inventory_2_outlined,
+    'products.read',
+  ),
 ];
 
 /// Navigation frame: a side rail on desktop/tablet, a bottom bar on phones.
@@ -31,12 +61,27 @@ class AppShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final index = _destinations
-        .indexWhere((d) => location.startsWith(d.path))
-        .clamp(0, _destinations.length - 1);
     final wide = MediaQuery.sizeOf(context).width >= 800;
     final me = ref.watch(meProvider);
-    void go(int i) => context.go(_destinations[i].path);
+    // Show the sections the user has rights for (all, while the user is still loading), so a
+    // technician sees "My jobs" and not a row of tabs that answer "forbidden".
+    final perms = me.value?.permissions;
+    final destinations = [
+      for (final d in _allDestinations)
+        if (perms == null || perms.contains(d.permission)) d,
+    ];
+    final found = destinations.indexWhere((d) => location.startsWith(d.path));
+    if (found < 0 && destinations.isNotEmpty && perms != null) {
+      // The current page is not for this user (e.g. the default start page): go to their first.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) context.go(destinations.first.path);
+      });
+    }
+    if (destinations.isEmpty) {
+      return Scaffold(body: Center(child: Text(context.l10n.noAccess)));
+    }
+    final index = found < 0 ? 0 : found;
+    void go(int i) => context.go(destinations[i].path);
 
     final userMenu = PopupMenuButton<String>(
       tooltip: context.l10n.account,
@@ -102,7 +147,7 @@ class AppShell extends ConsumerWidget {
                 ),
               ),
               destinations: [
-                for (final d in _destinations)
+                for (final d in destinations)
                   NavigationRailDestination(
                     icon: Icon(d.icon),
                     label: Text(d.label(context.l10n)),
@@ -125,7 +170,7 @@ class AppShell extends ConsumerWidget {
         selectedIndex: index,
         onDestinationSelected: go,
         destinations: [
-          for (final d in _destinations)
+          for (final d in destinations)
             NavigationDestination(
               icon: Icon(d.icon),
               label: d.label(context.l10n),

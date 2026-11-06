@@ -133,6 +133,50 @@ extension CodeLabels on AppLocalizations {
     _ => phoneOther,
   };
 
+  String repairStatus(String s) => switch (s) {
+    'announced' => repairStatusAnnounced,
+    'received' => repairStatusReceived,
+    'routed' => repairStatusRouted,
+    'in_progress' => repairStatusInProgress,
+    'waiting_customer' => repairStatusWaitingCustomer,
+    'waiting_parts' => repairStatusWaitingParts,
+    'completed' => repairStatusCompleted,
+    'shipped' => repairStatusShipped,
+    'cancelled' => repairStatusCancelled,
+    _ => s,
+  };
+
+  /// What the customer sees of a repair's state (the API simplifies it).
+  String portalRepairStatus(String s) => switch (s) {
+    'announced' => repairPortalAnnounced,
+    'in_repair' => repairPortalInRepair,
+    'waiting_customer' => repairPortalWaitingCustomer,
+    'ready' => repairPortalReady,
+    'shipped' => repairStatusShipped,
+    _ => repairStatusCancelled,
+  };
+
+  String warrantyLabel(String s) => switch (s) {
+    'in_warranty' => warrantyIn,
+    'out_of_warranty' => warrantyOut,
+    _ => warrantyUnknown,
+  };
+
+  String jobKind(String s) => switch (s) {
+    'installation' => jobKindInstallation,
+    'maintenance' => jobKindMaintenance,
+    'repair' => jobKindRepair,
+    'inspection' => jobKindInspection,
+    _ => jobKindOther,
+  };
+
+  String jobStatus(String s) => switch (s) {
+    'planned' => jobPlanned,
+    'in_progress' => jobInProgress,
+    'completed' => jobCompleted,
+    _ => jobCancelled,
+  };
+
   /// How the portal shows a ticket's state; internal states read as "in progress".
   String portalTicketStatus(String s) => switch (s) {
     'closed' => ticketClosed,
@@ -151,3 +195,9 @@ const contactRoles = [
   'quality',
   'other',
 ];
+
+/// Minutes as "1 h 05 min" (or "45 min").
+String minutesText(int minutes) {
+  final h = minutes ~/ 60, m = minutes % 60;
+  return h == 0 ? '$m min' : '$h h ${m.toString().padLeft(2, '0')} min';
+}

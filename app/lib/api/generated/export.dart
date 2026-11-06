@@ -111,6 +111,7 @@ export 'models/repair.dart';
 export 'models/repair_detail.dart';
 export 'models/repair_event.dart';
 export 'models/repair_input.dart';
+export 'models/repair_note_input.dart';
 export 'models/repair_page.dart';
 export 'models/reply_input.dart';
 export 'models/repricing_comparison.dart';

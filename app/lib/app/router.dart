@@ -6,6 +6,8 @@ import '../features/customers/customers_page.dart';
 import '../features/helpdesk/answers_page.dart';
 import '../features/helpdesk/ticket_screen.dart';
 import '../features/helpdesk/tickets_page.dart';
+import '../features/field/job_screen.dart';
+import '../features/field/jobs_page.dart';
 import '../features/orders/order_screen.dart';
 import '../features/orders/orders_page.dart';
 import '../features/login/login_page.dart';
@@ -14,6 +16,9 @@ import '../features/opportunities/opportunity_screen.dart';
 import '../features/products/product_screen.dart';
 import '../features/products/products_page.dart';
 import '../features/quotations/quotation_screen.dart';
+import '../features/repairs/departments_page.dart';
+import '../features/repairs/repair_screen.dart';
+import '../features/repairs/repairs_page.dart';
 import '../features/quotations/quotations_page.dart';
 import 'session.dart';
 import 'shell.dart';
@@ -60,6 +65,20 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/helpdesk/:id',
             builder: (_, s) => TicketScreen(id: s.pathParameters['id']!),
+          ),
+          GoRoute(path: '/repairs', builder: (_, _) => const RepairsPage()),
+          GoRoute(
+            path: '/repairs/departments',
+            builder: (_, _) => const DepartmentsPage(),
+          ),
+          GoRoute(
+            path: '/repairs/:id',
+            builder: (_, s) => RepairScreen(id: s.pathParameters['id']!),
+          ),
+          GoRoute(path: '/jobs', builder: (_, _) => const JobsPage()),
+          GoRoute(
+            path: '/jobs/:id',
+            builder: (_, s) => JobScreen(id: s.pathParameters['id']!),
           ),
           GoRoute(path: '/orders', builder: (_, _) => const OrdersPage()),
           GoRoute(

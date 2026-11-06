@@ -780,19 +780,19 @@ async fn route_repair(
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
-pub struct NoteInput {
+pub struct RepairNoteInput {
     pub note: String,
 }
 
 /// An internal note on the repair (diagnosis, parts used, test results). The customer never sees it.
 #[utoipa::path(post, path = "/repairs/{id}/notes", tag = "repairs", operation_id = "add_repair_note",
-    params(("id" = Uuid, Path)), request_body = NoteInput,
+    params(("id" = Uuid, Path)), request_body = RepairNoteInput,
     responses((status = 201, body = RepairDetail), (status = 403, body = ErrorBody)))]
 async fn add_note(
     State(state): State<AppState>,
     user: CurrentUser,
     Path(id): Path<Uuid>,
-    Json(input): Json<NoteInput>,
+    Json(input): Json<RepairNoteInput>,
 ) -> AppResult<(StatusCode, Json<RepairDetail>)> {
     if input.note.trim().is_empty() {
         return Err(AppError::Validation("the note is empty".into()));
