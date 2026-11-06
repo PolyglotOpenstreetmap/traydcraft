@@ -40,6 +40,12 @@ final _allDestinations = [
   ),
   _Dest('/jobs', (l) => l.jobs, Icons.engineering_outlined, 'field.read'),
   _Dest(
+    '/stock',
+    (l) => l.stockTitle,
+    Icons.warehouse_outlined,
+    'inventory.read',
+  ),
+  _Dest(
     '/customers',
     (l) => l.customers,
     Icons.business_outlined,

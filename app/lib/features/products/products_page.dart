@@ -48,7 +48,7 @@ class ProductsPage extends ConsumerWidget {
         ),
         EntityColumn(
           context.l10n.tracking,
-          (p) => p.tracking == 'serial' ? context.l10n.serial : '',
+          (p) => context.l10n.trackingLabel(p.tracking),
         ),
         EntityColumn(context.l10n.unit, (p) => p.unit),
         EntityColumn(

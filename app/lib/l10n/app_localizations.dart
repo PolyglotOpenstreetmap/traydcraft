@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'Code'**
   String get code;
 
+  /// No description provided for @codeNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Code and name are required.'**
+  String get codeNameRequired;
+
   /// No description provided for @codeNameVatRequired.
   ///
   /// In en, this message translates to:
@@ -782,11 +788,113 @@ abstract class AppLocalizations {
   /// **'Convert to order'**
   String get convertToOrder;
 
+  /// No description provided for @countAddLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Add stock not listed'**
+  String get countAddLine;
+
+  /// No description provided for @countCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel count'**
+  String get countCancel;
+
+  /// No description provided for @countCounted.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted'**
+  String get countCounted;
+
+  /// No description provided for @countDifference.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference'**
+  String get countDifference;
+
+  /// No description provided for @countExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected'**
+  String get countExpected;
+
+  /// No description provided for @countInvalidQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'A counted quantity is not a number.'**
+  String get countInvalidQuantity;
+
+  /// No description provided for @countNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New count'**
+  String get countNew;
+
   /// No description provided for @countOf.
   ///
   /// In en, this message translates to:
   /// **'{count} of {total}'**
   String countOf(int count, int total);
+
+  /// No description provided for @countOneProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Only one product (optional)'**
+  String get countOneProduct;
+
+  /// No description provided for @countPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Post count'**
+  String get countPost;
+
+  /// No description provided for @countPostConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'The differences are posted as stock adjustments. Lines without a counted quantity are left alone.'**
+  String get countPostConfirm;
+
+  /// No description provided for @countProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted'**
+  String get countProgress;
+
+  /// No description provided for @countStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start count'**
+  String get countStart;
+
+  /// No description provided for @countStatusCounting.
+  ///
+  /// In en, this message translates to:
+  /// **'Counting'**
+  String get countStatusCounting;
+
+  /// No description provided for @countStatusPosted.
+  ///
+  /// In en, this message translates to:
+  /// **'Posted'**
+  String get countStatusPosted;
+
+  /// No description provided for @countWarehouseRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a warehouse.'**
+  String get countWarehouseRequired;
+
+  /// No description provided for @countWholeWarehouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole warehouse'**
+  String get countWholeWarehouse;
+
+  /// No description provided for @countedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Started by'**
+  String get countedBy;
 
   /// No description provided for @country.
   ///
@@ -2042,6 +2150,36 @@ abstract class AppLocalizations {
   /// **'ready for shipping'**
   String get orderStatusReadyForShipping;
 
+  /// No description provided for @orderStockRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'Release'**
+  String get orderStockRelease;
+
+  /// No description provided for @orderStockReserve.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve'**
+  String get orderStockReserve;
+
+  /// No description provided for @orderStockReserveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock can be reserved once the customer has confirmed the order.'**
+  String get orderStockReserveHint;
+
+  /// No description provided for @orderStockThisLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} reserved for this line'**
+  String orderStockThisLine(String quantity);
+
+  /// No description provided for @orderStockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock availability'**
+  String get orderStockTitle;
+
   /// No description provided for @orders.
   ///
   /// In en, this message translates to:
@@ -3295,6 +3433,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'superseded'**
   String get statusSuperseded;
+
+  /// No description provided for @stockAdjust.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust'**
+  String get stockAdjust;
+
+  /// No description provided for @stockAdjustReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is the stock corrected?'**
+  String get stockAdjustReason;
+
+  /// No description provided for @stockAdjustRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a location, enter a quantity and give a reason.'**
+  String get stockAdjustRequired;
+
+  /// No description provided for @stockAllWarehouses.
+  ///
+  /// In en, this message translates to:
+  /// **'All warehouses'**
+  String get stockAllWarehouses;
+
+  /// No description provided for @stockAssignedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned to'**
+  String get stockAssignedTo;
+
+  /// No description provided for @stockAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get stockAvailable;
+
+  /// No description provided for @stockBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode'**
+  String get stockBarcode;
+
+  /// No description provided for @stockBelowReorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Below reorder level'**
+  String get stockBelowReorder;
+
+  /// No description provided for @stockChangeBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Change by (+/−)'**
+  String get stockChangeBy;
+
+  /// No description provided for @stockCounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock counts'**
+  String get stockCounts;
+
+  /// No description provided for @stockExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry date'**
+  String get stockExpiry;
+
+  /// No description provided for @stockFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get stockFrom;
+
+  /// No description provided for @stockInVans.
+  ///
+  /// In en, this message translates to:
+  /// **'In vans'**
+  String get stockInVans;
+
+  /// No description provided for @stockInvalidNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost, reorder levels and lead time must be numbers.'**
+  String get stockInvalidNumbers;
+
+  /// No description provided for @stockIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue'**
+  String get stockIssue;
+
+  /// No description provided for @stockKindVan.
+  ///
+  /// In en, this message translates to:
+  /// **'Service van'**
+  String get stockKindVan;
+
+  /// No description provided for @stockKindWarehouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouse'**
+  String get stockKindWarehouse;
+
+  /// No description provided for @stockLeadTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Lead time (days)'**
+  String get stockLeadTime;
+
+  /// No description provided for @stockLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get stockLocation;
+
+  /// No description provided for @stockLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock by location'**
+  String get stockLocations;
+
+  /// No description provided for @stockLot.
+  ///
+  /// In en, this message translates to:
+  /// **'Lot'**
+  String get stockLot;
+
+  /// No description provided for @stockLotNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Lot number'**
+  String get stockLotNumber;
+
+  /// No description provided for @stockLotTrackingHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Lots / batches'**
+  String get stockLotTrackingHelp;
+
+  /// No description provided for @stockMoves.
+  ///
+  /// In en, this message translates to:
+  /// **'Movements'**
+  String get stockMoves;
+
+  /// No description provided for @stockNewLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'New location'**
+  String get stockNewLocation;
+
+  /// No description provided for @stockNewLot.
+  ///
+  /// In en, this message translates to:
+  /// **'New lot'**
+  String get stockNewLot;
+
+  /// No description provided for @stockNewQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'New quantity'**
+  String get stockNewQuantity;
+
+  /// No description provided for @stockNewVan.
+  ///
+  /// In en, this message translates to:
+  /// **'New service van'**
+  String get stockNewVan;
+
+  /// No description provided for @stockNewWarehouse.
+  ///
+  /// In en, this message translates to:
+  /// **'New warehouse'**
+  String get stockNewWarehouse;
+
+  /// No description provided for @stockNoMoves.
+  ///
+  /// In en, this message translates to:
+  /// **'No movements yet'**
+  String get stockNoMoves;
+
+  /// No description provided for @stockNoWarehouses.
+  ///
+  /// In en, this message translates to:
+  /// **'No warehouses yet. An administrator creates them here.'**
+  String get stockNoWarehouses;
+
+  /// No description provided for @stockNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get stockNote;
+
+  /// No description provided for @stockNothingInStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing in stock'**
+  String get stockNothingInStock;
+
+  /// No description provided for @stockOnHand.
+  ///
+  /// In en, this message translates to:
+  /// **'On hand'**
+  String get stockOnHand;
+
+  /// No description provided for @stockOnlyInStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Only in stock'**
+  String get stockOnlyInStock;
+
+  /// No description provided for @stockProductQuantityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a product and enter a quantity.'**
+  String get stockProductQuantityRequired;
+
+  /// No description provided for @stockReasonConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption'**
+  String get stockReasonConsumption;
+
+  /// No description provided for @stockReasonCorrection.
+  ///
+  /// In en, this message translates to:
+  /// **'Correction'**
+  String get stockReasonCorrection;
+
+  /// No description provided for @stockReasonCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Count'**
+  String get stockReasonCount;
+
+  /// No description provided for @stockReasonManualReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual receipt'**
+  String get stockReasonManualReceipt;
+
+  /// No description provided for @stockReasonProductionOutput.
+  ///
+  /// In en, this message translates to:
+  /// **'Production output'**
+  String get stockReasonProductionOutput;
+
+  /// No description provided for @stockReasonPurchaseReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase receipt'**
+  String get stockReasonPurchaseReceipt;
+
+  /// No description provided for @stockReasonRepairUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Used in repair'**
+  String get stockReasonRepairUse;
+
+  /// No description provided for @stockReasonReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer return'**
+  String get stockReasonReturn;
+
+  /// No description provided for @stockReasonReversal.
+  ///
+  /// In en, this message translates to:
+  /// **'Reversal'**
+  String get stockReasonReversal;
+
+  /// No description provided for @stockReasonScrap.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrap'**
+  String get stockReasonScrap;
+
+  /// No description provided for @stockReasonShipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipment'**
+  String get stockReasonShipment;
+
+  /// No description provided for @stockReasonVanReplenishment.
+  ///
+  /// In en, this message translates to:
+  /// **'Van replenishment'**
+  String get stockReasonVanReplenishment;
+
+  /// No description provided for @stockReceive.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive'**
+  String get stockReceive;
+
+  /// No description provided for @stockReorderMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder maximum'**
+  String get stockReorderMax;
+
+  /// No description provided for @stockReorderMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder minimum'**
+  String get stockReorderMin;
+
+  /// No description provided for @stockReservations.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserved for orders'**
+  String get stockReservations;
+
+  /// No description provided for @stockReserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserved'**
+  String get stockReserved;
+
+  /// No description provided for @stockReverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse'**
+  String get stockReverse;
+
+  /// No description provided for @stockReverseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse this movement'**
+  String get stockReverseTitle;
+
+  /// No description provided for @stockReversed.
+  ///
+  /// In en, this message translates to:
+  /// **'reversed'**
+  String get stockReversed;
+
+  /// No description provided for @stockShortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Short by {quantity}'**
+  String stockShortBy(String quantity);
+
+  /// No description provided for @stockStandardCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard cost'**
+  String get stockStandardCost;
+
+  /// No description provided for @stockStateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'In stock'**
+  String get stockStateAvailable;
+
+  /// No description provided for @stockStateNotStocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Not stocked'**
+  String get stockStateNotStocked;
+
+  /// No description provided for @stockStatePartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly in stock'**
+  String get stockStatePartial;
+
+  /// No description provided for @stockStateReserved.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserved'**
+  String get stockStateReserved;
+
+  /// No description provided for @stockStateShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in stock'**
+  String get stockStateShort;
+
+  /// No description provided for @stockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock'**
+  String get stockTitle;
+
+  /// No description provided for @stockTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get stockTo;
+
+  /// No description provided for @stockTrackingLot.
+  ///
+  /// In en, this message translates to:
+  /// **'lot'**
+  String get stockTrackingLot;
+
+  /// No description provided for @stockTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get stockTransfer;
+
+  /// No description provided for @stockWarehouse.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouse'**
+  String get stockWarehouse;
+
+  /// No description provided for @stockWarehouses.
+  ///
+  /// In en, this message translates to:
+  /// **'Warehouses'**
+  String get stockWarehouses;
 
   /// No description provided for @street.
   ///

@@ -134,6 +134,36 @@ extension CodeLabels on AppLocalizations {
     _ => s,
   };
 
+  String trackingLabel(String s) => switch (s) {
+    'serial' => serial,
+    'lot' => stockTrackingLot,
+    _ => '',
+  };
+
+  String stockReason(String s) => switch (s) {
+    'manual_receipt' => stockReasonManualReceipt,
+    'purchase_receipt' => stockReasonPurchaseReceipt,
+    'return' => stockReasonReturn,
+    'consumption' => stockReasonConsumption,
+    'shipment' => stockReasonShipment,
+    'scrap' => stockReasonScrap,
+    'repair_use' => stockReasonRepairUse,
+    'transfer' => stockTransfer,
+    'van_replenishment' => stockReasonVanReplenishment,
+    'count' => stockReasonCount,
+    'correction' => stockReasonCorrection,
+    'reversal' => stockReasonReversal,
+    'production_output' => stockReasonProductionOutput,
+    _ => s,
+  };
+
+  String countStatus(String s) => switch (s) {
+    'counting' => countStatusCounting,
+    'posted' => countStatusPosted,
+    'cancelled' => cancelled,
+    _ => s,
+  };
+
   String bomStatus(String s) => switch (s) {
     'draft' => statusDraft,
     'active' => bomActive,

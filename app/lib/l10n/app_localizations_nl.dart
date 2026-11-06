@@ -292,6 +292,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get code => 'Code';
 
   @override
+  String get codeNameRequired => 'Code en naam zijn verplicht.';
+
+  @override
   String get codeNameVatRequired => 'Code, naam en btw-tarief zijn verplicht.';
 
   @override
@@ -374,9 +377,61 @@ class AppLocalizationsNl extends AppLocalizations {
   String get convertToOrder => 'Omzetten naar order';
 
   @override
+  String get countAddLine => 'Voorraad toevoegen die niet in de lijst staat';
+
+  @override
+  String get countCancel => 'Inventarisatie annuleren';
+
+  @override
+  String get countCounted => 'Geteld';
+
+  @override
+  String get countDifference => 'Verschil';
+
+  @override
+  String get countExpected => 'Verwacht';
+
+  @override
+  String get countInvalidQuantity => 'Een getelde hoeveelheid is geen getal.';
+
+  @override
+  String get countNew => 'Nieuwe inventarisatie';
+
+  @override
   String countOf(int count, int total) {
     return '$count van $total';
   }
+
+  @override
+  String get countOneProduct => 'Slechts één product (optioneel)';
+
+  @override
+  String get countPost => 'Inventarisatie boeken';
+
+  @override
+  String get countPostConfirm =>
+      'De verschillen worden als voorraadcorrecties geboekt. Lijnen zonder getelde hoeveelheid blijven ongewijzigd.';
+
+  @override
+  String get countProgress => 'Geteld';
+
+  @override
+  String get countStart => 'Inventarisatie starten';
+
+  @override
+  String get countStatusCounting => 'Bezig';
+
+  @override
+  String get countStatusPosted => 'Geboekt';
+
+  @override
+  String get countWarehouseRequired => 'Kies een magazijn.';
+
+  @override
+  String get countWholeWarehouse => 'Heel het magazijn';
+
+  @override
+  String get countedBy => 'Gestart door';
 
   @override
   String get country => 'Land';
@@ -1057,6 +1112,24 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get orderStatusReadyForShipping => 'klaar voor verzending';
+
+  @override
+  String get orderStockRelease => 'Vrijgeven';
+
+  @override
+  String get orderStockReserve => 'Reserveren';
+
+  @override
+  String get orderStockReserveHint =>
+      'Voorraad kan gereserveerd worden zodra de klant de order bevestigd heeft.';
+
+  @override
+  String orderStockThisLine(String quantity) {
+    return '$quantity gereserveerd voor deze lijn';
+  }
+
+  @override
+  String get orderStockTitle => 'Voorraadbeschikbaarheid';
 
   @override
   String get orders => 'Orders';
@@ -1745,6 +1818,219 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statusSuperseded => 'vervangen';
+
+  @override
+  String get stockAdjust => 'Corrigeren';
+
+  @override
+  String get stockAdjustReason => 'Waarom wordt de voorraad gecorrigeerd?';
+
+  @override
+  String get stockAdjustRequired =>
+      'Kies een locatie, geef een hoeveelheid in en een reden.';
+
+  @override
+  String get stockAllWarehouses => 'Alle magazijnen';
+
+  @override
+  String get stockAssignedTo => 'Toegewezen aan';
+
+  @override
+  String get stockAvailable => 'Beschikbaar';
+
+  @override
+  String get stockBarcode => 'Barcode';
+
+  @override
+  String get stockBelowReorder => 'Onder bestelpunt';
+
+  @override
+  String get stockChangeBy => 'Wijzigen met (+/−)';
+
+  @override
+  String get stockCounts => 'Inventarisaties';
+
+  @override
+  String get stockExpiry => 'Vervaldatum';
+
+  @override
+  String get stockFrom => 'Van';
+
+  @override
+  String get stockInVans => 'In bestelwagens';
+
+  @override
+  String get stockInvalidNumbers =>
+      'Kostprijs, bestelpunten en levertijd moeten getallen zijn.';
+
+  @override
+  String get stockIssue => 'Uitgeven';
+
+  @override
+  String get stockKindVan => 'Servicewagen';
+
+  @override
+  String get stockKindWarehouse => 'Magazijn';
+
+  @override
+  String get stockLeadTime => 'Levertijd (dagen)';
+
+  @override
+  String get stockLocation => 'Locatie';
+
+  @override
+  String get stockLocations => 'Voorraad per locatie';
+
+  @override
+  String get stockLot => 'Lot';
+
+  @override
+  String get stockLotNumber => 'Lotnummer';
+
+  @override
+  String get stockLotTrackingHelp => 'Loten / batches';
+
+  @override
+  String get stockMoves => 'Bewegingen';
+
+  @override
+  String get stockNewLocation => 'Nieuwe locatie';
+
+  @override
+  String get stockNewLot => 'Nieuw lot';
+
+  @override
+  String get stockNewQuantity => 'Nieuwe hoeveelheid';
+
+  @override
+  String get stockNewVan => 'Nieuwe servicewagen';
+
+  @override
+  String get stockNewWarehouse => 'Nieuw magazijn';
+
+  @override
+  String get stockNoMoves => 'Nog geen bewegingen';
+
+  @override
+  String get stockNoWarehouses =>
+      'Nog geen magazijnen. Een beheerder maakt ze hier aan.';
+
+  @override
+  String get stockNote => 'Opmerking';
+
+  @override
+  String get stockNothingInStock => 'Niets op voorraad';
+
+  @override
+  String get stockOnHand => 'In voorraad';
+
+  @override
+  String get stockOnlyInStock => 'Alleen op voorraad';
+
+  @override
+  String get stockProductQuantityRequired =>
+      'Kies een product en geef een hoeveelheid in.';
+
+  @override
+  String get stockReasonConsumption => 'Verbruik';
+
+  @override
+  String get stockReasonCorrection => 'Correctie';
+
+  @override
+  String get stockReasonCount => 'Inventarisatie';
+
+  @override
+  String get stockReasonManualReceipt => 'Handmatige ontvangst';
+
+  @override
+  String get stockReasonProductionOutput => 'Productie-oplevering';
+
+  @override
+  String get stockReasonPurchaseReceipt => 'Ontvangst inkoop';
+
+  @override
+  String get stockReasonRepairUse => 'Gebruikt bij herstelling';
+
+  @override
+  String get stockReasonReturn => 'Klantenretour';
+
+  @override
+  String get stockReasonReversal => 'Terugdraaiing';
+
+  @override
+  String get stockReasonScrap => 'Afschrijving';
+
+  @override
+  String get stockReasonShipment => 'Levering';
+
+  @override
+  String get stockReasonVanReplenishment => 'Bestelwagen aanvullen';
+
+  @override
+  String get stockReceive => 'Ontvangen';
+
+  @override
+  String get stockReorderMax => 'Maximumvoorraad';
+
+  @override
+  String get stockReorderMin => 'Minimumvoorraad';
+
+  @override
+  String get stockReservations => 'Gereserveerd voor orders';
+
+  @override
+  String get stockReserved => 'Gereserveerd';
+
+  @override
+  String get stockReverse => 'Terugdraaien';
+
+  @override
+  String get stockReverseTitle => 'Deze beweging terugdraaien';
+
+  @override
+  String get stockReversed => 'teruggedraaid';
+
+  @override
+  String stockShortBy(String quantity) {
+    return 'Tekort van $quantity';
+  }
+
+  @override
+  String get stockStandardCost => 'Standaardkostprijs';
+
+  @override
+  String get stockStateAvailable => 'Op voorraad';
+
+  @override
+  String get stockStateNotStocked => 'Geen voorraadartikel';
+
+  @override
+  String get stockStatePartial => 'Gedeeltelijk op voorraad';
+
+  @override
+  String get stockStateReserved => 'Gereserveerd';
+
+  @override
+  String get stockStateShort => 'Niet op voorraad';
+
+  @override
+  String get stockTitle => 'Voorraad';
+
+  @override
+  String get stockTo => 'Naar';
+
+  @override
+  String get stockTrackingLot => 'lot';
+
+  @override
+  String get stockTransfer => 'Verplaatsen';
+
+  @override
+  String get stockWarehouse => 'Magazijn';
+
+  @override
+  String get stockWarehouses => 'Magazijnen';
 
   @override
   String get street => 'Straat';
