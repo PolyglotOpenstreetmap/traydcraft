@@ -1,0 +1,16 @@
+[package]
+name = "traydcraft-worker"
+description = "Background jobs: fetching helpdesk e-mail over IMAP and sending the e-mail outbox."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+traydcraft-helpdesk.workspace = true
+anyhow.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
