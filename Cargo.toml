@@ -18,6 +18,7 @@ traydcraft-documents = { path = "crates/documents" }
 traydcraft-engineering = { path = "crates/engineering" }
 traydcraft-helpdesk = { path = "crates/helpdesk" }
 traydcraft-portal = { path = "crates/portal" }
+traydcraft-kb = { path = "crates/kb" }
 traydcraft-repairs = { path = "crates/repairs" }
 traydcraft-fieldservice = { path = "crates/fieldservice" }
 

@@ -57,6 +57,12 @@ pub enum Permission {
     HelpdeskAdmin,
     /// Manage prepared answers.
     AnswersWrite,
+    /// Read the knowledge base, including internal and draft entries.
+    KbRead,
+    /// Write knowledge base entries (drafts, edits, images, versions).
+    KbWrite,
+    /// Manage knowledge base categories and publish, unpublish or archive entries.
+    KbAdmin,
     OrdersRead,
     OrdersWrite,
     /// Create and change the people at customers (contacts) and their portal access.
@@ -78,7 +84,7 @@ pub enum Permission {
 }
 
 impl Permission {
-    pub const ALL: [Permission; 30] = [
+    pub const ALL: [Permission; 33] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -99,6 +105,9 @@ impl Permission {
         Permission::HelpdeskReply,
         Permission::HelpdeskAdmin,
         Permission::AnswersWrite,
+        Permission::KbRead,
+        Permission::KbWrite,
+        Permission::KbAdmin,
         Permission::OrdersRead,
         Permission::OrdersWrite,
         Permission::ContactsWrite,
@@ -133,6 +142,9 @@ impl Permission {
             Permission::HelpdeskReply => "helpdesk.reply",
             Permission::HelpdeskAdmin => "helpdesk.admin",
             Permission::AnswersWrite => "answers.write",
+            Permission::KbRead => "kb.read",
+            Permission::KbWrite => "kb.write",
+            Permission::KbAdmin => "kb.admin",
             Permission::OrdersRead => "orders.read",
             Permission::OrdersWrite => "orders.write",
             Permission::ContactsWrite => "contacts.write",
@@ -173,6 +185,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskRead
                 | HelpdeskWrite
                 | HelpdeskReply
+                | KbRead
                 | OrdersRead
                 | OrdersWrite
                 | ContactsWrite
@@ -194,6 +207,8 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskWrite
                 | HelpdeskReply
                 | AnswersWrite
+                | KbRead
+                | KbWrite
                 | ContactsWrite
                 | RepairsRead
                 | RepairsWrite
@@ -211,6 +226,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | OrdersRead
                 | HelpdeskRead
                 | HelpdeskWrite
+                | KbRead
         ),
         "product_manager" => matches!(
             p,
@@ -226,6 +242,8 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | SerialsWrite
                 | OrdersRead
                 | HelpdeskRead
+                | KbRead
+                | KbWrite
         ),
         // The workshop: works on repairs routed to the departments one belongs to.
         "workshop" => matches!(
@@ -249,6 +267,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | BomRead
                 | SerialsRead
                 | HelpdeskRead
+                | KbRead
                 | OrdersRead
         ),
         _ => false,
@@ -530,6 +549,24 @@ mod tests {
         assert!(role_grants("admin", Permission::HelpdeskAdmin));
         for r in ["sales", "sales_manager", "support", "production", "viewer"] {
             assert!(!role_grants(r, Permission::HelpdeskAdmin), "{r}");
+        }
+    }
+
+    #[test]
+    fn knowledge_base_rights_follow_the_roles() {
+        for p in [Permission::KbRead, Permission::KbWrite, Permission::KbAdmin] {
+            assert!(role_grants("admin", p));
+        }
+        for r in ["support", "product_manager"] {
+            assert!(role_grants(r, Permission::KbRead) && role_grants(r, Permission::KbWrite));
+            assert!(!role_grants(r, Permission::KbAdmin), "{r}");
+        }
+        for r in ["sales", "sales_manager", "production", "viewer"] {
+            assert!(role_grants(r, Permission::KbRead), "{r}");
+            assert!(!role_grants(r, Permission::KbWrite), "{r}");
+        }
+        for r in ["technician", "workshop", "dispatcher"] {
+            assert!(!role_grants(r, Permission::KbRead), "{r}");
         }
     }
 

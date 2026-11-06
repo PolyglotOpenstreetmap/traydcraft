@@ -22,6 +22,10 @@ use traydcraft_core::files::FileInfo;
 use traydcraft_core::{audit, is_language, new_id, AppError, AppResult, AppState, LANGUAGES};
 use traydcraft_crm::contacts::{self, Contact, ADDRESS_FORMS, TITLES};
 use traydcraft_helpdesk::portal::{self, PortalTicket, PortalTicketDetail};
+use traydcraft_kb::public::{BrowseParams, LanguageParams, SuggestQuery};
+use traydcraft_kb::reader::{
+    self as kb_reader, Audience, ReaderCategory, ReaderEntry, ReaderSummary,
+};
 use traydcraft_repairs::portal::{
     self as repair_portal, Announcement, PortalRepair, PortalRepairDetail,
 };
@@ -674,6 +678,139 @@ async fn request_priority(
     Ok((StatusCode::CREATED, Json(r)))
 }
 
+// ---------------------------------------------------------------------------------------------
+// Knowledge base: published entries with visibility "portal" or "public"
+// ---------------------------------------------------------------------------------------------
+
+/// The language the contact wants: their own, else their customer's.
+async fn kb_language(
+    conn: &mut sqlx::PgConnection,
+    user: &PortalUser,
+    asked: Option<&str>,
+) -> AppResult<String> {
+    let own: Option<String> = sqlx::query_scalar(
+        "SELECT coalesce(c.language, cu.language)::text FROM crm.contacts c
+         JOIN crm.customers cu ON cu.id = c.customer_id WHERE c.id = $1",
+    )
+    .bind(user.contact_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    traydcraft_kb::public::language(asked, &own.unwrap_or_else(|| "en".into()))
+}
+
+#[utoipa::path(get, path = "/portal/kb/categories", tag = "portal", operation_id = "list_portal_kb_categories",
+    params(LanguageParams),
+    responses((status = 200, body = Vec<ReaderCategory>), (status = 401, body = ErrorBody)))]
+async fn kb_categories(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Query(p): Query<LanguageParams>,
+) -> AppResult<Json<Vec<ReaderCategory>>> {
+    let mut conn = state.db.acquire().await?;
+    let lang = kb_language(&mut conn, &user, p.language.as_deref()).await?;
+    Ok(Json(
+        kb_reader::categories(&mut conn, Audience::Portal, user.company_id, &lang).await?,
+    ))
+}
+
+/// Browse or search the help articles.
+#[utoipa::path(get, path = "/portal/kb/entries", tag = "portal", operation_id = "list_portal_kb_entries",
+    params(BrowseParams),
+    responses((status = 200, body = Vec<ReaderSummary>), (status = 401, body = ErrorBody)))]
+async fn kb_entries(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Query(p): Query<BrowseParams>,
+) -> AppResult<Json<Vec<ReaderSummary>>> {
+    let mut conn = state.db.acquire().await?;
+    let lang = kb_language(&mut conn, &user, p.language.as_deref()).await?;
+    Ok(Json(
+        traydcraft_kb::public::browse(&mut conn, Audience::Portal, user.company_id, &p, &lang)
+            .await?,
+    ))
+}
+
+/// Up to three articles that fit what the contact types, for the "new ticket" form.
+#[utoipa::path(get, path = "/portal/kb/suggestions", tag = "portal", operation_id = "suggest_portal_kb_entries",
+    params(SuggestQuery),
+    responses((status = 200, body = Vec<ReaderSummary>), (status = 401, body = ErrorBody)))]
+async fn kb_suggestions(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Query(p): Query<SuggestQuery>,
+) -> AppResult<Json<Vec<ReaderSummary>>> {
+    let mut conn = state.db.acquire().await?;
+    let lang = kb_language(&mut conn, &user, p.language.as_deref()).await?;
+    Ok(Json(
+        traydcraft_kb::public::suggest(&mut conn, Audience::Portal, user.company_id, &p, &lang)
+            .await?,
+    ))
+}
+
+/// One article. Counts one view. Internal, draft and archived entries are "not found".
+#[utoipa::path(get, path = "/portal/kb/entries/{id}", tag = "portal", operation_id = "get_portal_kb_entry",
+    params(("id" = Uuid, Path), LanguageParams),
+    responses((status = 200, body = ReaderEntry), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody)))]
+async fn kb_entry(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+    Query(p): Query<LanguageParams>,
+) -> AppResult<Json<ReaderEntry>> {
+    let mut conn = state.db.acquire().await?;
+    let lang = kb_language(&mut conn, &user, p.language.as_deref()).await?;
+    Ok(Json(
+        kb_reader::read(
+            &mut conn,
+            Audience::Portal,
+            user.company_id,
+            id,
+            &lang,
+            Some(user.contact_id),
+            true,
+        )
+        .await?,
+    ))
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct KbVote {
+    /// true = helpful, false = not helpful
+    pub helpful: bool,
+}
+
+/// Says whether the article helped. One vote per contact and article; sending it again changes it.
+#[utoipa::path(put, path = "/portal/kb/entries/{id}/vote", tag = "portal", operation_id = "vote_portal_kb_entry",
+    params(("id" = Uuid, Path)), request_body = KbVote,
+    responses((status = 204), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody)))]
+async fn kb_vote(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+    Json(input): Json<KbVote>,
+) -> AppResult<StatusCode> {
+    let mut tx = state.db.begin().await?;
+    kb_reader::vote(&mut tx, user.company_id, user.contact_id, id, input.helpful).await?;
+    tx.commit().await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[utoipa::path(get, path = "/portal/kb/entries/{id}/images/{file_id}", tag = "portal", operation_id = "get_portal_kb_image",
+    params(("id" = Uuid, Path), ("file_id" = Uuid, Path)),
+    responses((status = 200, content_type = "application/octet-stream", body = String), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody)))]
+async fn kb_image(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path((id, file_id)): Path<(Uuid, Uuid)>,
+) -> AppResult<Response> {
+    let mut conn = state.db.acquire().await?;
+    let (ct, data) =
+        kb_reader::image(&mut conn, Audience::Portal, user.company_id, id, file_id).await?;
+    Ok(traydcraft_kb::public::reader_image_response(
+        false, &ct, data,
+    ))
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(request_login_link))
@@ -691,6 +828,12 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(get_order))
         .routes(routes!(confirm_order))
         .routes(routes!(request_priority))
+        .routes(routes!(kb_categories))
+        .routes(routes!(kb_entries))
+        .routes(routes!(kb_suggestions))
+        .routes(routes!(kb_entry))
+        .routes(routes!(kb_vote))
+        .routes(routes!(kb_image))
         // Photos are large: raise the body limit for the upload route only.
         .merge(
             OpenApiRouter::new()

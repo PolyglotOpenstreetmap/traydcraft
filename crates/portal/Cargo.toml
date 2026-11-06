@@ -10,6 +10,7 @@ publish.workspace = true
 traydcraft-core.workspace = true
 traydcraft-crm.workspace = true
 traydcraft-helpdesk.workspace = true
+traydcraft-kb.workspace = true
 traydcraft-repairs.workspace = true
 traydcraft-sales.workspace = true
 axum.workspace = true

@@ -2883,6 +2883,7 @@ dependencies = [
  "traydcraft-engineering",
  "traydcraft-fieldservice",
  "traydcraft-helpdesk",
+ "traydcraft-kb",
  "traydcraft-portal",
  "traydcraft-products",
  "traydcraft-repairs",
@@ -3013,6 +3014,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "traydcraft-kb"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "traydcraft-core",
+ "utoipa",
+ "utoipa-axum",
+ "uuid",
+]
+
+[[package]]
 name = "traydcraft-portal"
 version = "0.1.0"
 dependencies = [
@@ -3027,6 +3043,7 @@ dependencies = [
  "traydcraft-core",
  "traydcraft-crm",
  "traydcraft-helpdesk",
+ "traydcraft-kb",
  "traydcraft-repairs",
  "traydcraft-sales",
  "utoipa",
