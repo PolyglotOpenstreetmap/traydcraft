@@ -623,6 +623,15 @@ async fn lot_tracked_stock_is_kept_per_lot(db: PgPool) {
         assert_eq!(s, StatusCode::CREATED);
         (s, v)
     };
+    // The generated Dart client sends dates as date-times.
+    let (status, d) = post(&e.app, STORES, "/inventory/receipts", json!({ "id": uid(), "product_id": BOLT, "location_id": e.main, "quantity": "1", "lot_number": "L-C", "expiry_date": "2027-05-01T00:00:00.000" })).await;
+    assert_eq!(status, StatusCode::CREATED, "{d}");
+    let (_, lots) = get(&e.app, SALES, &format!("/inventory/lots?product_id={BOLT}")).await;
+    assert!(lots
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|l| l["lot_number"] == "L-C" && l["expiry_date"] == "2027-05-01"));
     // More of an existing lot adds to it; a different expiry date for it is refused.
     let (status, _) = post(&e.app, STORES, "/inventory/receipts", json!({ "id": uid(), "product_id": BOLT, "location_id": e.main, "quantity": "10", "lot_number": "L-A" })).await;
     assert_eq!(status, StatusCode::CREATED);
@@ -648,7 +657,11 @@ async fn lot_tracked_stock_is_kept_per_lot(db: PgPool) {
         .collect();
     assert_eq!(
         per_lot,
-        vec![("L-A".to_string(), q("110")), ("L-B".to_string(), q("50"))]
+        vec![
+            ("L-A".to_string(), q("110")),
+            ("L-B".to_string(), q("50")),
+            ("L-C".to_string(), q("1"))
+        ]
     );
     let (_, lots) = get(
         &e.app,
@@ -656,7 +669,7 @@ async fn lot_tracked_stock_is_kept_per_lot(db: PgPool) {
         &format!("/inventory/lots?product_id={BOLT}&in_stock=true"),
     )
     .await;
-    assert_eq!(lots.as_array().unwrap().len(), 2);
+    assert_eq!(lots.as_array().unwrap().len(), 3);
     assert_eq!(lots[0]["lot_number"], "L-B", "earliest expiry first");
 
     // Issues name the lot, and one lot cannot be drawn below its own quantity.

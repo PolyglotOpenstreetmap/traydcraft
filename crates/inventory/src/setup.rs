@@ -124,6 +124,7 @@ pub struct LotParams {
 
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct LotInput {
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub expiry_date: Option<NaiveDate>,
     #[serde(default)]
     pub notes: String,

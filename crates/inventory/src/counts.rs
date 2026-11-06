@@ -86,6 +86,7 @@ pub struct CountEntry {
     pub location_id: Option<Uuid>,
     pub lot_id: Option<Uuid>,
     pub lot_number: Option<String>,
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub expiry_date: Option<NaiveDate>,
     /// The counted quantity; null clears it (the line is left alone when posting).
     #[schema(value_type = Option<String>, example = "12")]

@@ -34,6 +34,7 @@ pub struct ReceiptInput {
     pub uom: Option<String>,
     /// Lot-tracked products: the lot (created if new).
     pub lot_number: Option<String>,
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub expiry_date: Option<NaiveDate>,
     /// Serial-tracked products: an existing unit that is in stock without a location...
     pub serial_unit_id: Option<Uuid>,
@@ -88,6 +89,7 @@ pub struct AdjustmentInput {
     pub lot_id: Option<Uuid>,
     /// Lot-tracked stock that was found: the lot number (created if new).
     pub lot_number: Option<String>,
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub expiry_date: Option<NaiveDate>,
     /// Set the stock at the location to this quantity...
     #[schema(value_type = Option<String>, example = "12")]

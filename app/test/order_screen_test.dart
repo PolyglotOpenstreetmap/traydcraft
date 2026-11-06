@@ -10,6 +10,7 @@ import 'package:traydcraft_app/l10n/app_localizations.dart';
 import 'fake_http.dart';
 
 Map<String, Object?> _line(String pos, {String pricing = 'list'}) => {
+  'id': 'line$pos',
   'position': int.parse(pos),
   'product_id': 'p$pos',
   'product_code': 'UNIT-$pos',
