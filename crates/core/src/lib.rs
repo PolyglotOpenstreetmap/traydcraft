@@ -4,6 +4,7 @@ pub mod audit;
 pub mod auth;
 pub mod company;
 pub mod error;
+pub mod files;
 pub mod mail;
 pub mod numbering;
 pub mod serde_util;

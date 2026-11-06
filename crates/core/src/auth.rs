@@ -59,10 +59,24 @@ pub enum Permission {
     OrdersWrite,
     /// Create and change the people at customers (contacts) and their portal access.
     ContactsWrite,
+    /// See repairs and their photos.
+    RepairsRead,
+    /// Register repairs, change their status, add notes and photos (in one's own departments).
+    RepairsWrite,
+    /// Route a repair to a department, and work on repairs of any department.
+    RepairsRoute,
+    /// Create and change the workshop departments and who belongs to them (site admin).
+    DepartmentsWrite,
+    /// See field jobs: one's own as a technician, all as a planner or read-only role.
+    FieldRead,
+    /// Work on one's own jobs: start, complete, tick tasks, log work, add photos.
+    FieldWork,
+    /// Plan jobs and assign technicians.
+    FieldPlan,
 }
 
 impl Permission {
-    pub const ALL: [Permission; 22] = [
+    pub const ALL: [Permission; 29] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -85,6 +99,13 @@ impl Permission {
         Permission::OrdersRead,
         Permission::OrdersWrite,
         Permission::ContactsWrite,
+        Permission::RepairsRead,
+        Permission::RepairsWrite,
+        Permission::RepairsRoute,
+        Permission::DepartmentsWrite,
+        Permission::FieldRead,
+        Permission::FieldWork,
+        Permission::FieldPlan,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -111,6 +132,13 @@ impl Permission {
             Permission::OrdersRead => "orders.read",
             Permission::OrdersWrite => "orders.write",
             Permission::ContactsWrite => "contacts.write",
+            Permission::RepairsRead => "repairs.read",
+            Permission::RepairsWrite => "repairs.write",
+            Permission::RepairsRoute => "repairs.route",
+            Permission::DepartmentsWrite => "departments.write",
+            Permission::FieldRead => "field.read",
+            Permission::FieldWork => "field.work",
+            Permission::FieldPlan => "field.plan",
         }
     }
 }
@@ -121,7 +149,11 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
     match role {
         "admin" => true,
         "sales_manager" => {
-            role_grants("sales", p) || matches!(p, RebatesWrite | PricesBackdate | AnswersWrite)
+            role_grants("sales", p)
+                || matches!(
+                    p,
+                    RebatesWrite | PricesBackdate | AnswersWrite | RepairsRoute | FieldPlan
+                )
         }
         "sales" => matches!(
             p,
@@ -140,6 +172,9 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | OrdersRead
                 | OrdersWrite
                 | ContactsWrite
+                | RepairsRead
+                | RepairsWrite
+                | FieldRead
         ),
         // First-line customer service: answers e-mails, maintains prepared answers.
         "support" => matches!(
@@ -156,6 +191,9 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskReply
                 | AnswersWrite
                 | ContactsWrite
+                | RepairsRead
+                | RepairsWrite
+                | RepairsRoute
                 | OrdersRead
         ),
         // Production asks questions through internal notes; sales talks to the customer.
@@ -185,9 +223,22 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | OrdersRead
                 | HelpdeskRead
         ),
+        // The workshop: works on repairs routed to the departments one belongs to.
+        "workshop" => matches!(
+            p,
+            CustomersRead | ProductsRead | RepairsRead | RepairsWrite | BomRead | SerialsRead
+        ),
+        // Field technician: sees and works on their own jobs only.
+        "technician" => matches!(p, FieldRead | FieldWork),
+        "dispatcher" => matches!(
+            p,
+            CustomersRead | FieldRead | FieldPlan | RepairsRead | HelpdeskRead | ContactsWrite
+        ),
         "viewer" => matches!(
             p,
-            CustomersRead
+            RepairsRead
+                | FieldRead
+                | CustomersRead
                 | ProductsRead
                 | QuotationsRead
                 | OpportunitiesRead
@@ -478,6 +529,36 @@ mod tests {
         for r in ["production", "product_manager", "viewer"] {
             assert!(!role_grants(r, Permission::ContactsWrite), "{r}");
         }
+    }
+
+    #[test]
+    fn only_admins_create_departments() {
+        for r in [
+            "sales",
+            "sales_manager",
+            "support",
+            "workshop",
+            "dispatcher",
+            "technician",
+            "viewer",
+        ] {
+            assert!(!role_grants(r, Permission::DepartmentsWrite), "{r}");
+        }
+        assert!(role_grants("admin", Permission::DepartmentsWrite));
+    }
+
+    #[test]
+    fn workshop_and_field_roles_are_narrow() {
+        // The workshop works on repairs but does not route them; technicians cannot plan.
+        assert!(role_grants("workshop", Permission::RepairsWrite));
+        assert!(!role_grants("workshop", Permission::RepairsRoute));
+        assert!(role_grants("support", Permission::RepairsRoute));
+        assert!(role_grants("technician", Permission::FieldWork));
+        assert!(!role_grants("technician", Permission::FieldPlan));
+        assert!(!role_grants("technician", Permission::RepairsRead));
+        assert!(!role_grants("technician", Permission::CustomersRead));
+        assert!(role_grants("dispatcher", Permission::FieldPlan));
+        assert!(!role_grants("dispatcher", Permission::FieldWork));
     }
 
     #[test]

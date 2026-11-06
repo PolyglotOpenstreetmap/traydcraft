@@ -10,6 +10,7 @@ publish.workspace = true
 traydcraft-core.workspace = true
 traydcraft-crm.workspace = true
 traydcraft-helpdesk.workspace = true
+traydcraft-repairs.workspace = true
 axum.workspace = true
 chrono.workspace = true
 rand = "0.9"

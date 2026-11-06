@@ -10,8 +10,10 @@
 mod mail;
 pub mod session;
 
-use axum::extract::{Path, State};
+use axum::body::Bytes;
+use axum::extract::{DefaultBodyLimit, Path, Query, State};
 use axum::http::StatusCode;
+use axum::response::Response;
 use axum::Json;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
@@ -19,7 +21,10 @@ use session::{new_token, PortalUser, LINK_PREFIX, SESSION_PREFIX};
 use traydcraft_core::{audit, is_language, new_id, AppError, AppResult, AppState, LANGUAGES};
 use traydcraft_crm::contacts::{self, Contact, ADDRESS_FORMS, TITLES};
 use traydcraft_helpdesk::portal::{self, PortalTicket, PortalTicketDetail};
-use utoipa::ToSchema;
+use traydcraft_repairs::portal::{
+    self as repair_portal, Announcement, PortalRepair, PortalRepairDetail,
+};
+use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
@@ -404,6 +409,118 @@ async fn add_message(
     Ok((StatusCode::CREATED, Json(d)))
 }
 
+// ---------------------------------------------------------------------------------------------
+// Repairs
+// ---------------------------------------------------------------------------------------------
+
+#[utoipa::path(get, path = "/portal/repairs", tag = "portal", operation_id = "list_portal_repairs",
+    responses((status = 200, body = Vec<PortalRepair>), (status = 401, body = ErrorBody)))]
+async fn list_repairs(
+    State(state): State<AppState>,
+    user: PortalUser,
+) -> AppResult<Json<Vec<PortalRepair>>> {
+    let mut conn = state.db.acquire().await?;
+    Ok(Json(repair_portal::list(&mut conn, &user.viewer()).await?))
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct AnnounceRepair {
+    /// The product in the customer's words, e.g. "Pump 5 kW, blue".
+    #[serde(default)]
+    pub product_description: String,
+    #[serde(default)]
+    pub serial_number: String,
+    pub fault_description: String,
+    /// The customer's own reference (RMA or purchase order).
+    #[serde(default)]
+    pub customer_reference: String,
+}
+
+/// Announces a repair that the customer is going to send in. Photos can be added afterwards.
+#[utoipa::path(post, path = "/portal/repairs", tag = "portal", operation_id = "announce_portal_repair", request_body = AnnounceRepair,
+    responses((status = 201, body = PortalRepairDetail), (status = 401, body = ErrorBody), (status = 422, body = ErrorBody)))]
+async fn announce_repair(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Json(input): Json<AnnounceRepair>,
+) -> AppResult<(StatusCode, Json<PortalRepairDetail>)> {
+    let mut tx = state.db.begin().await?;
+    let d = repair_portal::announce(
+        &mut tx,
+        &user.viewer(),
+        Announcement {
+            product_description: &input.product_description,
+            serial_number: &input.serial_number,
+            fault_description: &input.fault_description,
+            customer_reference: &input.customer_reference,
+        },
+    )
+    .await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(d)))
+}
+
+#[utoipa::path(get, path = "/portal/repairs/{id}", tag = "portal", operation_id = "get_portal_repair", params(("id" = Uuid, Path)),
+    responses((status = 200, body = PortalRepairDetail), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody)))]
+async fn get_repair(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+) -> AppResult<Json<PortalRepairDetail>> {
+    let mut conn = state.db.acquire().await?;
+    Ok(Json(
+        repair_portal::get(&mut conn, &user.viewer(), id).await?,
+    ))
+}
+
+#[derive(Debug, Deserialize, IntoParams)]
+pub struct PhotoParams {
+    pub caption: Option<String>,
+    pub filename: Option<String>,
+    /// A client-chosen id: sending the same id again returns the first upload.
+    pub client_id: Option<Uuid>,
+}
+
+/// Adds a photo to a repair: the request body is the image (JPEG, PNG or WebP, at most 12 MB).
+#[utoipa::path(post, path = "/portal/repairs/{id}/photos", tag = "portal", operation_id = "upload_portal_repair_photo",
+    params(("id" = Uuid, Path), PhotoParams), request_body(content = String, content_type = "application/octet-stream"),
+    responses((status = 201, body = PortalRepairDetail), (status = 401, body = ErrorBody), (status = 422, body = ErrorBody)))]
+async fn upload_repair_photo(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+    Query(p): Query<PhotoParams>,
+    body: Bytes,
+) -> AppResult<(StatusCode, Json<PortalRepairDetail>)> {
+    let mut tx = state.db.begin().await?;
+    let d = repair_portal::add_photo(
+        &mut tx,
+        &user.viewer(),
+        id,
+        p.filename.as_deref().unwrap_or(""),
+        p.caption.as_deref().unwrap_or(""),
+        p.client_id,
+        &body,
+    )
+    .await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(d)))
+}
+
+#[utoipa::path(get, path = "/portal/repairs/{id}/photos/{photo_id}", tag = "portal", operation_id = "get_portal_repair_photo",
+    params(("id" = Uuid, Path), ("photo_id" = Uuid, Path)),
+    responses((status = 200, content_type = "image/*", body = String), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody)))]
+async fn get_repair_photo(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path((id, photo_id)): Path<(Uuid, Uuid)>,
+) -> AppResult<Response> {
+    let mut conn = state.db.acquire().await?;
+    let (content_type, data) =
+        repair_portal::photo_data(&mut conn, &user.viewer(), id, photo_id).await?;
+    Ok(traydcraft_core::files::image_response(&content_type, data))
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(request_login_link))
@@ -413,4 +530,15 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list_tickets, create_ticket))
         .routes(routes!(get_ticket))
         .routes(routes!(add_message))
+        .routes(routes!(list_repairs, announce_repair))
+        .routes(routes!(get_repair))
+        .routes(routes!(get_repair_photo))
+        // Photos are large: raise the body limit for the upload route only.
+        .merge(
+            OpenApiRouter::new()
+                .routes(routes!(upload_repair_photo))
+                .layer(DefaultBodyLimit::max(
+                    traydcraft_core::files::MAX_FILE_BYTES + 64 * 1024,
+                )),
+        )
 }

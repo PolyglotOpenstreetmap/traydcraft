@@ -337,6 +337,18 @@ async fn add_note(
     Ok(id)
 }
 
+/// An internal note written by another module on behalf of a colleague (e.g. "repair R2026-00001
+/// registered"). Never sent to the customer.
+pub async fn add_linked_note(
+    conn: &mut PgConnection,
+    user: &CurrentUser,
+    ticket_id: Uuid,
+    body: &str,
+) -> AppResult<()> {
+    add_note(conn, user, ticket_id, body).await?;
+    Ok(())
+}
+
 async fn set_status(conn: &mut PgConnection, ticket_id: Uuid, status: &str) -> AppResult<()> {
     check_one_of("status", status, &STATUSES)?;
     sqlx::query(

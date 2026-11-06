@@ -18,6 +18,8 @@ traydcraft-documents = { path = "crates/documents" }
 traydcraft-engineering = { path = "crates/engineering" }
 traydcraft-helpdesk = { path = "crates/helpdesk" }
 traydcraft-portal = { path = "crates/portal" }
+traydcraft-repairs = { path = "crates/repairs" }
+traydcraft-fieldservice = { path = "crates/fieldservice" }
 
 anyhow = "1"
 axum = { version = "0.8", features = ["macros"] }

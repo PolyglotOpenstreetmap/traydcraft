@@ -5,10 +5,13 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/announce_repair.dart';
 import '../models/login_link_input.dart';
 import '../models/message_input.dart';
 import '../models/new_ticket.dart';
 import '../models/portal_profile.dart';
+import '../models/portal_repair.dart';
+import '../models/portal_repair_detail.dart';
 import '../models/portal_session.dart';
 import '../models/portal_ticket.dart';
 import '../models/portal_ticket_detail.dart';
@@ -34,6 +37,38 @@ abstract class PortalClient {
   @PUT('/api/v1/portal/me')
   Future<PortalProfile> updateMe({
     @Body() required ProfileInput body,
+  });
+
+  @GET('/api/v1/portal/repairs')
+  Future<List<PortalRepair>> listPortalRepairs();
+
+  /// Announces a repair that the customer is going to send in. Photos can be added afterwards.
+  @POST('/api/v1/portal/repairs')
+  Future<PortalRepairDetail> announcePortalRepair({
+    @Body() required AnnounceRepair body,
+  });
+
+  @GET('/api/v1/portal/repairs/{id}')
+  Future<PortalRepairDetail> getPortalRepair({
+    @Path('id') required String id,
+  });
+
+  /// Adds a photo to a repair: the request body is the image (JPEG, PNG or WebP, at most 12 MB).
+  ///
+  /// [clientId] - A client-chosen id: sending the same id again returns the first upload.
+  @POST('/api/v1/portal/repairs/{id}/photos')
+  Future<PortalRepairDetail> uploadPortalRepairPhoto({
+    @Path('id') required String id,
+    @Body() required String body,
+    @Query('caption') String? caption,
+    @Query('filename') String? filename,
+    @Query('client_id') String? clientId,
+  });
+
+  @GET('/api/v1/portal/repairs/{id}/photos/{photo_id}')
+  Future<String> getPortalRepairPhoto({
+    @Path('id') required String id,
+    @Path('photo_id') required String photoId,
   });
 
   /// Logs out: the session token stops working.

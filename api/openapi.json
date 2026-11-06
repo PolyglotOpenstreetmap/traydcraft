@@ -815,6 +815,928 @@
         }
       }
     },
+    "/api/v1/departments": {
+      "get": {
+        "tags": [
+          "repairs"
+        ],
+        "operationId": "list_departments",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Department"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "repairs"
+        ],
+        "operationId": "create_department",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Department"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/departments/{id}": {
+      "put": {
+        "tags": [
+          "repairs"
+        ],
+        "operationId": "update_department",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DepartmentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Department"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "summary": "All jobs the user may see, for planning.",
+        "operationId": "list_jobs",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches number, title, customer and city.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "A status, or `active` for planned and in progress.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "technician",
+            "in": "query",
+            "description": "`me`, `none` (unassigned) or a user id.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Jobs scheduled from this moment on.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Jobs scheduled before this moment.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Job"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "create_job",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "get_job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "update_job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/cancel": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Cancels a job (planners only).",
+        "operationId": "cancel_job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/complete": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "complete_job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/photos": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Adds a photo: the request body is the image (JPEG, PNG or WebP, at most 12 MB).",
+        "operationId": "upload_job_photo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "caption",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "filename",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "A client-chosen id: uploading the same id again returns the first upload.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/photos/{photo_id}": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "get_job_photo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/reopen": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Takes a completed or cancelled job back into work (planners only).",
+        "operationId": "reopen_job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/start": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Starts the job: the technician has arrived and begins. Starting twice changes nothing.",
+        "operationId": "start_job",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/tasks": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "operationId": "add_job_task",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/tasks/{task_id}/done": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Ticks or unticks a task. Setting the state it already has changes nothing, so retries are safe.",
+        "operationId": "set_job_task_done",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoneInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/jobs/{id}/work-logs": {
+      "post": {
+        "tags": [
+          "field"
+        ],
+        "summary": "Logs time and notes of work (or travel) on a job, for the logged-in technician.",
+        "operationId": "add_work_log",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkLogInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/field/my-jobs": {
+      "get": {
+        "tags": [
+          "field"
+        ],
+        "summary": "The jobs assigned to me that still have to be done (plus those finished in the last week),\nin the order of their appointment.",
+        "operationId": "list_my_jobs",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Job"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/helpdesk/calls": {
       "post": {
         "tags": [
@@ -1438,6 +2360,296 @@
             }
           },
           "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/repairs": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "list_portal_repairs",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalRepair"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Announces a repair that the customer is going to send in. Photos can be added afterwards.",
+        "operationId": "announce_portal_repair",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnounceRepair"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalRepairDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/repairs/{id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "get_portal_repair",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalRepairDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/repairs/{id}/photos": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Adds a photo to a repair: the request body is the image (JPEG, PNG or WebP, at most 12 MB).",
+        "operationId": "upload_portal_repair_photo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "caption",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "filename",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "A client-chosen id: sending the same id again returns the first upload.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalRepairDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/repairs/{id}/photos/{photo_id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "get_portal_repair_photo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -3213,6 +4425,577 @@
         }
       }
     },
+    "/api/v1/repairs": {
+      "get": {
+        "tags": [
+          "repairs"
+        ],
+        "operationId": "list_repairs",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches number, customer, serial number, product and fault.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "A status, or `open` for everything not yet shipped or cancelled.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "department",
+            "in": "query",
+            "description": "A department id, or `none` for repairs not routed yet.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "assigned",
+            "in": "query",
+            "description": "`me` for repairs assigned to me, or a user id.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "customer_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairPage"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "Registers a repair. Give a `ticket_id` to create it from the ticket where it was announced.",
+        "operationId": "create_repair",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewRepairInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repairs/{id}": {
+      "get": {
+        "tags": [
+          "repairs"
+        ],
+        "operationId": "get_repair",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "Changes the descriptive fields of a repair (not its status or department).",
+        "operationId": "update_repair",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RepairInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repairs/{id}/notes": {
+      "post": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "An internal note on the repair (diagnosis, parts used, test results). The customer never sees it.",
+        "operationId": "add_repair_note",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repairs/{id}/photos": {
+      "post": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "Adds a photo: the request body is the image itself (JPEG, PNG or WebP, at most 12 MB).",
+        "operationId": "upload_repair_photo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "caption",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "filename",
+            "in": "query",
+            "description": "The original file name.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "A client-chosen id: uploading the same id again returns the first upload (safe retries).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repairs/{id}/photos/{photo_id}": {
+      "get": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "The image itself.",
+        "operationId": "get_repair_photo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "photo_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repairs/{id}/route": {
+      "post": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "Routes a repair to a department (or on to another one). It waits there as `routed`.",
+        "operationId": "route_repair",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/repairs/{id}/status": {
+      "post": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "Moves a repair along its workflow (everything except routing, see `/route`).",
+        "operationId": "set_repair_status",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatusInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RepairDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/serials": {
       "get": {
         "tags": [
@@ -4012,6 +5795,41 @@
         }
       }
     },
+    "/api/v1/tickets/{id}/repairs": {
+      "get": {
+        "tags": [
+          "repairs"
+        ],
+        "summary": "The repairs registered for a ticket (the ticket may announce several).",
+        "operationId": "list_ticket_repairs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Repair"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tickets/{id}/replies": {
       "post": {
         "tags": [
@@ -4100,6 +5918,28 @@
   },
   "components": {
     "schemas": {
+      "AnnounceRepair": {
+        "type": "object",
+        "required": [
+          "fault_description"
+        ],
+        "properties": {
+          "customer_reference": {
+            "type": "string",
+            "description": "The customer's own reference (RMA or purchase order)."
+          },
+          "fault_description": {
+            "type": "string"
+          },
+          "product_description": {
+            "type": "string",
+            "description": "The product in the customer's words, e.g. \"Pump 5 kW, blue\"."
+          },
+          "serial_number": {
+            "type": "string"
+          }
+        }
+      },
       "AnswerText": {
         "type": "object",
         "required": [
@@ -4753,6 +6593,18 @@
           }
         }
       },
+      "CompleteInput": {
+        "type": "object",
+        "required": [
+          "notes"
+        ],
+        "properties": {
+          "notes": {
+            "type": "string",
+            "description": "What was done, and anything left open."
+          }
+        }
+      },
       "ComponentHistory": {
         "type": "object",
         "description": "A component link of this unit, including removed ones.",
@@ -5321,6 +7173,79 @@
           }
         }
       },
+      "Department": {
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "sort_order",
+          "active",
+          "members",
+          "open_repairs"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "open_repairs": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Repairs currently in this department (routed, in progress or waiting)."
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DepartmentInput": {
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string",
+            "description": "Short unique code, e.g. `ELEC`."
+          },
+          "member_user_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The colleagues who work in this department and may work on its repairs."
+          },
+          "name": {
+            "type": "string"
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "DetachInput": {
         "type": "object",
         "properties": {
@@ -5330,6 +7255,17 @@
               "null"
             ],
             "description": "What happens to the removed component: in_stock (default) or scrapped."
+          }
+        }
+      },
+      "DoneInput": {
+        "type": "object",
+        "required": [
+          "done"
+        ],
+        "properties": {
+          "done": {
+            "type": "boolean"
           }
         }
       },
@@ -5468,6 +7404,365 @@
           }
         }
       },
+      "Job": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "kind",
+          "status",
+          "priority",
+          "title",
+          "instructions",
+          "customer_id",
+          "customer_name",
+          "site_name",
+          "street",
+          "postal_code",
+          "city",
+          "country_code",
+          "address",
+          "completion_notes",
+          "technicians",
+          "tasks_total",
+          "tasks_done"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "The address on one line."
+          },
+          "city": {
+            "type": "string"
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "completion_notes": {
+            "type": "string"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The person to meet on site."
+          },
+          "contact_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "instructions": {
+            "type": "string",
+            "description": "What has to be done there."
+          },
+          "kind": {
+            "type": "string",
+            "description": "installation | maintenance | repair | inspection | other"
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "maps_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Opens navigation to the site."
+          },
+          "number": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "repair_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "site_name": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "planned | in_progress | completed | cancelled"
+          },
+          "street": {
+            "type": "string"
+          },
+          "tasks_done": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tasks_total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "technicians": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Technician"
+            }
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "JobDetail": {
+        "type": "object",
+        "required": [
+          "job",
+          "contact_phones",
+          "tasks",
+          "work_logs",
+          "photos",
+          "work_minutes",
+          "travel_minutes"
+        ],
+        "properties": {
+          "contact_phones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SitePhone"
+            },
+            "description": "Phone numbers of the person to meet, to call when arriving."
+          },
+          "job": {
+            "$ref": "#/components/schemas/Job"
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JobPhoto"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Task"
+            }
+          },
+          "travel_minutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "work_logs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkLog"
+            }
+          },
+          "work_minutes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total minutes of work and of travel logged so far."
+          }
+        }
+      },
+      "JobInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "customer_id"
+        ],
+        "properties": {
+          "city": {
+            "type": "string"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "country_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "repair_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "scheduled_end": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "scheduled_start": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "site_name": {
+            "type": "string",
+            "description": "Where to go. Left empty, the customer's address is used."
+          },
+          "street": {
+            "type": "string"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The checklist; only used when creating (change it with the task endpoints)."
+          },
+          "technician_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "JobPhoto": {
+        "type": "object",
+        "required": [
+          "id",
+          "caption",
+          "filename",
+          "uploader_name",
+          "created_at"
+        ],
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the file; fetch it from `/field/jobs/{id}/photos/{photo_id}`."
+          },
+          "uploader_name": {
+            "type": "string"
+          }
+        }
+      },
       "LeadInput": {
         "type": "object",
         "properties": {
@@ -5571,6 +7866,22 @@
           }
         }
       },
+      "Member": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "Membership": {
         "type": "object",
         "required": [
@@ -5621,6 +7932,64 @@
             "description": "Copies the lines of this BOM (any revision of the same product). Default: the active BOM, if any."
           },
           "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "NewRepairInput": {
+        "type": "object",
+        "properties": {
+          "announced": {
+            "type": "boolean",
+            "description": "True when the customer announced it but it has not arrived yet."
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Optional when `ticket_id` is given and the ticket has a customer."
+          },
+          "customer_reference": {
+            "type": "string"
+          },
+          "fault_description": {
+            "type": "string",
+            "description": "What is wrong. Defaults to the subject of the ticket."
+          },
+          "priority": {
+            "type": "string"
+          },
+          "product_description": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The ticket where the customer announced the repair."
+          },
+          "warranty": {
             "type": "string"
           }
         }
@@ -6073,6 +8442,45 @@
           }
         }
       },
+      "Photo": {
+        "type": "object",
+        "required": [
+          "id",
+          "caption",
+          "filename",
+          "content_type",
+          "size_bytes",
+          "uploader_name",
+          "created_at"
+        ],
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The id of the file; fetch it from `/repairs/{id}/photos/{photo_id}`."
+          },
+          "size_bytes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "uploader_name": {
+            "type": "string"
+          }
+        }
+      },
       "PipelineStage": {
         "type": "object",
         "required": [
@@ -6125,6 +8533,35 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "PortalPhoto": {
+        "type": "object",
+        "required": [
+          "id",
+          "caption",
+          "filename",
+          "uploader_name",
+          "created_at"
+        ],
+        "properties": {
+          "caption": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploader_name": {
+            "type": "string"
           }
         }
       },
@@ -6206,6 +8643,81 @@
           "title": {
             "type": "string",
             "description": "mr | ms | none"
+          }
+        }
+      },
+      "PortalRepair": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "product_description",
+          "serial_number",
+          "fault_description",
+          "customer_reference",
+          "contact_name",
+          "photo_count",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "contact_name": {
+            "type": "string",
+            "description": "Who registered it (colleagues' repairs are visible with the `customer` scope)."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_reference": {
+            "type": "string"
+          },
+          "fault_description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "photo_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "product_description": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "announced | in_repair | waiting_customer | ready | shipped | cancelled"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PortalRepairDetail": {
+        "type": "object",
+        "required": [
+          "repair",
+          "photos"
+        ],
+        "properties": {
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalPhoto"
+            }
+          },
+          "repair": {
+            "$ref": "#/components/schemas/PortalRepair"
           }
         }
       },
@@ -7132,6 +9644,14 @@
           }
         }
       },
+      "ReasonInput": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
       "RebateInput": {
         "type": "object",
         "required": [
@@ -7207,6 +9727,302 @@
           },
           "subject": {
             "type": "string"
+          }
+        }
+      },
+      "Repair": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "priority",
+          "customer_id",
+          "customer_name",
+          "product_description",
+          "serial_number",
+          "fault_description",
+          "customer_reference",
+          "warranty",
+          "source",
+          "photo_count",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "assigned_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "assigned_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "contact_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "customer_reference": {
+            "type": "string"
+          },
+          "department_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "department_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fault_description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "photo_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product_description": {
+            "type": "string",
+            "description": "The product as the customer describes it."
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "received_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "staff | portal"
+          },
+          "status": {
+            "type": "string",
+            "description": "announced | received | routed | in_progress | waiting_customer | waiting_parts | completed | shipped | cancelled"
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The ticket where the repair was announced or discussed."
+          },
+          "ticket_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "warranty": {
+            "type": "string",
+            "description": "unknown | in_warranty | out_of_warranty"
+          }
+        }
+      },
+      "RepairDetail": {
+        "type": "object",
+        "required": [
+          "repair",
+          "events",
+          "photos"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RepairEvent"
+            }
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Photo"
+            }
+          },
+          "repair": {
+            "$ref": "#/components/schemas/Repair"
+          }
+        }
+      },
+      "RepairEvent": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "note",
+          "actor_name",
+          "created_at"
+        ],
+        "properties": {
+          "actor_name": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "from_department": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "from_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "created | status | routed | note | photo"
+          },
+          "note": {
+            "type": "string"
+          },
+          "to_department": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "to_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RepairInput": {
+        "type": "object",
+        "required": [
+          "fault_description",
+          "warranty",
+          "priority"
+        ],
+        "properties": {
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "customer_reference": {
+            "type": "string"
+          },
+          "fault_description": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "product_description": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "warranty": {
+            "type": "string"
+          }
+        }
+      },
+      "RepairPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Repair"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -7396,6 +10212,29 @@
           "keep",
           "current"
         ]
+      },
+      "RouteInput": {
+        "type": "object",
+        "required": [
+          "department_id"
+        ],
+        "properties": {
+          "assigned_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "A member of the department who should do it; leave empty to let the department pick it up."
+          },
+          "department_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
       },
       "SerialComponent": {
         "type": "object",
@@ -7635,6 +10474,21 @@
           }
         }
       },
+      "SitePhone": {
+        "type": "object",
+        "required": [
+          "label",
+          "number"
+        ],
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          }
+        }
+      },
       "StageInput": {
         "type": "object",
         "required": [
@@ -7658,6 +10512,85 @@
           },
           "stage": {
             "$ref": "#/components/schemas/OpportunityStage"
+          }
+        }
+      },
+      "StatusInput": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "required": [
+          "id",
+          "position",
+          "description",
+          "done"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "done": {
+            "type": "boolean"
+          },
+          "done_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "done_by_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TaskInput": {
+        "type": "object",
+        "required": [
+          "description"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Technician": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -7960,6 +10893,83 @@
           }
         }
       },
+      "WorkLog": {
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "user_name",
+          "kind",
+          "started_at",
+          "ended_at",
+          "minutes",
+          "notes"
+        ],
+        "properties": {
+          "ended_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "work | travel"
+          },
+          "minutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_name": {
+            "type": "string"
+          }
+        }
+      },
+      "WorkLogInput": {
+        "type": "object",
+        "required": [
+          "started_at",
+          "ended_at"
+        ],
+        "properties": {
+          "ended_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Chosen by the client: sending the same id again changes nothing (offline retries)."
+          },
+          "kind": {
+            "type": "string",
+            "description": "work | travel"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ZonePriceEntry": {
         "type": "object",
         "required": [
@@ -8051,6 +11061,14 @@
     {
       "name": "helpdesk",
       "description": "Tickets, e-mail and prepared answers"
+    },
+    {
+      "name": "repairs",
+      "description": "Repairs, workshop departments and photos"
+    },
+    {
+      "name": "field",
+      "description": "Field jobs for technicians: tasks, work logs and photos"
     },
     {
       "name": "portal",
