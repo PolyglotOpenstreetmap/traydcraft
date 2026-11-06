@@ -81,10 +81,18 @@ pub enum Permission {
     FieldWork,
     /// Plan jobs and assign technicians.
     FieldPlan,
+    /// See stock, moves and availability.
+    InventoryRead,
+    /// Receive, issue, transfer, reserve and count stock.
+    InventoryWrite,
+    /// Warehouses, locations, units of measure, reversals, posting counts and adjustments.
+    InventoryAdmin,
+    /// See and change standard cost (and anything derived from it).
+    InventoryCost,
 }
 
 impl Permission {
-    pub const ALL: [Permission; 33] = [
+    pub const ALL: [Permission; 37] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -118,6 +126,10 @@ impl Permission {
         Permission::FieldRead,
         Permission::FieldWork,
         Permission::FieldPlan,
+        Permission::InventoryRead,
+        Permission::InventoryWrite,
+        Permission::InventoryAdmin,
+        Permission::InventoryCost,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -155,6 +167,10 @@ impl Permission {
             Permission::FieldRead => "field.read",
             Permission::FieldWork => "field.work",
             Permission::FieldPlan => "field.plan",
+            Permission::InventoryRead => "inventory.read",
+            Permission::InventoryWrite => "inventory.write",
+            Permission::InventoryAdmin => "inventory.admin",
+            Permission::InventoryCost => "inventory.cost",
         }
     }
 }
@@ -192,6 +208,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | RepairsRead
                 | RepairsWrite
                 | FieldRead
+                | InventoryRead
         ),
         // First-line customer service: answers e-mails, maintains prepared answers.
         "support" => matches!(
@@ -214,6 +231,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | RepairsWrite
                 | RepairsRoute
                 | OrdersRead
+                | InventoryRead
         ),
         // Production asks questions through internal notes; sales talks to the customer.
         "production" => matches!(
@@ -227,6 +245,13 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskRead
                 | HelpdeskWrite
                 | KbRead
+                | InventoryRead
+                | InventoryWrite
+        ),
+        // Stores: receives, issues, transfers and counts stock; never sees cost.
+        "warehouse" => matches!(
+            p,
+            ProductsRead | BomRead | SerialsRead | OrdersRead | InventoryRead | InventoryWrite
         ),
         "product_manager" => matches!(
             p,
@@ -244,11 +269,19 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskRead
                 | KbRead
                 | KbWrite
+                | InventoryRead
+                | InventoryCost
         ),
         // The workshop: works on repairs routed to the departments one belongs to.
         "workshop" => matches!(
             p,
-            CustomersRead | ProductsRead | RepairsRead | RepairsWrite | BomRead | SerialsRead
+            CustomersRead
+                | ProductsRead
+                | RepairsRead
+                | RepairsWrite
+                | BomRead
+                | SerialsRead
+                | InventoryRead
         ),
         // Field technician: sees and works on their own jobs only.
         "technician" => matches!(p, FieldRead | FieldWork),
@@ -269,6 +302,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskRead
                 | KbRead
                 | OrdersRead
+                | InventoryRead
         ),
         _ => false,
     }
@@ -608,6 +642,39 @@ mod tests {
         assert!(!role_grants("technician", Permission::CustomersRead));
         assert!(role_grants("dispatcher", Permission::FieldPlan));
         assert!(!role_grants("dispatcher", Permission::FieldWork));
+    }
+
+    #[test]
+    fn inventory_rights_follow_the_roles() {
+        for p in [
+            Permission::InventoryRead,
+            Permission::InventoryWrite,
+            Permission::InventoryAdmin,
+            Permission::InventoryCost,
+        ] {
+            assert!(role_grants("admin", p));
+        }
+        for r in ["sales", "sales_manager", "support", "viewer", "workshop"] {
+            assert!(role_grants(r, Permission::InventoryRead), "{r}");
+            assert!(!role_grants(r, Permission::InventoryWrite), "{r}");
+        }
+        for r in ["production", "warehouse"] {
+            assert!(role_grants(r, Permission::InventoryWrite), "{r}");
+            assert!(!role_grants(r, Permission::InventoryAdmin), "{r}");
+        }
+        // Cost is not for sales, the warehouse or production.
+        for r in [
+            "sales",
+            "sales_manager",
+            "support",
+            "production",
+            "warehouse",
+            "viewer",
+        ] {
+            assert!(!role_grants(r, Permission::InventoryCost), "{r}");
+        }
+        assert!(role_grants("product_manager", Permission::InventoryCost));
+        assert!(!role_grants("technician", Permission::InventoryRead));
     }
 
     #[test]

@@ -21,6 +21,7 @@ traydcraft-portal = { path = "crates/portal" }
 traydcraft-kb = { path = "crates/kb" }
 traydcraft-repairs = { path = "crates/repairs" }
 traydcraft-fieldservice = { path = "crates/fieldservice" }
+traydcraft-inventory = { path = "crates/inventory" }
 
 anyhow = "1"
 axum = { version = "0.8", features = ["macros"] }

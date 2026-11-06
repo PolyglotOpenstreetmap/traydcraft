@@ -147,6 +147,86 @@ async fn lock(conn: &mut PgConnection, ids: &[Uuid]) -> AppResult<()> {
     Ok(())
 }
 
+/// True if inventory currently holds the unit at a location. Its status is then driven by stock
+/// moves (ADR 0019): issue it from stock instead of changing the status here.
+async fn has_stock_location(conn: &mut PgConnection, id: Uuid) -> AppResult<bool> {
+    Ok(sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM inventory.serial_stock WHERE serial_unit_id = $1)",
+    )
+    .bind(id)
+    .fetch_one(conn)
+    .await?)
+}
+
+/// The facts inventory needs about a unit, read under a row lock.
+#[derive(Debug, Clone)]
+pub struct StockUnit {
+    pub id: Uuid,
+    pub product_id: Uuid,
+    pub serial_number: String,
+    pub status: String,
+    pub customer_id: Option<Uuid>,
+    pub built_into: Option<Uuid>,
+}
+
+/// Locks a unit of the company for a stock move.
+pub async fn lock_for_stock(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    id: Uuid,
+) -> AppResult<StockUnit> {
+    lock(conn, &[id]).await?;
+    let u = load(conn, company_id, id).await?;
+    Ok(StockUnit {
+        id: u.id,
+        product_id: u.product_id,
+        serial_number: u.serial_number,
+        status: u.status,
+        customer_id: u.customer_id,
+        built_into: u.parent_id,
+    })
+}
+
+/// Finds a unit by serial number (serial numbers are unique per product).
+pub async fn find_by_serial(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    product_id: Uuid,
+    serial: &str,
+) -> AppResult<Option<Uuid>> {
+    Ok(sqlx::query_scalar(
+        "SELECT id FROM engineering.serial_units WHERE company_id = $1 AND product_id = $2 AND serial_number = $3",
+    )
+    .bind(company_id)
+    .bind(product_id)
+    .bind(serial)
+    .fetch_optional(conn)
+    .await?)
+}
+
+/// Sets the status of a unit as a consequence of a stock move (the caller has checked the
+/// transition). `customer_id` replaces the customer when given; `clear_customer` removes it.
+pub async fn set_status_from_stock(
+    conn: &mut PgConnection,
+    id: Uuid,
+    status: &str,
+    customer_id: Option<Uuid>,
+    clear_customer: bool,
+) -> AppResult<()> {
+    sqlx::query(
+        "UPDATE engineering.serial_units
+         SET status = $2, customer_id = CASE WHEN $4 THEN NULL ELSE COALESCE($3, customer_id) END, updated_at = now()
+         WHERE id = $1",
+    )
+    .bind(id)
+    .bind(status)
+    .bind(customer_id)
+    .bind(clear_customer)
+    .execute(conn)
+    .await?;
+    Ok(())
+}
+
 async fn detail(
     conn: &mut PgConnection,
     company_id: Uuid,
@@ -235,22 +315,17 @@ async fn list_serials(
     Ok(Json(SerialUnitPage { items, total }))
 }
 
-/// Registers a serialised unit. (Later also created automatically by production and goods receipt.)
-#[utoipa::path(post, path = "/products/{id}/serials", tag = "engineering", params(("id" = Uuid, Path)),
-    request_body = SerialInput,
-    responses((status = 201, body = SerialUnitDetail), (status = 409, body = ErrorBody), (status = 422, body = ErrorBody)))]
-async fn create_serial(
-    State(state): State<AppState>,
-    user: CurrentUser,
-    Path(product_id): Path<Uuid>,
-    Json(input): Json<SerialInput>,
-) -> AppResult<(StatusCode, Json<SerialUnitDetail>)> {
-    user.require(Permission::SerialsWrite)?;
-    let serial = input.serial_number.trim();
-    if serial.is_empty() {
-        return Err(AppError::Validation("serial_number is required".into()));
-    }
-    let mut tx = state.db.begin().await?;
+/// Registers a serialised unit in the caller's transaction. Used by [`create_serial`] and by
+/// inventory when a serial product is received. `bom_id` defaults to the product's active BOM.
+pub async fn register_unit(
+    tx: &mut PgConnection,
+    user: &CurrentUser,
+    product_id: Uuid,
+    serial: &str,
+    bom_id: Option<Uuid>,
+    customer_id: Option<Uuid>,
+    notes: &str,
+) -> AppResult<Uuid> {
     let product = get_product(&mut *tx, product_id).await?;
     if product.tracking != "serial" {
         return Err(AppError::Validation(format!(
@@ -258,7 +333,7 @@ async fn create_serial(
             product.code
         )));
     }
-    let bom_id: Option<Uuid> = match input.bom_id {
+    let bom_id: Option<Uuid> = match bom_id {
         Some(bom_id) => {
             let ok: bool = sqlx::query_scalar(
                 "SELECT EXISTS (SELECT 1 FROM engineering.boms WHERE id = $1 AND product_id = $2 AND status <> 'draft')",
@@ -293,18 +368,47 @@ async fn create_serial(
     .bind(product_id)
     .bind(serial)
     .bind(bom_id)
-    .bind(input.customer_id)
-    .bind(&input.notes)
+    .bind(customer_id)
+    .bind(notes)
     .bind(user.user_id)
     .execute(&mut *tx)
     .await?;
     audit::record(
-        &mut tx,
-        &user,
+        &mut *tx,
+        user,
         "serial_unit",
         id,
         "created",
         serde_json::json!({ "serial_number": serial }),
+    )
+    .await?;
+    Ok(id)
+}
+
+/// Registers a serialised unit. (Later also created automatically by production and goods receipt.)
+#[utoipa::path(post, path = "/products/{id}/serials", tag = "engineering", params(("id" = Uuid, Path)),
+    request_body = SerialInput,
+    responses((status = 201, body = SerialUnitDetail), (status = 409, body = ErrorBody), (status = 422, body = ErrorBody)))]
+async fn create_serial(
+    State(state): State<AppState>,
+    user: CurrentUser,
+    Path(product_id): Path<Uuid>,
+    Json(input): Json<SerialInput>,
+) -> AppResult<(StatusCode, Json<SerialUnitDetail>)> {
+    user.require(Permission::SerialsWrite)?;
+    let serial = input.serial_number.trim();
+    if serial.is_empty() {
+        return Err(AppError::Validation("serial_number is required".into()));
+    }
+    let mut tx = state.db.begin().await?;
+    let id = register_unit(
+        &mut tx,
+        &user,
+        product_id,
+        serial,
+        input.bom_id,
+        input.customer_id,
+        &input.notes,
     )
     .await?;
     let d = detail(&mut tx, user.company_id, id).await?;
@@ -352,6 +456,12 @@ async fn set_status(
     if unit.status == "scrapped" {
         return Err(AppError::Conflict(format!(
             "{} is scrapped",
+            unit.serial_number
+        )));
+    }
+    if has_stock_location(&mut tx, id).await? {
+        return Err(AppError::Conflict(format!(
+            "{} is held in a stock location; issue it from stock to change its status",
             unit.serial_number
         )));
     }
@@ -411,6 +521,12 @@ async fn attach_component(
         return Err(AppError::Conflict(format!(
             "{} is {}, not in stock",
             child.serial_number, child.status
+        )));
+    }
+    if has_stock_location(&mut tx, input.child_id).await? {
+        return Err(AppError::Conflict(format!(
+            "{} is held in a stock location; issue it from stock (reason consumption) first",
+            child.serial_number
         )));
     }
     let bom_id = parent.bom_id.ok_or_else(|| {

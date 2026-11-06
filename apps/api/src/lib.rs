@@ -30,6 +30,7 @@ pub const DEV_SEED_SQL: &str = include_str!("../../../seed/dev_seed.sql");
         (name = "kb", description = "Knowledge base: entries in five languages, search, versions, public reading"),
         (name = "repairs", description = "Repairs, workshop departments and photos"),
         (name = "field", description = "Field jobs for technicians: tasks, work logs and photos"),
+        (name = "inventory", description = "Warehouses, stock moves, lots, reservations and counts"),
         (name = "portal", description = "Customer portal: login for contacts, their tickets and profile"),
     )
 )]
@@ -63,6 +64,7 @@ fn api() -> (Router<AppState>, OpenApiDoc) {
         .merge(traydcraft_kb::router())
         .merge(traydcraft_repairs::router())
         .merge(traydcraft_fieldservice::router())
+        .merge(traydcraft_inventory::router())
         .merge(traydcraft_portal::router());
     OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api/v1", v1)

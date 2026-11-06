@@ -18,6 +18,7 @@ traydcraft-kb.workspace = true
 traydcraft-portal.workspace = true
 traydcraft-repairs.workspace = true
 traydcraft-fieldservice.workspace = true
+traydcraft-inventory.workspace = true
 traydcraft-products.workspace = true
 traydcraft-sales.workspace = true
 anyhow.workspace = true

@@ -59,6 +59,8 @@ pub struct OrderSummary {
 
 #[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
 pub struct OrderLine {
+    /// Identifies the line of this revision (inventory reserves stock against it).
+    pub id: Uuid,
     pub position: i32,
     pub product_id: Option<Uuid>,
     pub product_code: String,
@@ -213,7 +215,7 @@ pub(crate) async fn lock(conn: &mut PgConnection, company_id: Uuid, id: Uuid) ->
 }
 
 const LINE_COLUMNS: &str =
-    "position, product_id, product_code, description, unit, quantity, list_unit_price,
+    "id, position, product_id, product_code, description, unit, quantity, list_unit_price,
     pricing_type, rebate_percent, line_discount_percent, net_unit_price, line_total, vat_rate";
 
 pub(crate) async fn revision_lines(
@@ -634,6 +636,7 @@ async fn edit_order(
         })
         .map_err(|err| AppError::Validation(format!("line {}: {err}", e.position)))?;
         lines.push(OrderLine {
+            id: new_id(),
             position: i as i32 + 1,
             description: e
                 .description
@@ -1117,6 +1120,9 @@ async fn cancel(
     .bind(input.reason.trim())
     .execute(&mut *tx)
     .await?;
+    // Stock reserved for the order goes back to the free stock.
+    traydcraft_inventory::release_for_order(&mut tx, user.company_id, id, Some(user.user_id))
+        .await?;
     audit::record(
         &mut tx,
         &user,
