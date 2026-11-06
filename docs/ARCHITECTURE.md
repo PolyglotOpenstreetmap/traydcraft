@@ -45,7 +45,7 @@ PostgreSQL — one database, one schema per module
 | core | slice | companies, users, memberships/roles, numbering, audit |
 | crm | slice | customers, **contacts** (people with roles, language, form of address, e-mails and phones; lookup by e-mail and phone — [ADR 0014](adr/0014-contacts-calls-and-customer-portal.md)), per-company terms (zone, general rebate, payment terms), product/family rebates, opportunities / pipeline |
 | products / pricing | slice | products, families, pricing types (list/net/indicative), price zones, dated zone prices, bulk price changes ([ADR 0012](adr/0012-rebates-price-dates-and-price-changes.md)) |
-| sales | slice | quotations (snapshots, price date, revisions keeping or updating prices), linked to opportunities; sales orders from an accepted revision |
+| sales | slice | quotations (snapshots, price date, revisions keeping or updating prices), linked to opportunities; sales orders from an accepted revision with a draft → sent → confirmed lifecycle, revisions, order confirmation PDF by e-mail, customer confirmation (staff or portal) and priority with history ([ADR 0016](adr/0016-order-lifecycle.md)) |
 | documents | slice | PDF rendering (Typst) |
 | engineering | slice | BOM revisions (multi-level via subassemblies), explosion, serial units and as-built genealogy ([ADR 0011](adr/0011-bom-revisions-and-serial-genealogy.md)); routings and configurator planned |
 | purchasing | planned | suppliers, purchase orders, receipts |
