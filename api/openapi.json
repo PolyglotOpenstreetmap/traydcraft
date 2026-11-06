@@ -2188,6 +2188,17 @@
             }
           },
           {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -2231,6 +2242,7 @@
         "tags": [
           "sales"
         ],
+        "summary": "The latest revision of an order.",
         "operationId": "get_order",
         "parameters": [
           {
@@ -2255,6 +2267,593 @@
             }
           },
           "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Edits the draft revision: quantities, discounts, descriptions and notes. Prices and rebates\nstay as agreed on the quotation; totals are recomputed here.",
+        "operationId": "edit_order",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderEditInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/cancel": {
+      "post": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Cancels the order. Possible until it is ready for shipping.",
+        "operationId": "cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrderInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/confirm": {
+      "post": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Confirms the order on the customer's behalf (e.g. after a phone call or an e-mail).",
+        "operationId": "confirm",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmOrderInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/priority": {
+      "put": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Changes the priority of an order. The reason is required; the change is kept in the history.",
+        "operationId": "change_priority",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriorityInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/priority-history": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "operationId": "priority_history",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PriorityChange"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/priority-requests": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Customer requests to change the priority, newest first.",
+        "operationId": "list_requests",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PriorityRequest"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/priority-requests/{request_id}/dismiss": {
+      "post": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Turns a customer request down without changing the priority.",
+        "operationId": "dismiss_request",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DismissRequestInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriorityRequest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/revisions": {
+      "post": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Starts the next revision as a draft, copying the latest one. The sent revision is kept and\nmarked superseded: the customer can no longer confirm it.",
+        "operationId": "new_revision",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/revisions/{revision}": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "A specific revision of an order, e.g. an older one that was sent.",
+        "operationId": "get_order_revision",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/revisions/{revision}/pdf": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "The order confirmation of one revision as PDF (a draft carries a watermark).",
+        "operationId": "order_pdf",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/orders/{id}/send": {
+      "post": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Sends the draft revision: it becomes `sent`, the order confirmation PDF is rendered in the\ncustomer's language and queued as an e-mail for the worker. Refused (409) when there is no\naddress to send it to.",
+        "operationId": "send_order",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "409": {
             "description": "",
             "content": {
               "application/json": {
@@ -2350,6 +2949,235 @@
             }
           },
           "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/orders": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Orders of the customer: the latest revision that was sent or confirmed, never a draft.",
+        "operationId": "list_portal_orders",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalOrder"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/orders/{id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "get_portal_order",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalOrderDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/orders/{id}/confirm": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "The customer confirms their order. Only the latest sent revision can be confirmed.",
+        "operationId": "confirm_portal_order",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmPortalOrder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalOrderDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/orders/{id}/priority-requests": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Asks staff to treat the order as more or less urgent. Staff decide.",
+        "operationId": "request_portal_order_priority",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPriorityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriorityRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -4145,7 +4973,7 @@
         "tags": [
           "sales"
         ],
-        "summary": "Converts a sent or accepted quotation revision into a sales order.",
+        "summary": "Converts a sent or accepted quotation revision into a draft sales order (revision 1).",
         "operationId": "convert",
         "parameters": [
           {
@@ -6493,6 +7321,17 @@
           }
         }
       },
+      "CancelOrderInput": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
       "ChangeKind": {
         "type": "string",
         "enum": [
@@ -6645,6 +7484,38 @@
           },
           "serial_number": {
             "type": "string"
+          }
+        }
+      },
+      "ConfirmOrderInput": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "The revision being confirmed; refused when it is not the latest. Defaults to the latest."
+          }
+        }
+      },
+      "ConfirmPortalOrder": {
+        "type": "object",
+        "required": [
+          "revision"
+        ],
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The revision the customer is looking at; refused when it is no longer the latest."
           }
         }
       },
@@ -7255,6 +8126,14 @@
               "null"
             ],
             "description": "What happens to the removed component: in_stock (default) or scrapped."
+          }
+        }
+      },
+      "DismissRequestInput": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
           }
         }
       },
@@ -7936,6 +8815,22 @@
           }
         }
       },
+      "NewPriorityRequest": {
+        "type": "object",
+        "required": [
+          "priority",
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "description": "expedite | low"
+          }
+        }
+      },
       "NewRepairInput": {
         "type": "object",
         "properties": {
@@ -8245,14 +9140,55 @@
       },
       "Order": {
         "type": "object",
+        "description": "One revision of an order (the latest unless asked otherwise) with its lines.",
         "required": [
           "order",
+          "revision",
+          "revision_status",
           "vat_total",
           "notes",
           "created_at",
+          "confirmation_note",
+          "cancel_reason",
+          "revisions",
           "lines"
         ],
         "properties": {
+          "cancel_reason": {
+            "type": "string"
+          },
+          "confirmation_note": {
+            "type": "string"
+          },
+          "confirmed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "confirmed_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "A staff user id (`confirmed_via` = staff) or a contact id (portal)."
+          },
+          "confirmed_revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "confirmed_via": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "staff | portal"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -8269,7 +9205,45 @@
           "order": {
             "$ref": "#/components/schemas/OrderSummary"
           },
+          "revision": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The revision these lines and totals belong to."
+          },
+          "revision_status": {
+            "type": "string"
+          },
+          "revisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderRevisionInfo"
+            }
+          },
           "vat_total": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderEditInput": {
+        "type": "object",
+        "description": "Changes to a draft revision. Lines that are left out are removed; prices and rebates stay as\nagreed on the quotation, the totals are recomputed by the server.",
+        "required": [
+          "lines"
+        ],
+        "properties": {
+          "customer_reference": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineEdit"
+            }
+          },
+          "notes": {
             "type": "string"
           }
         }
@@ -8283,6 +9257,7 @@
           "unit",
           "quantity",
           "list_unit_price",
+          "pricing_type",
           "rebate_percent",
           "line_discount_percent",
           "net_unit_price",
@@ -8309,6 +9284,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "pricing_type": {
+            "type": "string",
+            "description": "list | net | indicative"
+          },
           "product_code": {
             "type": "string"
           },
@@ -8333,6 +9312,35 @@
           }
         }
       },
+      "OrderLineEdit": {
+        "type": "object",
+        "required": [
+          "position",
+          "quantity"
+        ],
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Replaces the description; empty keeps the current one."
+          },
+          "line_discount_percent": {
+            "type": "string",
+            "example": "0"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The position of the line in the current draft revision."
+          },
+          "quantity": {
+            "type": "string",
+            "example": "2"
+          }
+        }
+      },
       "OrderPage": {
         "type": "object",
         "required": [
@@ -8352,12 +9360,58 @@
           }
         }
       },
+      "OrderRevisionInfo": {
+        "type": "object",
+        "required": [
+          "revision",
+          "status",
+          "subtotal",
+          "total",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sent_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "sent_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The address the order confirmation was e-mailed to."
+          },
+          "status": {
+            "type": "string",
+            "description": "draft | sent | confirmed | superseded"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          }
+        }
+      },
       "OrderSummary": {
         "type": "object",
         "required": [
           "id",
           "number",
           "status",
+          "priority",
+          "current_revision",
           "quotation_id",
           "quotation_number",
           "quotation_revision",
@@ -8374,6 +9428,11 @@
         "properties": {
           "currency": {
             "type": "string"
+          },
+          "current_revision": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The latest revision."
           },
           "customer_id": {
             "type": "string",
@@ -8396,6 +9455,10 @@
             "type": "string",
             "format": "date"
           },
+          "priority": {
+            "type": "string",
+            "description": "low | normal | expedite"
+          },
           "quotation_id": {
             "type": "string",
             "format": "uuid"
@@ -8416,7 +9479,7 @@
           },
           "status": {
             "type": "string",
-            "description": "confirmed | cancelled"
+            "description": "draft | sent | confirmed | in_planning | planned | in_production | ready_for_shipping | cancelled"
           },
           "subtotal": {
             "type": "string"
@@ -8533,6 +9596,137 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "PortalOrder": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "revision",
+          "customer_reference",
+          "order_date",
+          "currency",
+          "subtotal",
+          "vat_total",
+          "total",
+          "can_confirm",
+          "open_priority_requests"
+        ],
+        "properties": {
+          "can_confirm": {
+            "type": "boolean",
+            "description": "True while this revision is the latest and waits for the customer's confirmation."
+          },
+          "confirmed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "customer_reference": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "open_priority_requests": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "order_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The revision shown here: the latest that was sent or confirmed, never a draft."
+          },
+          "status": {
+            "type": "string",
+            "description": "sent | confirmed | cancelled"
+          },
+          "subtotal": {
+            "type": "string"
+          },
+          "total": {
+            "type": "string"
+          },
+          "vat_total": {
+            "type": "string"
+          }
+        }
+      },
+      "PortalOrderDetail": {
+        "type": "object",
+        "required": [
+          "order",
+          "lines"
+        ],
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalOrderLine"
+            }
+          },
+          "order": {
+            "$ref": "#/components/schemas/PortalOrder"
+          }
+        }
+      },
+      "PortalOrderLine": {
+        "type": "object",
+        "required": [
+          "position",
+          "product_code",
+          "description",
+          "unit",
+          "quantity",
+          "list_unit_price",
+          "net_unit_price",
+          "line_total",
+          "vat_rate"
+        ],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "line_total": {
+            "type": "string"
+          },
+          "list_unit_price": {
+            "type": "string"
+          },
+          "net_unit_price": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "vat_rate": {
+            "type": "string"
           }
         }
       },
@@ -9000,6 +10194,125 @@
               "null"
             ],
             "format": "date"
+          }
+        }
+      },
+      "PriorityChange": {
+        "type": "object",
+        "required": [
+          "id",
+          "old_priority",
+          "new_priority",
+          "reason",
+          "changed_by",
+          "changed_by_name",
+          "changed_at"
+        ],
+        "properties": {
+          "changed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "changed_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "changed_by_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "new_priority": {
+            "type": "string"
+          },
+          "old_priority": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "PriorityInput": {
+        "type": "object",
+        "required": [
+          "priority",
+          "reason"
+        ],
+        "properties": {
+          "priority": {
+            "type": "string",
+            "description": "low | normal | expedite"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the priority changes; required."
+          },
+          "request_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The customer request this change answers; it is marked applied."
+          }
+        }
+      },
+      "PriorityRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "order_id",
+          "requested_priority",
+          "message",
+          "requested_by_contact_id",
+          "requested_by_name",
+          "status",
+          "created_at",
+          "resolution_note"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "message": {
+            "type": "string"
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requested_by_contact_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "requested_by_name": {
+            "type": "string"
+          },
+          "requested_priority": {
+            "type": "string",
+            "description": "low | expedite"
+          },
+          "resolution_note": {
+            "type": "string"
+          },
+          "resolved_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "open | applied | dismissed"
           }
         }
       },

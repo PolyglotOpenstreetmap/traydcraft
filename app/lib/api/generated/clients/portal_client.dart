@@ -6,15 +6,20 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/announce_repair.dart';
+import '../models/confirm_portal_order.dart';
 import '../models/login_link_input.dart';
 import '../models/message_input.dart';
+import '../models/new_priority_request.dart';
 import '../models/new_ticket.dart';
+import '../models/portal_order.dart';
+import '../models/portal_order_detail.dart';
 import '../models/portal_profile.dart';
 import '../models/portal_repair.dart';
 import '../models/portal_repair_detail.dart';
 import '../models/portal_session.dart';
 import '../models/portal_ticket.dart';
 import '../models/portal_ticket_detail.dart';
+import '../models/priority_request.dart';
 import '../models/profile_input.dart';
 import '../models/session_input.dart';
 
@@ -37,6 +42,29 @@ abstract class PortalClient {
   @PUT('/api/v1/portal/me')
   Future<PortalProfile> updateMe({
     @Body() required ProfileInput body,
+  });
+
+  /// Orders of the customer: the latest revision that was sent or confirmed, never a draft.
+  @GET('/api/v1/portal/orders')
+  Future<List<PortalOrder>> listPortalOrders();
+
+  @GET('/api/v1/portal/orders/{id}')
+  Future<PortalOrderDetail> getPortalOrder({
+    @Path('id') required String id,
+  });
+
+  /// The customer confirms their order. Only the latest sent revision can be confirmed.
+  @POST('/api/v1/portal/orders/{id}/confirm')
+  Future<PortalOrderDetail> confirmPortalOrder({
+    @Path('id') required String id,
+    @Body() required ConfirmPortalOrder body,
+  });
+
+  /// Asks staff to treat the order as more or less urgent. Staff decide.
+  @POST('/api/v1/portal/orders/{id}/priority-requests')
+  Future<PriorityRequest> requestPortalOrderPriority({
+    @Path('id') required String id,
+    @Body() required NewPriorityRequest body,
   });
 
   @GET('/api/v1/portal/repairs')

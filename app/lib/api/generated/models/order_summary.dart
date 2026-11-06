@@ -10,12 +10,14 @@ part 'order_summary.g.dart';
 class OrderSummary {
   const OrderSummary({
     required this.currency,
+    required this.currentRevision,
     required this.customerId,
     required this.customerName,
     required this.customerReference,
     required this.id,
     required this.number,
     required this.orderDate,
+    required this.priority,
     required this.quotationId,
     required this.quotationNumber,
     required this.quotationRevision,
@@ -29,6 +31,10 @@ class OrderSummary {
   factory OrderSummary.fromJson(Map<String, Object?> json) => _$OrderSummaryFromJson(json);
   
   final String currency;
+
+  /// The latest revision.
+  @JsonKey(name: 'current_revision')
+  final int currentRevision;
   @JsonKey(name: 'customer_id')
   final String customerId;
   @JsonKey(name: 'customer_name')
@@ -39,6 +45,9 @@ class OrderSummary {
   final String number;
   @JsonKey(name: 'order_date')
   final DateTime orderDate;
+
+  /// low | normal | expedite
+  final String priority;
   @JsonKey(name: 'quotation_id')
   final String quotationId;
   @JsonKey(name: 'quotation_number')
@@ -50,7 +59,7 @@ class OrderSummary {
   @JsonKey(name: 'salesperson_name')
   final String salespersonName;
 
-  /// confirmed | cancelled
+  /// draft | sent | confirmed | in_planning | planned | in_production | ready_for_shipping | cancelled
   final String status;
   final String subtotal;
   final String total;

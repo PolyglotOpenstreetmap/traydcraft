@@ -15,6 +15,7 @@ class OrderLine {
     required this.listUnitPrice,
     required this.netUnitPrice,
     required this.position,
+    required this.pricingType,
     required this.productCode,
     required this.quantity,
     required this.rebatePercent,
@@ -35,6 +36,10 @@ class OrderLine {
   @JsonKey(name: 'net_unit_price')
   final String netUnitPrice;
   final int position;
+
+  /// list | net | indicative
+  @JsonKey(name: 'pricing_type')
+  final String pricingType;
   @JsonKey(name: 'product_code')
   final String productCode;
   @JsonKey(includeIfNull: false,name: 'product_id')
