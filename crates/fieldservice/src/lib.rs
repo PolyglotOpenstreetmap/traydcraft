@@ -11,7 +11,7 @@ use axum::extract::{DefaultBodyLimit, Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::Response;
 use axum::Json;
-use chrono::{DateTime, Datelike, Duration, Utc};
+use chrono::{DateTime, Datelike, Duration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgConnection};
 use traydcraft_core::files::{self, MAX_FILE_BYTES};
@@ -20,6 +20,13 @@ use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
+
+pub mod contracts;
+pub mod extras;
+pub mod recurrence;
+pub mod report;
+
+use extras::{JobEquipment, JobPart, JobSignature};
 
 type ErrorBody = traydcraft_core::error::ErrorBody;
 
@@ -102,6 +109,14 @@ pub struct Job {
     pub technicians: Vec<Technician>,
     pub tasks_total: i64,
     pub tasks_done: i64,
+    /// The maintenance contract this job was generated for.
+    pub contract_id: Option<Uuid>,
+    pub contract_number: Option<String>,
+    /// The day a contract visit is due.
+    pub due_date: Option<NaiveDate>,
+    /// When the service report was last e-mailed to the customer.
+    pub report_sent_at: Option<DateTime<Utc>>,
+    pub report_sent_to: String,
 }
 
 #[derive(FromRow)]
@@ -133,6 +148,11 @@ struct JobRow {
     completion_notes: String,
     tasks_total: i64,
     tasks_done: i64,
+    contract_id: Option<Uuid>,
+    contract_number: Option<String>,
+    due_date: Option<NaiveDate>,
+    report_sent_at: Option<DateTime<Utc>>,
+    report_sent_to: String,
 }
 
 #[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
@@ -182,6 +202,12 @@ pub struct JobDetail {
     pub tasks: Vec<Task>,
     pub work_logs: Vec<WorkLog>,
     pub photos: Vec<JobPhoto>,
+    /// Equipment (installed units of the customer) worked on.
+    pub equipment: Vec<JobEquipment>,
+    /// Parts used (record only; stock is not deducted).
+    pub parts: Vec<JobPart>,
+    /// The customer's signature, or that they declined to sign.
+    pub signature: Option<JobSignature>,
     /// Total minutes of work and of travel logged so far.
     pub work_minutes: i64,
     pub travel_minutes: i64,
@@ -192,7 +218,9 @@ const SELECT: &str = "SELECT j.id, j.number, j.kind, j.status, j.priority, j.tit
         j.ticket_id, j.repair_id, j.site_name, j.street, j.postal_code, j.city, j.country_code::text AS country_code,
         j.latitude, j.longitude, j.scheduled_start, j.scheduled_end, j.started_at, j.completed_at, j.completion_notes,
         (SELECT count(*) FROM field.job_tasks t WHERE t.job_id = j.id) AS tasks_total,
-        (SELECT count(*) FROM field.job_tasks t WHERE t.job_id = j.id AND t.done) AS tasks_done
+        (SELECT count(*) FROM field.job_tasks t WHERE t.job_id = j.id AND t.done) AS tasks_done,
+        j.contract_id, (SELECT k.number FROM field.contracts k WHERE k.id = j.contract_id) AS contract_number,
+        j.due_date, j.report_sent_at, j.report_sent_to
      FROM field.jobs j JOIN crm.customers c ON c.id = j.customer_id LEFT JOIN crm.contacts ct ON ct.id = j.contact_id";
 
 fn one_line(r: &JobRow) -> String {
@@ -265,6 +293,11 @@ async fn assemble(conn: &mut PgConnection, rows: Vec<JobRow>) -> AppResult<Vec<J
                 completion_notes: r.completion_notes,
                 tasks_total: r.tasks_total,
                 tasks_done: r.tasks_done,
+                contract_id: r.contract_id,
+                contract_number: r.contract_number,
+                due_date: r.due_date,
+                report_sent_at: r.report_sent_at,
+                report_sent_to: r.report_sent_to,
             }
         })
         .collect())
@@ -331,8 +364,11 @@ async fn load_detail(
          FROM field.job_photos p JOIN core.files f ON f.id = p.file_id WHERE p.job_id = $1 ORDER BY p.created_at, p.id",
     )
     .bind(id)
-    .fetch_all(conn)
+    .fetch_all(&mut *conn)
     .await?;
+    let equipment = extras::equipment_of(&mut *conn, id).await?;
+    let parts = extras::parts_of(&mut *conn, id).await?;
+    let signature = extras::signature_of(conn, id).await?;
     let sum = |kind: &str| {
         work_logs
             .iter()
@@ -348,6 +384,9 @@ async fn load_detail(
         tasks,
         work_logs,
         photos,
+        equipment,
+        parts,
+        signature,
     })
 }
 
@@ -397,6 +436,8 @@ pub struct ListParams {
     /// `me`, `none` (unassigned) or a user id.
     pub technician: Option<String>,
     pub customer_id: Option<Uuid>,
+    /// Jobs generated for this maintenance contract.
+    pub contract_id: Option<Uuid>,
     /// Jobs scheduled from this moment on.
     pub from: Option<DateTime<Utc>>,
     /// Jobs scheduled before this moment.
@@ -439,6 +480,7 @@ async fn list_jobs_inner(
            AND ($9::timestamptz IS NULL OR j.scheduled_start >= $9)
            AND ($10::timestamptz IS NULL OR j.scheduled_start < $10)
            AND ($11 OR j.status <> 'completed' OR j.completed_at > now() - interval '7 days')
+           AND ($12::uuid IS NULL OR j.contract_id = $12)
          ORDER BY (j.status IN ('completed', 'cancelled')), j.scheduled_start NULLS LAST, j.number LIMIT 300"
     ))
     .bind(user.company_id)
@@ -452,6 +494,7 @@ async fn list_jobs_inner(
     .bind(p.from)
     .bind(p.to)
     .bind(!include_recent_done)
+    .bind(p.contract_id)
     .fetch_all(&mut *conn)
     .await?;
     assemble(conn, rows).await
@@ -484,6 +527,7 @@ async fn my_jobs(State(state): State<AppState>, user: CurrentUser) -> AppResult<
         status: None,
         technician: None,
         customer_id: None,
+        contract_id: None,
         from: None,
         to: None,
     };
@@ -651,6 +695,13 @@ async fn prepare(conn: &mut PgConnection, user: &CurrentUser, input: &JobInput) 
     })
 }
 
+/// The next job number of the company (`J2026-00001`).
+async fn next_job_number(conn: &mut PgConnection, company_id: Uuid) -> AppResult<String> {
+    let year = Utc::now().year();
+    let n = traydcraft_core::numbering::next_number(conn, company_id, "job", year).await?;
+    Ok(format!("J{year}-{n:05}"))
+}
+
 async fn set_technicians(conn: &mut PgConnection, job_id: Uuid, ids: &[Uuid]) -> AppResult<()> {
     sqlx::query("DELETE FROM field.job_technicians WHERE job_id = $1")
         .bind(job_id)
@@ -680,9 +731,7 @@ async fn create_job(
     input.check()?;
     let mut tx = state.db.begin().await?;
     let site = prepare(&mut tx, &user, &input).await?;
-    let year = Utc::now().year();
-    let n = traydcraft_core::numbering::next_number(&mut tx, user.company_id, "job", year).await?;
-    let number = format!("J{year}-{n:05}");
+    let number = next_job_number(&mut tx, user.company_id).await?;
     let id = new_id();
     sqlx::query(
         "INSERT INTO field.jobs (id, company_id, number, kind, priority, title, instructions, customer_id, contact_id,
@@ -1121,6 +1170,9 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(reopen_job))
         .routes(routes!(add_work_log))
         .routes(routes!(get_photo))
+        .merge(extras::router())
+        .merge(contracts::router())
+        .merge(report::router())
         .merge(
             OpenApiRouter::new()
                 .routes(routes!(upload_photo))

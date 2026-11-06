@@ -2,6 +2,7 @@
 //!
 //! * Polls the helpdesk mailbox over IMAP (when IMAP_HOST is set) and turns mails into tickets.
 //! * Escalates tickets whose SLA ran out (one internal e-mail per ticket and kind of breach).
+//! * Generates the planned jobs of active maintenance contracts before their visits are due.
 //! * Sends queued outgoing e-mails (ticket replies and system mail such as portal login links)
 //!   over SMTP, or writes them as .eml files when
 //!   MAIL_TRANSPORT=files (development).
@@ -111,6 +112,17 @@ async fn main() -> anyhow::Result<()> {
             Ok(0) => {}
             Ok(n) => tracing::info!(n, "SLA breaches escalated"),
             Err(e) => tracing::error!(error = ?e, "SLA escalation failed"),
+        }
+        match traydcraft_fieldservice::contracts::generate_due_visits(&db, traydcraft_core::today())
+            .await
+        {
+            Ok(g) if g.jobs == 0 && g.renewed == 0 => {}
+            Ok(g) => tracing::info!(
+                jobs = g.jobs,
+                renewed = g.renewed,
+                "maintenance contracts processed"
+            ),
+            Err(e) => tracing::error!(error = ?e, "generating contract visits failed"),
         }
         match process_outbox(&db, &mailer, 50).await {
             Ok(0) => {}

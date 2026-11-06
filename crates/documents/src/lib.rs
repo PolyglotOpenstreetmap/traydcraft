@@ -71,6 +71,17 @@ pub async fn render_pdf<T: Serialize>(
     template: &str,
     data: &T,
 ) -> anyhow::Result<Vec<u8>> {
+    render_pdf_with_files(config, template, data, &[]).await
+}
+
+/// Like [`render_pdf`], with extra files (images) placed next to `data.json`. `files` are
+/// `(name, bytes)` pairs; a name must be a plain file name.
+pub async fn render_pdf_with_files<T: Serialize>(
+    config: &DocumentConfig,
+    template: &str,
+    data: &T,
+    files: &[(String, Vec<u8>)],
+) -> anyhow::Result<Vec<u8>> {
     let template_path = config.template_dir.join(format!("{template}.typ"));
     let work = tempfile::tempdir().context("creating temp dir")?;
     let main = work.path().join("main.typ");
@@ -78,6 +89,12 @@ pub async fn render_pdf<T: Serialize>(
         .await
         .with_context(|| format!("reading template {}", template_path.display()))?;
     tokio::fs::write(work.path().join("data.json"), serde_json::to_vec(data)?).await?;
+    for (name, bytes) in files {
+        if name.contains(['/', '\\']) || name.starts_with('.') {
+            bail!("invalid attachment name {name}");
+        }
+        tokio::fs::write(work.path().join(name), bytes).await?;
+    }
     let out = work.path().join("out.pdf");
 
     let child = tokio::process::Command::new(&config.typst_bin)

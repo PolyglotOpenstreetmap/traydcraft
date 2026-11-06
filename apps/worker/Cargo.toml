@@ -8,6 +8,8 @@ publish.workspace = true
 
 [dependencies]
 traydcraft-helpdesk.workspace = true
+traydcraft-fieldservice.workspace = true
+traydcraft-core.workspace = true
 anyhow.workspace = true
 sqlx.workspace = true
 tokio.workspace = true
