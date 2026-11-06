@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:printing/printing.dart';
 
 import '../../app/api.dart';
+import '../../shared/actions.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
 import '../../l10n/l10n.dart';
@@ -285,6 +286,25 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
   Future<void> _transition(Future<Quotation> Function(String id) call) =>
       _run(() async => _apply(await call(_id!)));
 
+  /// Turns this sent or accepted revision into a sales order and opens it.
+  Future<void> _convert() async {
+    final reference = await askText(
+      context,
+      title: context.l10n.convertToOrder,
+      label: context.l10n.customerReference,
+    );
+    if (reference == null) return;
+    await _run(() async {
+      final order = await _api.sales.convert(
+        id: _id!,
+        body: ConvertInput(
+          customerReference: reference.trim().isEmpty ? null : reference.trim(),
+        ),
+      );
+      if (mounted) context.pushReplacement('/orders/${order.order.id}');
+    });
+  }
+
   /// Shows what today's prices would change, then lets the user keep or update the prices.
   Future<void> _revise() async {
     final pricing = await showDialog<RevisionPricing>(
@@ -443,6 +463,12 @@ class _QuotationPageState extends ConsumerState<QuotationScreen> {
           child: Text(context.l10n.rejected),
         ),
       ],
+      if (s == QuotationStatus.sent || s == QuotationStatus.accepted)
+        FilledButton.icon(
+          onPressed: _busy ? null : _convert,
+          icon: const Icon(Icons.shopping_cart_checkout),
+          label: Text(context.l10n.convertToOrder),
+        ),
       if (s == QuotationStatus.sent || s == QuotationStatus.rejected)
         OutlinedButton.icon(
           onPressed: _busy ? null : _revise,
