@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../api/generated/export.dart';
 import '../l10n/l10n.dart';
+import 'portal_orders.dart';
 import 'portal_pages.dart';
 import 'portal_repairs.dart';
 import 'portal_state.dart';
@@ -46,6 +47,11 @@ final portalRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/repairs/:id',
             builder: (_, s) => PortalRepairPage(id: s.pathParameters['id']!),
+          ),
+          GoRoute(path: '/orders', builder: (_, _) => const PortalOrdersPage()),
+          GoRoute(
+            path: '/orders/:id',
+            builder: (_, s) => PortalOrderPage(id: s.pathParameters['id']!),
           ),
           GoRoute(
             path: '/profile',
@@ -114,6 +120,10 @@ class PortalShell extends ConsumerWidget {
           TextButton(
             onPressed: () => context.go('/'),
             child: Text(l.myTickets),
+          ),
+          TextButton(
+            onPressed: () => context.go('/orders'),
+            child: Text(l.myOrders),
           ),
           TextButton(
             onPressed: () => context.go('/repairs'),

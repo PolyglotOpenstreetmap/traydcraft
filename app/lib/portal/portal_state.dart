@@ -131,6 +131,15 @@ final portalRepairProvider = FutureProvider.autoDispose
       (ref, id) => ref.watch(portalApiProvider).getPortalRepair(id: id),
     );
 
+final portalOrdersProvider = FutureProvider.autoDispose<List<PortalOrder>>(
+  (ref) => ref.watch(portalApiProvider).listPortalOrders(),
+);
+
+final portalOrderProvider = FutureProvider.autoDispose
+    .family<PortalOrderDetail, String>(
+      (ref, id) => ref.watch(portalApiProvider).getPortalOrder(id: id),
+    );
+
 /// The language of the portal: the person's own, once known; before login the device's.
 class PortalLocaleNotifier extends Notifier<Locale?> {
   @override
