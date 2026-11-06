@@ -9,6 +9,7 @@ import '../../shared/actions.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
 import '../customers/customer_form.dart';
+import 'call_dialogs.dart';
 import 'tickets_page.dart';
 
 final usersProvider = FutureProvider<List<CompanyUser>>(
@@ -46,6 +47,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   String? _opportunityId;
   List<QuotationSummary> _quotations = [];
   List<Opportunity> _opportunities = [];
+  List<Contact> _contacts = [];
 
   // Composer.
   /// The composer mode the user chose; replying also needs the helpdesk.reply permission.
@@ -107,6 +109,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
       setState(() {
         _quotations = [];
         _opportunities = [];
+        _contacts = [];
       });
       return;
     }
@@ -116,10 +119,14 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     final opps = await _api.crm
         .listOpportunities(customerId: c, limit: 100)
         .then((p) => p.items, onError: (Object _) => <Opportunity>[]);
+    final people = await _api.crm
+        .listCustomerContacts(id: c)
+        .then((p) => p, onError: (Object _) => <Contact>[]);
     if (mounted) {
       setState(() {
         _quotations = quotes;
         _opportunities = opps;
+        _contacts = people;
       });
     }
   }
@@ -261,6 +268,32 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     );
   }
 
+  /// Links the ticket to a person of the customer: name, address and language follow.
+  void _selectContact(Contact? c) {
+    setState(() {
+      _contactId = c?.id;
+      if (c != null) {
+        _contactName.text = c.fullName;
+        _contactEmail.text = c.emails.isEmpty ? '' : c.emails.first.email;
+        _language = c.effectiveLanguage;
+      }
+    });
+  }
+
+  Future<void> _logCall() async {
+    final t = _d!.ticket;
+    Contact? who;
+    for (final c in _contacts) {
+      if (c.id == _contactId) who = c;
+    }
+    final d = await showCallDialog(context, ticketId: t.id, contact: who);
+    if (d != null && mounted) {
+      _apply(d);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(context.l10n.callLogged)));
+    }
+  }
+
   Future<void> _newCustomer() async {
     final t = _d!.ticket;
     final c = await showNewCustomerForm(
@@ -351,6 +384,12 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (canWrite && !t.internal)
+                TextButton.icon(
+                  onPressed: _logCall,
+                  icon: const Icon(Icons.phone_in_talk_outlined),
+                  label: Text(l.logCall),
+                ),
               Chip(label: Text(l.ticketStatus(t.status))),
               const SizedBox(width: 8),
               Chip(
@@ -662,6 +701,38 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
             ],
           ),
         ),
+        if (_customerId != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: DropdownButtonFormField<String?>(
+              isExpanded: true,
+              key: ValueKey('contact-${_contacts.length}-$_contactId'),
+              initialValue: _contacts.any((c) => c.id == _contactId)
+                  ? _contactId
+                  : null,
+              decoration: InputDecoration(labelText: l.contactPerson),
+              items: [
+                DropdownMenuItem<String?>(
+                  value: null,
+                  child: Text(l.noContactLinked),
+                ),
+                for (final c in _contacts)
+                  DropdownMenuItem<String?>(
+                    value: c.id,
+                    child: Text(
+                      [
+                        c.fullName,
+                        if (c.jobTitle.isNotEmpty) c.jobTitle,
+                        languageName(c.effectiveLanguage),
+                      ].join(' · '),
+                    ),
+                  ),
+              ],
+              onChanged: (id) => _selectContact(
+                id == null ? null : _contacts.firstWhere((c) => c.id == id),
+              ),
+            ),
+          ),
         Row(
           children: [
             Expanded(
@@ -820,6 +891,24 @@ class _ArticleCard extends StatelessWidget {
         '${a.authorName ?? a.fromName} → ${a.toAddresses.join(', ')}',
         Alignment.centerRight,
       ),
+      'call_in' || 'call_out' => (
+        a.kind == 'call_in'
+            ? theme.colorScheme.surfaceContainerHighest
+            : theme.colorScheme.primaryContainer,
+        a.kind == 'call_in' ? Icons.phone_callback : Icons.phone_forwarded,
+        [
+          a.kind == 'call_in' ? l.callIncoming : l.callOutgoing,
+          if (a.contactName != null) a.contactName!,
+          if (a.authorName != null) a.authorName!,
+        ].join(' · '),
+        a.kind == 'call_in' ? Alignment.centerLeft : Alignment.centerRight,
+      ),
+      'portal_in' => (
+        theme.colorScheme.surfaceContainerHighest,
+        Icons.language,
+        '${a.contactName ?? a.fromName} · ${l.viaPortal}',
+        Alignment.centerLeft,
+      ),
       _ => (
         Colors.amber.shade100,
         Icons.lock_outline,
@@ -877,6 +966,20 @@ class _ArticleCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(a.subject, style: theme.textTheme.titleSmall),
+                  ),
+                if (a.phoneNumber != null || a.durationSeconds != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      [
+                        if (a.phoneNumber != null) a.phoneNumber!,
+                        if (a.durationSeconds != null)
+                          l.minutesShort(
+                            (a.durationSeconds! / 60).ceil().toString(),
+                          ),
+                      ].join('  ·  '),
+                      style: theme.textTheme.bodySmall,
+                    ),
                   ),
                 const SizedBox(height: 6),
                 SelectableText(a.body),

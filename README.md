@@ -10,7 +10,8 @@ our own processes.
 > Status: **vertical slice**. Customers and opportunities, products with families and five price
 > zones, customer rebates (product / family / general), net and indicative prices, bulk price
 > changes, quotations with revisions and server-side pricing (incl. earlier price lists), sales
-> orders, a helpdesk (e-mail tickets, prepared answers in five languages, production questions), PDF output, multi-level bills of materials
+> orders, a helpdesk (e-mail tickets, phone calls, prepared answers in five languages, production questions),
+> contacts with their own language and form of address, a customer portal, PDF output, multi-level bills of materials
 > with revisions, serial numbers with as-built genealogy, generated Dart API client and a Flutter app.
 > See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the target architecture and roadmap.
 
@@ -20,11 +21,12 @@ our own processes.
 apps/api/            HTTP server: wires modules, OpenAPI, migrations, integration tests
 crates/core/         errors, auth (OIDC / dev), companies, numbering, audit trail
 crates/pricing/      pure pricing engine (no I/O): zone prices, discounts, rounding, VAT
-crates/crm/          customers, per-company commercial terms, opportunities
+crates/crm/          customers, contacts (people), per-company commercial terms, opportunities
 crates/products/     products, price zones, price history
 crates/sales/        quotations: drafts, snapshots, revisions, PDF data
 crates/engineering/  BOM revisions, explosion, serial units and genealogy
-crates/helpdesk/     tickets from e-mail, threading, prepared answers, outbox, IMAP
+crates/helpdesk/     tickets from e-mail and phone, threading, prepared answers, outbox, IMAP
+crates/portal/       customer portal: passwordless login for contacts, their tickets and profile
 apps/worker/         background worker: IMAP polling and sending the e-mail outbox
 crates/documents/    Typst PDF rendering, Belgian number formatting
 migrations/          SQLx migrations (one PostgreSQL schema per module)
@@ -72,6 +74,21 @@ flutter run -d windows     # or: -d chrome, -d <android device>
 ```
 
 Sign in with server `http://localhost:8080` and a development user e-mail.
+
+Customer portal (a separate web build; the demo data has portal users such as
+`jan.peeters@alpha.example`). The login link is e-mailed by the worker, so with
+`MAIL_TRANSPORT=files` open the newest `.eml` in `./outbox`. The company needs a `portal_url`
+(the demo company has one):
+
+```bash
+cd app
+flutter run -d chrome --web-port 8081 -t lib/portal/portal_main.dart \
+  --dart-define=PORTAL_API_URL=http://localhost:8080 \
+  --dart-define=PORTAL_COMPANY_ID=00000000-0000-7000-8000-000000000001
+```
+
+Staff manage the people at a customer under Customers → Contacts, look up a caller with
+"Who is calling?" in the helpdesk, and give a contact portal access in the contact form.
 
 ## Tests
 

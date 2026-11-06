@@ -43,6 +43,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get addNote => 'Notitie toevoegen';
 
   @override
+  String get addPhone => 'Telefoonnummer toevoegen';
+
+  @override
   String get addProduct => 'Product toevoegen';
 
   @override
@@ -52,6 +55,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String addedBy(String date, String name) {
     return 'toegevoegd $date door $name';
   }
+
+  @override
+  String get addressForm => 'Aanspreekvorm';
+
+  @override
+  String get addressFormal => 'Formeel (u)';
+
+  @override
+  String get addressInformal => 'Informeel (je)';
 
   @override
   String get agreed => 'Afgesproken';
@@ -117,6 +129,26 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get byStage => 'volgens fase';
+
+  @override
+  String get callIncoming => 'Inkomend gesprek';
+
+  @override
+  String get callLogged => 'Gesprek geregistreerd';
+
+  @override
+  String get callMinutes => 'Duur (minuten)';
+
+  @override
+  String get callOutgoing => 'Uitgaand gesprek';
+
+  @override
+  String get callSummary => 'Wat werd er besproken';
+
+  @override
+  String callWith(String name) {
+    return 'Gesprek met $name';
+  }
 
   @override
   String get canStillKeep => 'Je kunt de afgesproken prijzen nog behouden.';
@@ -212,6 +244,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get contactName => 'Naam contactpersoon';
 
   @override
+  String get contactPerson => 'Contactpersoon';
+
+  @override
+  String get contacts => 'Contactpersonen';
+
+  @override
   String get convertHelp =>
       'Wil de klant nog iets wijzigen? Maak eerst een nieuwe revisie van de offerte, koppel die hier en zet ze dan om.';
 
@@ -240,6 +278,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get customerLanguage => 'Taal klant';
+
+  @override
+  String customerMainNumber(String name) {
+    return 'Hoofdnummer van $name';
+  }
 
   @override
   String customerNamed(String name) {
@@ -289,7 +332,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get edit => 'Bewerken';
 
   @override
+  String get editContact => 'Contactpersoon bewerken';
+
+  @override
   String get email => 'E-mail';
+
+  @override
+  String get emailAddresses => 'E-mailadressen (het eerste is het hoofdadres)';
 
   @override
   String get enterChange => 'Geef de wijziging in, bv. 4,5 voor +4,5 %.';
@@ -331,7 +380,13 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get firstName => 'Voornaam';
+
+  @override
   String get from => 'Vanaf';
+
+  @override
+  String get fromYou => 'U';
 
   @override
   String generalRebateInfo(String percent) {
@@ -342,10 +397,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get generalRebatePercent => 'Algemene korting %';
 
   @override
+  String greetingPreview(String greeting) {
+    return 'Aanspreking: $greeting';
+  }
+
+  @override
   String get helpdesk => 'Helpdesk';
 
   @override
   String get inactive => 'inactief';
+
+  @override
+  String get inactiveContact => 'Niet meer actief (vertrokken)';
 
   @override
   String indicativeLine(String description) {
@@ -376,10 +439,21 @@ class AppLocalizationsNl extends AppLocalizations {
       'Een vraag tussen collega\'s; er wordt niets naar de klant gestuurd.';
 
   @override
+  String get jobTitle => 'Functie';
+
+  @override
   String get keepAgreedPrices => 'Afgesproken prijzen behouden';
 
   @override
   String get language => 'Taal';
+
+  @override
+  String languageSameAsCustomer(String language) {
+    return 'Zelfde als het bedrijf ($language)';
+  }
+
+  @override
+  String get lastName => 'Achternaam';
 
   @override
   String get leadCreated => 'Lead aangemaakt';
@@ -392,6 +466,20 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get loadMore => 'Meer laden';
+
+  @override
+  String get logCall => 'Gesprek registreren';
+
+  @override
+  String get loginLinkInvalid =>
+      'Deze aanmeldlink is verlopen of al gebruikt. Vraag een nieuwe aan.';
+
+  @override
+  String get loginLinkSent =>
+      'Als dit adres het portaal mag gebruiken, is er een aanmeldlink onderweg. Controleer uw inbox.';
+
+  @override
+  String get lookUp => 'Opzoeken';
 
   @override
   String get lost => 'Verloren';
@@ -412,6 +500,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get message => 'Bericht';
 
   @override
+  String get messageSent => 'Bericht verzonden';
+
+  @override
+  String minutesShort(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get myProfile => 'Mijn gegevens';
+
+  @override
   String get myTickets => 'Mijn tickets';
 
   @override
@@ -422,6 +521,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get newAnswer => 'Nieuw antwoord';
+
+  @override
+  String get newContact => 'Nieuwe contactpersoon';
 
   @override
   String get newCustomer => 'Nieuwe klant';
@@ -470,6 +572,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noBom => 'Nog geen stuklijst.';
 
   @override
+  String get noContactLinked => 'Geen contactpersoon gekoppeld';
+
+  @override
+  String get noContacts => 'Nog geen contactpersonen.';
+
+  @override
   String get noCustomerLinked => 'Geen klant gekoppeld';
 
   @override
@@ -489,6 +597,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get noSerialComponents => 'Geen componenten met serienummer.';
+
+  @override
+  String get noTicketsYet => 'U hebt nog geen tickets.';
+
+  @override
+  String get nobodyFound => 'Niemand gevonden met dit nummer.';
 
   @override
   String get none => 'Geen';
@@ -554,11 +668,57 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pdf => 'PDF';
 
   @override
+  String get personTitle => 'Aanspreektitel';
+
+  @override
   String get phone => 'Telefoon';
+
+  @override
+  String get phoneCall => 'Telefoongesprek';
+
+  @override
+  String get phoneDirect => 'Rechtstreeks';
+
+  @override
+  String get phoneHint => 'Met landcode, bv. +32 475 12 34 56';
+
+  @override
+  String get phoneMobile => 'Gsm';
+
+  @override
+  String get phoneNumber => 'Telefoonnummer';
+
+  @override
+  String get phoneNumbers => 'Telefoonnummers';
+
+  @override
+  String get phoneOther => 'Andere';
+
+  @override
+  String get phoneWork => 'Werk';
 
   @override
   String get placeholdersHelp =>
       'Plaatshouders (klik om in te voegen in de huidige taal):';
+
+  @override
+  String get portalAccess => 'Toegang tot het klantenportaal';
+
+  @override
+  String get portalScope => 'Ziet in het portaal';
+
+  @override
+  String get portalScopeCustomer => 'Alle tickets van het bedrijf';
+
+  @override
+  String get portalScopeOwn => 'Enkel eigen tickets';
+
+  @override
+  String get portalSignInIntro =>
+      'Geef uw e-mailadres op. U ontvangt een link om aan te melden, een wachtwoord is niet nodig.';
+
+  @override
+  String get portalTitle => 'Klantenportaal';
 
   @override
   String get postalCode => 'Postcode';
@@ -680,6 +840,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get products => 'Producten';
 
   @override
+  String get profileHelp =>
+      'Kies de taal en hoe wij u aanspreken in onze e-mails en in dit portaal.';
+
+  @override
   String get quantity => 'Aantal';
 
   @override
@@ -698,6 +862,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get quotations => 'Offertes';
+
+  @override
+  String raisedBy(String name) {
+    return 'Aangemaakt door $name';
+  }
 
   @override
   String get reason => 'Reden';
@@ -789,6 +958,30 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get roleInvoicing => 'Facturatie';
+
+  @override
+  String get roleManagement => 'Directie';
+
+  @override
+  String get roleOther => 'Andere';
+
+  @override
+  String get rolePurchasing => 'Aankoop';
+
+  @override
+  String get roleQuality => 'Kwaliteit';
+
+  @override
+  String get roleSalesContact => 'Commercieel contact';
+
+  @override
+  String get roleTechnical => 'Technicus';
+
+  @override
+  String get roles => 'Rollen';
+
+  @override
   String get roundTo => 'Afronden op';
 
   @override
@@ -819,6 +1012,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get send => 'Verzenden';
+
+  @override
+  String get sendLoginLink => 'Verstuur aanmeldlink';
 
   @override
   String get serial => 'serienummer';
@@ -852,10 +1048,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String get server => 'Server';
 
   @override
+  String get showInactive => 'Toon inactieve';
+
+  @override
   String get signIn => 'Aanmelden';
 
   @override
   String get signOut => 'Afmelden';
+
+  @override
+  String signedInAs(String name) {
+    return 'Aangemeld als $name';
+  }
+
+  @override
+  String get signingIn => 'Aanmelden…';
 
   @override
   String get singleProduct => 'Eén product';
@@ -933,7 +1140,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get text => 'Tekst';
 
   @override
+  String get ticketClosed => 'Gesloten';
+
+  @override
   String get ticketDetails => 'Ticketgegevens';
+
+  @override
+  String get ticketInProgress => 'In behandeling';
+
+  @override
+  String get ticketOpened => 'Ticket aangemaakt';
 
   @override
   String get ticketStatusClosed => 'afgesloten';
@@ -951,11 +1167,23 @@ class AppLocalizationsNl extends AppLocalizations {
   String get ticketStatusPendingInternal => 'wacht op collega';
 
   @override
+  String get ticketWaitingForYou => 'Wacht op uw antwoord';
+
+  @override
   String get title => 'Titel';
 
   @override
   String get titleCustomerValueRequired =>
       'Titel, klant en een geldige waarde zijn verplicht.';
+
+  @override
+  String get titleMr => 'Dhr.';
+
+  @override
+  String get titleMs => 'Mevr.';
+
+  @override
+  String get titleNone => 'Niet opgegeven';
 
   @override
   String get to => 'Aan';
@@ -1002,6 +1230,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get unitPriceExclVat => 'Eenheidsprijs (excl. btw)';
 
   @override
+  String get unknownCaller => 'Onbekende beller';
+
+  @override
   String get until => 'Tot';
 
   @override
@@ -1044,6 +1275,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get vatPercent => 'Btw %';
 
   @override
+  String get viaPortal => 'Via het klantenportaal';
+
+  @override
   String weighted(String amount) {
     return 'gewogen $amount';
   }
@@ -1052,12 +1286,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get whatWasAsked => 'Wat werd er gevraagd?';
 
   @override
+  String get whoIsCalling => 'Wie belt er?';
+
+  @override
   String get won => 'Gewonnen';
 
   @override
   String writeIn(String language) {
     return 'Schrijf in het $language';
   }
+
+  @override
+  String get yourMessage => 'Uw bericht';
 
   @override
   String get zone => 'Zone';

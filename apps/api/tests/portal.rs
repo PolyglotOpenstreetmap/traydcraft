@@ -99,7 +99,7 @@ async fn a_contact_logs_in_with_a_link_that_works_once(db: PgPool) {
     assert!(subject.contains("klantenportaal"), "{subject}");
     assert!(body.starts_with("Geachte heer Peeters,"), "{body}");
     assert!(
-        body.contains("https://portal.example.com/login#token=tcl_"),
+        body.contains("http://localhost:8081/login#token=tcl_"),
         "{body}"
     );
 

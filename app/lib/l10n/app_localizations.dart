@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'Add note'**
   String get addNote;
 
+  /// No description provided for @addPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Add phone number'**
+  String get addPhone;
+
   /// No description provided for @addProduct.
   ///
   /// In en, this message translates to:
@@ -181,6 +187,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'added {date} by {name}'**
   String addedBy(String date, String name);
+
+  /// No description provided for @addressForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Form of address'**
+  String get addressForm;
+
+  /// No description provided for @addressFormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Formal (Dear Mr. Smith)'**
+  String get addressFormal;
+
+  /// No description provided for @addressInformal.
+  ///
+  /// In en, this message translates to:
+  /// **'Informal (Hi Sam)'**
+  String get addressInformal;
 
   /// No description provided for @agreed.
   ///
@@ -301,6 +325,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'by stage'**
   String get byStage;
+
+  /// No description provided for @callIncoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming call'**
+  String get callIncoming;
+
+  /// No description provided for @callLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Call logged'**
+  String get callLogged;
+
+  /// No description provided for @callMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration (minutes)'**
+  String get callMinutes;
+
+  /// No description provided for @callOutgoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Outgoing call'**
+  String get callOutgoing;
+
+  /// No description provided for @callSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'What was discussed'**
+  String get callSummary;
+
+  /// No description provided for @callWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Call with {name}'**
+  String callWith(String name);
 
   /// No description provided for @canStillKeep.
   ///
@@ -476,6 +536,18 @@ abstract class AppLocalizations {
   /// **'Contact name'**
   String get contactName;
 
+  /// No description provided for @contactPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact person'**
+  String get contactPerson;
+
+  /// No description provided for @contacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts'**
+  String get contacts;
+
   /// No description provided for @convertHelp.
   ///
   /// In en, this message translates to:
@@ -529,6 +601,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Customer language'**
   String get customerLanguage;
+
+  /// No description provided for @customerMainNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Main number of {name}'**
+  String customerMainNumber(String name);
 
   /// No description provided for @customerNamed.
   ///
@@ -620,11 +698,23 @@ abstract class AppLocalizations {
   /// **'Edit'**
   String get edit;
 
+  /// No description provided for @editContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit contact'**
+  String get editContact;
+
   /// No description provided for @email.
   ///
   /// In en, this message translates to:
   /// **'E-mail'**
   String get email;
+
+  /// No description provided for @emailAddresses.
+  ///
+  /// In en, this message translates to:
+  /// **'E-mail addresses (the first is primary)'**
+  String get emailAddresses;
 
   /// No description provided for @enterChange.
   ///
@@ -692,11 +782,23 @@ abstract class AppLocalizations {
   /// **'Family {code}'**
   String familyNamed(String code);
 
+  /// No description provided for @firstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get firstName;
+
   /// No description provided for @from.
   ///
   /// In en, this message translates to:
   /// **'From'**
   String get from;
+
+  /// No description provided for @fromYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get fromYou;
 
   /// No description provided for @generalRebateInfo.
   ///
@@ -710,6 +812,12 @@ abstract class AppLocalizations {
   /// **'General rebate %'**
   String get generalRebatePercent;
 
+  /// No description provided for @greetingPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Greeting: {greeting}'**
+  String greetingPreview(String greeting);
+
   /// No description provided for @helpdesk.
   ///
   /// In en, this message translates to:
@@ -721,6 +829,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'inactive'**
   String get inactive;
+
+  /// No description provided for @inactiveContact.
+  ///
+  /// In en, this message translates to:
+  /// **'No longer active (left the company)'**
+  String get inactiveContact;
 
   /// No description provided for @indicativeLine.
   ///
@@ -764,6 +878,12 @@ abstract class AppLocalizations {
   /// **'A question between colleagues; nothing is sent to the customer.'**
   String get internalTicketHelp;
 
+  /// No description provided for @jobTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Job title'**
+  String get jobTitle;
+
   /// No description provided for @keepAgreedPrices.
   ///
   /// In en, this message translates to:
@@ -775,6 +895,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @languageSameAsCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Same as company ({language})'**
+  String languageSameAsCustomer(String language);
+
+  /// No description provided for @lastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get lastName;
 
   /// No description provided for @leadCreated.
   ///
@@ -799,6 +931,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load more'**
   String get loadMore;
+
+  /// No description provided for @logCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Log call'**
+  String get logCall;
+
+  /// No description provided for @loginLinkInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This login link has expired or was already used. Request a new one.'**
+  String get loginLinkInvalid;
+
+  /// No description provided for @loginLinkSent.
+  ///
+  /// In en, this message translates to:
+  /// **'If this address may use the portal, a login link is on its way. Check your inbox.'**
+  String get loginLinkSent;
+
+  /// No description provided for @lookUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up'**
+  String get lookUp;
 
   /// No description provided for @lost.
   ///
@@ -836,6 +992,24 @@ abstract class AppLocalizations {
   /// **'Message'**
   String get message;
 
+  /// No description provided for @messageSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Message sent'**
+  String get messageSent;
+
+  /// No description provided for @minutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String minutesShort(String minutes);
+
+  /// No description provided for @myProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'My details'**
+  String get myProfile;
+
   /// No description provided for @myTickets.
   ///
   /// In en, this message translates to:
@@ -859,6 +1033,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New answer'**
   String get newAnswer;
+
+  /// No description provided for @newContact.
+  ///
+  /// In en, this message translates to:
+  /// **'New contact'**
+  String get newContact;
 
   /// No description provided for @newCustomer.
   ///
@@ -944,6 +1124,18 @@ abstract class AppLocalizations {
   /// **'No bill of materials yet.'**
   String get noBom;
 
+  /// No description provided for @noContactLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'No contact person linked'**
+  String get noContactLinked;
+
+  /// No description provided for @noContacts.
+  ///
+  /// In en, this message translates to:
+  /// **'No contacts yet.'**
+  String get noContacts;
+
   /// No description provided for @noCustomerLinked.
   ///
   /// In en, this message translates to:
@@ -985,6 +1177,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No serialised components.'**
   String get noSerialComponents;
+
+  /// No description provided for @noTicketsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no tickets yet.'**
+  String get noTicketsYet;
+
+  /// No description provided for @nobodyFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody found with this number.'**
+  String get nobodyFound;
 
   /// No description provided for @none.
   ///
@@ -1112,17 +1316,107 @@ abstract class AppLocalizations {
   /// **'PDF'**
   String get pdf;
 
+  /// No description provided for @personTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get personTitle;
+
   /// No description provided for @phone.
   ///
   /// In en, this message translates to:
   /// **'Phone'**
   String get phone;
 
+  /// No description provided for @phoneCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone call'**
+  String get phoneCall;
+
+  /// No description provided for @phoneDirect.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct'**
+  String get phoneDirect;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'With country code, e.g. +32 475 12 34 56'**
+  String get phoneHint;
+
+  /// No description provided for @phoneMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile'**
+  String get phoneMobile;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get phoneNumber;
+
+  /// No description provided for @phoneNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone numbers'**
+  String get phoneNumbers;
+
+  /// No description provided for @phoneOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get phoneOther;
+
+  /// No description provided for @phoneWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Work'**
+  String get phoneWork;
+
   /// No description provided for @placeholdersHelp.
   ///
   /// In en, this message translates to:
   /// **'Placeholders (click to insert in the current language):'**
   String get placeholdersHelp;
+
+  /// No description provided for @portalAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer portal access'**
+  String get portalAccess;
+
+  /// No description provided for @portalScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Sees in the portal'**
+  String get portalScope;
+
+  /// No description provided for @portalScopeCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'All tickets of the company'**
+  String get portalScopeCustomer;
+
+  /// No description provided for @portalScopeOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Own tickets only'**
+  String get portalScopeOwn;
+
+  /// No description provided for @portalSignInIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your e-mail address. We will send you a link to sign in, no password needed.'**
+  String get portalSignInIntro;
+
+  /// No description provided for @portalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer portal'**
+  String get portalTitle;
 
   /// No description provided for @postalCode.
   ///
@@ -1340,6 +1634,12 @@ abstract class AppLocalizations {
   /// **'Products'**
   String get products;
 
+  /// No description provided for @profileHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the language and the way we address you in our e-mails and in this portal.'**
+  String get profileHelp;
+
   /// No description provided for @quantity.
   ///
   /// In en, this message translates to:
@@ -1375,6 +1675,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quotations'**
   String get quotations;
+
+  /// No description provided for @raisedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Raised by {name}'**
+  String raisedBy(String name);
 
   /// No description provided for @reason.
   ///
@@ -1526,6 +1832,54 @@ abstract class AppLocalizations {
   /// **'Agreed prices: price list of {agreed}. Current prices: price list of {current}.'**
   String revisionPriceLists(String agreed, String current);
 
+  /// No description provided for @roleInvoicing.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoicing'**
+  String get roleInvoicing;
+
+  /// No description provided for @roleManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Management'**
+  String get roleManagement;
+
+  /// No description provided for @roleOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get roleOther;
+
+  /// No description provided for @rolePurchasing.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchasing'**
+  String get rolePurchasing;
+
+  /// No description provided for @roleQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality'**
+  String get roleQuality;
+
+  /// No description provided for @roleSalesContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Sales contact'**
+  String get roleSalesContact;
+
+  /// No description provided for @roleTechnical.
+  ///
+  /// In en, this message translates to:
+  /// **'Technician'**
+  String get roleTechnical;
+
+  /// No description provided for @roles.
+  ///
+  /// In en, this message translates to:
+  /// **'Roles'**
+  String get roles;
+
   /// No description provided for @roundTo.
   ///
   /// In en, this message translates to:
@@ -1585,6 +1939,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send'**
   String get send;
+
+  /// No description provided for @sendLoginLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send login link'**
+  String get sendLoginLink;
 
   /// No description provided for @serial.
   ///
@@ -1646,6 +2006,12 @@ abstract class AppLocalizations {
   /// **'Server'**
   String get server;
 
+  /// No description provided for @showInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Show inactive'**
+  String get showInactive;
+
   /// No description provided for @signIn.
   ///
   /// In en, this message translates to:
@@ -1657,6 +2023,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign out'**
   String get signOut;
+
+  /// No description provided for @signedInAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {name}'**
+  String signedInAs(String name);
+
+  /// No description provided for @signingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get signingIn;
 
   /// No description provided for @singleProduct.
   ///
@@ -1796,11 +2174,29 @@ abstract class AppLocalizations {
   /// **'Text'**
   String get text;
 
+  /// No description provided for @ticketClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get ticketClosed;
+
   /// No description provided for @ticketDetails.
   ///
   /// In en, this message translates to:
   /// **'Ticket details'**
   String get ticketDetails;
+
+  /// No description provided for @ticketInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get ticketInProgress;
+
+  /// No description provided for @ticketOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket opened'**
+  String get ticketOpened;
 
   /// No description provided for @ticketStatusClosed.
   ///
@@ -1832,6 +2228,12 @@ abstract class AppLocalizations {
   /// **'waiting for colleague'**
   String get ticketStatusPendingInternal;
 
+  /// No description provided for @ticketWaitingForYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for your reply'**
+  String get ticketWaitingForYou;
+
   /// No description provided for @title.
   ///
   /// In en, this message translates to:
@@ -1843,6 +2245,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Title, customer and a valid value are required.'**
   String get titleCustomerValueRequired;
+
+  /// No description provided for @titleMr.
+  ///
+  /// In en, this message translates to:
+  /// **'Mr.'**
+  String get titleMr;
+
+  /// No description provided for @titleMs.
+  ///
+  /// In en, this message translates to:
+  /// **'Ms.'**
+  String get titleMs;
+
+  /// No description provided for @titleNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not specified'**
+  String get titleNone;
 
   /// No description provided for @to.
   ///
@@ -1928,6 +2348,12 @@ abstract class AppLocalizations {
   /// **'Unit price (excl. VAT)'**
   String get unitPriceExclVat;
 
+  /// No description provided for @unknownCaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown caller'**
+  String get unknownCaller;
+
   /// No description provided for @until.
   ///
   /// In en, this message translates to:
@@ -2000,6 +2426,12 @@ abstract class AppLocalizations {
   /// **'VAT %'**
   String get vatPercent;
 
+  /// No description provided for @viaPortal.
+  ///
+  /// In en, this message translates to:
+  /// **'Via the customer portal'**
+  String get viaPortal;
+
   /// No description provided for @weighted.
   ///
   /// In en, this message translates to:
@@ -2012,6 +2444,12 @@ abstract class AppLocalizations {
   /// **'What was asked?'**
   String get whatWasAsked;
 
+  /// No description provided for @whoIsCalling.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is calling?'**
+  String get whoIsCalling;
+
   /// No description provided for @won.
   ///
   /// In en, this message translates to:
@@ -2023,6 +2461,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Write in {language}'**
   String writeIn(String language);
+
+  /// No description provided for @yourMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your message'**
+  String get yourMessage;
 
   /// No description provided for @zone.
   ///

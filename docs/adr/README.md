@@ -18,3 +18,4 @@ accepted one; mark superseded records as such.
 | [0011](0011-bom-revisions-and-serial-genealogy.md) | BOM revisions and serial-number genealogy | Accepted |
 | [0012](0012-rebates-price-dates-and-price-changes.md) | Rebates, pricing types, price dates and price changes | Accepted |
 | [0013](0013-helpdesk-email-and-languages.md) | Helpdesk: e-mail tickets, prepared answers, orders, five languages | Accepted |
+| [0014](0014-contacts-calls-and-customer-portal.md) | Contacts with language and address form, phone calls, customer portal | Accepted |

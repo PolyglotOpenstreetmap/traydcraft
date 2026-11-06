@@ -7,6 +7,7 @@ import '../../l10n/l10n.dart';
 import '../../shared/entity_list.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
+import 'call_dialogs.dart';
 
 const ticketStatuses = [
   'new',
@@ -92,6 +93,19 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
         ],
       ),
       actions: [
+        if (perms.contains('helpdesk.write'))
+          FilledButton.tonalIcon(
+            icon: const Icon(Icons.phone_in_talk_outlined),
+            label: Text(l.whoIsCalling),
+            onPressed: () async {
+              final d = await showCallerLookup(context);
+              if (d != null && context.mounted) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(l.callLogged)));
+                context.push('/helpdesk/${d.ticket.id}');
+              }
+            },
+          ),
         OutlinedButton.icon(
           icon: const Icon(Icons.text_snippet_outlined),
           label: Text(l.preparedAnswers),
@@ -147,10 +161,38 @@ class _NewTicketDialogState extends ConsumerState<NewTicketDialog> {
   final _contactEmail = TextEditingController();
   final _body = TextEditingController();
   Customer? _customer;
+  List<Contact> _contacts = [];
+  Contact? _contact;
   String _category = 'question';
   String? _language;
   bool _internal = false;
   String? _error;
+
+  Future<void> _customerSelected(Customer c) async {
+    setState(() {
+      _customer = c;
+      _contact = null;
+      _contacts = [];
+      _language ??= c.language;
+      if (_contactEmail.text.isEmpty) _contactEmail.text = c.email ?? '';
+    });
+    final people = await ref
+        .read(apiProvider)
+        .crm
+        .listCustomerContacts(id: c.id)
+        .then((p) => p, onError: (Object _) => <Contact>[]);
+    if (mounted && _customer?.id == c.id) setState(() => _contacts = people);
+  }
+
+  /// A known person brings their name, address and the language to write in.
+  void _contactSelected(Contact? c) => setState(() {
+    _contact = c;
+    if (c != null) {
+      _contactName.text = c.fullName;
+      _contactEmail.text = c.emails.isEmpty ? '' : c.emails.first.email;
+      _language = c.effectiveLanguage;
+    }
+  });
 
   Future<void> _save() async {
     try {
@@ -162,6 +204,7 @@ class _NewTicketDialogState extends ConsumerState<NewTicketDialog> {
               subject: _subject.text.trim(),
               body: _body.text.trim(),
               customerId: _customer?.id,
+              contactId: _contact?.id,
               contactName: _contactName.text.trim(),
               contactEmail: _contactEmail.text.trim(),
               category: _category,
@@ -201,14 +244,33 @@ class _NewTicketDialogState extends ConsumerState<NewTicketDialog> {
                             .crm
                             .listCustomers(q: q, limit: 20))
                         .items,
-                onSelected: (c) => setState(() {
-                  _customer = c;
-                  _language ??= c.language;
-                  if (_contactEmail.text.isEmpty) {
-                    _contactEmail.text = c.email ?? '';
-                  }
-                }),
+                onSelected: _customerSelected,
               ),
+              if (_contacts.isNotEmpty) ...[
+                gap,
+                DropdownButtonFormField<String?>(
+                  isExpanded: true,
+                  key: ValueKey('contact-${_contact?.id}'),
+                  initialValue: _contact?.id,
+                  decoration: InputDecoration(labelText: l.contactPerson),
+                  items: [
+                    DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text(l.noContactLinked),
+                    ),
+                    for (final c in _contacts)
+                      DropdownMenuItem<String?>(
+                        value: c.id,
+                        child: Text(
+                          '${c.fullName} · ${languageName(c.effectiveLanguage)}',
+                        ),
+                      ),
+                  ],
+                  onChanged: (id) => _contactSelected(
+                    id == null ? null : _contacts.firstWhere((c) => c.id == id),
+                  ),
+                ),
+              ],
               gap,
               Row(
                 children: [

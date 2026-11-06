@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/api.dart';
 import '../../shared/format.dart';
+import '../contacts/contacts_dialog.dart';
 import 'rebates_dialog.dart';
 import '../../l10n/l10n.dart';
 
@@ -278,6 +279,12 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
         ),
       ),
       actions: [
+        if (c != null)
+          TextButton.icon(
+            icon: const Icon(Icons.people_outline),
+            label: Text(context.l10n.contacts),
+            onPressed: () => showContactsDialog(context, c!),
+          ),
         if (c != null)
           TextButton.icon(
             icon: const Icon(Icons.percent),

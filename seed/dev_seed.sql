@@ -377,7 +377,7 @@ UPDATE crm.customers SET language = 'de' WHERE code = 'C0003';
 -- may speak another one (Luc is a Dutch-speaking technician at a French-speaking customer,
 -- Hans prefers English at a German one). Sofie is addressed informally.
 -- ---------------------------------------------------------------------------------------------
-UPDATE core.companies SET portal_url = 'https://portal.example.com'
+UPDATE core.companies SET portal_url = 'http://localhost:8081'
 WHERE id = '00000000-0000-7000-8000-000000000001';
 
 INSERT INTO crm.contacts (id, customer_id, first_name, last_name, job_title, title, address_form, language, roles, portal_access, portal_scope) VALUES

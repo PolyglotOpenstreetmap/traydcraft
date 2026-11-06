@@ -18,7 +18,7 @@ system is proven (see [ADR 0008](adr/0008-accounting-stays-external.md)).
 Flutter app (Windows desktop for office, Android/iOS for technicians, web optional)
         │  HTTPS · REST/JSON · OpenAPI (generated Dart client)
 Rust API (Axum) — modular monolith
-  core · crm · products/pricing · sales · (inventory · production · service · helpdesk · finance)
+  core · crm · products/pricing · sales · helpdesk · portal · (inventory · production · service · finance)
         │  SQLx, one transaction per business operation
 PostgreSQL — one database, one schema per module
   + object storage (documents, photos)
@@ -43,7 +43,7 @@ PostgreSQL — one database, one schema per module
 | Module | Status | Owns (schema) |
 |---|---|---|
 | core | slice | companies, users, memberships/roles, numbering, audit |
-| crm | slice | customers, per-company terms (zone, general rebate, payment terms), product/family rebates, opportunities / pipeline |
+| crm | slice | customers, **contacts** (people with roles, language, form of address, e-mails and phones; lookup by e-mail and phone — [ADR 0014](adr/0014-contacts-calls-and-customer-portal.md)), per-company terms (zone, general rebate, payment terms), product/family rebates, opportunities / pipeline |
 | products / pricing | slice | products, families, pricing types (list/net/indicative), price zones, dated zone prices, bulk price changes ([ADR 0012](adr/0012-rebates-price-dates-and-price-changes.md)) |
 | sales | slice | quotations (snapshots, price date, revisions keeping or updating prices), linked to opportunities; sales orders from an accepted revision |
 | documents | slice | PDF rendering (Typst) |
@@ -54,7 +54,8 @@ PostgreSQL — one database, one schema per module
 | quality | planned | inspections, non-conformances, traceability |
 | service | planned | installed assets (builds on serial units), repairs, warranties |
 | field service | planned | planning board, mobile app with offline sync ([ADR 0006](adr/0006-offline-sync.md)) |
-| helpdesk | slice | e-mail-to-ticket (IMAP) with threading and matching, replies via outbox (SMTP), prepared answers in 5 languages, leads / orders / production questions from tickets ([ADR 0013](adr/0013-helpdesk-email-and-languages.md)); SLA and portal planned |
+| helpdesk | slice | e-mail-to-ticket (IMAP) with threading and matching, replies via outbox (SMTP), prepared answers in 5 languages, leads / orders / production questions from tickets ([ADR 0013](adr/0013-helpdesk-email-and-languages.md)), phone calls logged on tickets; SLA planned |
+| portal | slice | customer portal: passwordless login for contacts, their tickets and profile; Flutter web entry point ([ADR 0014](adr/0014-contacts-calls-and-customer-portal.md)) |
 | finance | planned | invoices, credit notes, Peppol via access point, Exact integration |
 
 ## Conventions
@@ -73,7 +74,7 @@ PostgreSQL — one database, one schema per module
 2. **Engineering & inventory** — BOM revisions and serial numbers (done); next: routings, configurator, warehouses, stock ledger, purchasing.
 3. **Manufacturing** — MRP for MTS and MTO, production orders, labour, quality.
 4. **Service** — installed assets, repairs, field service planning, mobile app with offline sync.
-5. **Helpdesk & portal** — tickets from e-mail, prepared answers and orders (done); next: SLA, attachments, customer portal.
+5. **Helpdesk & portal** — tickets from e-mail, prepared answers, orders, contacts, phone calls and a ticket portal (done); next: SLA, attachments, orders and quotations in the portal.
 6. **Finance** — invoicing, Peppol, payments, Exact integration.
 
 Each release runs alongside Salesforce/Exact, with one system clearly owning each kind of record

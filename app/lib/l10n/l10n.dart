@@ -109,4 +109,45 @@ extension CodeLabels on AppLocalizations {
     'obsolete' => bomObsolete,
     _ => s,
   };
+
+  String contactRole(String s) => switch (s) {
+    'sales_contact' => roleSalesContact,
+    'technical' => roleTechnical,
+    'purchasing' => rolePurchasing,
+    'invoicing' => roleInvoicing,
+    'management' => roleManagement,
+    'quality' => roleQuality,
+    _ => roleOther,
+  };
+
+  String personTitleLabel(String s) => switch (s) {
+    'mr' => titleMr,
+    'ms' => titleMs,
+    _ => titleNone,
+  };
+
+  String phoneLabel(String s) => switch (s) {
+    'work' => phoneWork,
+    'mobile' => phoneMobile,
+    'direct' => phoneDirect,
+    _ => phoneOther,
+  };
+
+  /// How the portal shows a ticket's state; internal states read as "in progress".
+  String portalTicketStatus(String s) => switch (s) {
+    'closed' => ticketClosed,
+    'pending_customer' => ticketWaitingForYou,
+    _ => ticketInProgress,
+  };
 }
+
+/// Roles a contact can have at a customer, as the API names them.
+const contactRoles = [
+  'sales_contact',
+  'technical',
+  'purchasing',
+  'invoicing',
+  'management',
+  'quality',
+  'other',
+];
