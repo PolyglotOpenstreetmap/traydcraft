@@ -332,6 +332,116 @@
         }
       }
     },
+    "/api/v1/csat/{token}": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "What the customer sees before rating. Reading changes nothing, so mail scanners that open\nlinks do not use up the token.",
+        "operationId": "get_csat",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsatInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Records the rating. The token works once and only until it expires.",
+        "operationId": "rate_csat",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CsatInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsatInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/customers": {
       "get": {
         "tags": [
@@ -1829,6 +1939,1244 @@
         }
       }
     },
+    "/api/v1/helpdesk/settings": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "get_settings",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpdeskSettings"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "put_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelpdeskSettings"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/sla-policies": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "get_policies",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SlaPolicy"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Replaces the windows for the given priorities. Open tickets get new due times.",
+        "operationId": "put_policies",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SlaPoliciesInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SlaPolicy"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/tags": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "All tags in use at this company, for filters and suggestions.",
+        "operationId": "list_tags",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagCount"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/teams": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "list_teams",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Team"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "create_team",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/teams/{id}": {
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "update_team",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/categories": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "list_kb_categories",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "create_kb_category",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/categories/{id}": {
+      "put": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "update_kb_category",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Deletes a category that has no entries and no sub-categories; otherwise deactivate it.",
+        "operationId": "delete_kb_category",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Lists or searches entries. With `q` the best match comes first and each entry has a snippet.",
+        "operationId": "list_kb_entries",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search words (several words must all occur; \"quoted phrases\" and -excluded words work).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "description": "Includes the sub-categories of this category.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language to search and show; entries without it show English, then another language.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "description": "internal | portal | public",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "draft | published | archived",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntrySummary"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "create_kb_entry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "get_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Edits an entry. Editing a published entry saves a new version when the texts changed, and\nchanging the visibility of a published entry needs the right to publish.",
+        "operationId": "update_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}/archive": {
+      "post": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Retires an entry: hidden from readers, kept for staff.",
+        "operationId": "archive_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}/images": {
+      "post": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Uploads an image for an entry: the request body is the file (JPEG, PNG or WebP, at most\n12 MB). Use it in the text as `![description](image:<id>)`.",
+        "operationId": "upload_kb_image",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "query",
+            "description": "The original file name.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "A client-chosen id: uploading the same id again returns the first upload.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}/images/{file_id}": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "get_kb_image",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "delete_kb_image",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}/publish": {
+      "post": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Makes a draft or archived entry visible to its audience; saves the first version.",
+        "operationId": "publish_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}/unpublish": {
+      "post": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Takes a published entry back to draft.",
+        "operationId": "unpublish_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}/versions": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "list_kb_versions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntryVersion"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/entries/{id}/versions/{version}/restore": {
+      "post": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Puts the texts of an earlier version back as a new version. History is never rewritten.",
+        "operationId": "restore_kb_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Entry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/kb/tags": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "All tags in use, for suggestions in filters and the editor.",
+        "operationId": "list_kb_tags",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -2866,6 +4214,399 @@
         }
       }
     },
+    "/api/v1/portal/kb/categories": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "list_portal_kb_categories",
+        "parameters": [
+          {
+            "name": "language",
+            "in": "query",
+            "description": "nl | fr | en | de | es (default: the company's language)",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReaderCategory"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/kb/entries": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Browse or search the help articles.",
+        "operationId": "list_portal_kb_entries",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search words.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "description": "Includes the sub-categories of this category.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "nl | fr | en | de | es (default: the company's language)",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReaderSummary"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/kb/entries/{id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "One article. Counts one view. Internal, draft and archived entries are \"not found\".",
+        "operationId": "get_portal_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "nl | fr | en | de | es (default: the company's language)",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReaderEntry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/kb/entries/{id}/images/{file_id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "get_portal_kb_image",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/kb/entries/{id}/vote": {
+      "put": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Says whether the article helped. One vote per contact and article; sending it again changes it.",
+        "operationId": "vote_portal_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KbVote"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/kb/suggestions": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Up to three articles that fit what the contact types, for the \"new ticket\" form.",
+        "operationId": "suggest_portal_kb_entries",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "What the customer typed so far, e.g. the subject of a new ticket.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReaderSummary"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/portal/login-links": {
       "post": {
         "tags": [
@@ -3663,6 +5404,164 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PortalTicketDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/tickets/{id}/attachments": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Uploads a file to a ticket: the request body is the file (JPEG, PNG, WebP or PDF, at most\n12 MB). Send its id in `attachment_ids` with the next message.",
+        "operationId": "upload_portal_ticket_attachment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "query",
+            "description": "The original file name.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "A client-chosen id: uploading the same id again returns the first upload (safe retries).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/tickets/{id}/attachments/{file_id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "A file of a message the customer can see, as a download.",
+        "operationId": "get_portal_ticket_attachment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -4673,6 +6572,302 @@
             }
           },
           "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/kb/{company_id}/categories": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Categories that have public entries.",
+        "operationId": "list_public_kb_categories",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "nl | fr | en | de | es (default: the company's language)",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReaderCategory"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/kb/{company_id}/entries": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Public entries, or the best matches for the search words.",
+        "operationId": "list_public_kb_entries",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search words.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "description": "Includes the sub-categories of this category.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "nl | fr | en | de | es (default: the company's language)",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReaderSummary"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/kb/{company_id}/entries/{id}": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "One public entry. Counts one view. Internal, portal-only, draft and archived entries are\n\"not found\".",
+        "operationId": "get_public_kb_entry",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "description": "nl | fr | en | de | es (default: the company's language)",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReaderEntry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/kb/{company_id}/entries/{id}/images/{file_id}": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "operationId": "get_public_kb_image",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
             "description": "",
             "content": {
               "application/json": {
@@ -6209,6 +8404,67 @@
             }
           },
           {
+            "name": "team_id",
+            "in": "query",
+            "description": "Tickets in this team.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "mine",
+            "in": "query",
+            "description": "Tickets that are mine: I own them, or nobody owns them and they are in one of my teams.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "unassigned",
+            "in": "query",
+            "description": "Tickets with neither an owner nor a team.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "sla",
+            "in": "query",
+            "description": "`breached` or `at_risk` (under 25 % of a window left).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "Tickets with this tag.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -6416,6 +8672,216 @@
         }
       }
     },
+    "/api/v1/tickets/{id}/assignment": {
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Assigns a ticket to a team and/or an owner.",
+        "operationId": "assign",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/attachments": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Uploads a file to the ticket: the request body is the file itself (JPEG, PNG, WebP or PDF,\nat most 12 MB). Attach it to a note or reply by passing its id in `attachment_ids`.",
+        "operationId": "upload_ticket_attachment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "filename",
+            "in": "query",
+            "description": "The original file name.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "description": "A client-chosen id: uploading the same id again returns the first upload (safe retries).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileInfo"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/attachments/{file_id}": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "The file itself, as a download.",
+        "operationId": "get_ticket_attachment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tickets/{id}/convert": {
       "post": {
         "tags": [
@@ -6478,6 +8944,115 @@
         }
       }
     },
+    "/api/v1/tickets/{id}/kb-entries/{entry_id}/render": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "An entry in the ticket's language as plain text and a link, to put in a reply. Nothing is sent.",
+        "operationId": "render_kb_entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenderedEntry"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/kb-suggestions": {
+      "get": {
+        "tags": [
+          "kb"
+        ],
+        "summary": "Published entries that fit a ticket: the words of the subject and the latest customer\nmessage, searched in the ticket's language. Internal entries are included; entries linked\nto the ticket's category rank higher.",
+        "operationId": "suggest_kb_entries",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "At most this many entries (default 5, at most 10).",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntrySummary"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tickets/{id}/lead": {
       "post": {
         "tags": [
@@ -6513,6 +9088,78 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/merge": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Merges this ticket into another ticket of the same customer. Articles (with their\nattachments), tags and time entries move to the target; this ticket is closed with a note\nand points at the target. A merge cannot be undone. Returns the target.",
+        "operationId": "merge",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergeInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
                 }
               }
             }
@@ -6720,6 +9367,277 @@
         }
       }
     },
+    "/api/v1/tickets/{id}/tags": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "add_tag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/tags/{tag}": {
+      "delete": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "remove_tag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tag",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/time-entries": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "list_time",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntries"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "add_time",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeEntryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntries"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/time-entries/{entry_id}": {
+      "delete": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Removes an entry: one's own, or any with the helpdesk admin permission.",
+        "operationId": "delete_time",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entry_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntries"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/users": {
       "get": {
         "tags": [
@@ -6798,9 +9716,17 @@
           "cc_addresses",
           "subject",
           "body",
-          "created_at"
+          "created_at",
+          "attachments"
         ],
         "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileInfo"
+            },
+            "description": "Files sent or received with the message."
+          },
           "author_name": {
             "type": [
               "string",
@@ -6903,6 +9829,26 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "AssignmentInput": {
+        "type": "object",
+        "description": "Where a ticket goes: both fields replace the current values (empty clears).",
+        "properties": {
+          "owner_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -7328,6 +10274,92 @@
         ],
         "properties": {
           "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "required": [
+          "id",
+          "sort_order",
+          "active",
+          "names",
+          "entry_count"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "entry_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Entries in this category (not counting its sub-categories)."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "names": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryName"
+            }
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Only one level of nesting: the parent has no parent itself."
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CategoryInput": {
+        "type": "object",
+        "required": [
+          "names"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "names": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryName"
+            },
+            "description": "At least one language; the others fall back to English."
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CategoryName": {
+        "type": "object",
+        "required": [
+          "language",
+          "name"
+        ],
+        "properties": {
+          "language": {
+            "type": "string"
+          },
+          "name": {
             "type": "string"
           }
         }
@@ -7766,6 +10798,56 @@
           }
         }
       },
+      "CsatInfo": {
+        "type": "object",
+        "required": [
+          "ticket_number",
+          "subject",
+          "company_name",
+          "language",
+          "state"
+        ],
+        "properties": {
+          "company_name": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the ticket, for the page the customer lands on."
+          },
+          "rating": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "description": "open (can be rated) | rated | expired"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "ticket_number": {
+            "type": "string"
+          }
+        }
+      },
+      "CsatInput": {
+        "type": "object",
+        "required": [
+          "rating"
+        ],
+        "properties": {
+          "comment": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "string",
+            "description": "good | bad"
+          }
+        }
+      },
       "Customer": {
         "type": "object",
         "required": [
@@ -8148,6 +11230,354 @@
           }
         }
       },
+      "Entry": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "slug",
+          "visibility",
+          "status",
+          "created_at",
+          "updated_at",
+          "view_count",
+          "helpful_yes",
+          "helpful_no",
+          "version",
+          "texts",
+          "tags",
+          "related",
+          "product_ids",
+          "ticket_categories",
+          "images"
+        ],
+        "properties": {
+          "author_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "author_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "category_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "helpful_no": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "helpful_yes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileInfo"
+            }
+          },
+          "number": {
+            "type": "string"
+          },
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "related": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelatedEntry"
+            }
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "draft | published | archived"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "texts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntryText"
+            }
+          },
+          "ticket_categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ticket categories this entry helps with (shown first in suggestions)."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of the latest saved version (0 when never published)."
+          },
+          "view_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "visibility": {
+            "type": "string",
+            "description": "internal | portal | public"
+          }
+        }
+      },
+      "EntryInput": {
+        "type": "object",
+        "required": [
+          "visibility",
+          "texts"
+        ],
+        "properties": {
+          "category_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "related_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "texts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntryText"
+            },
+            "description": "At least one language with a title; others fall back to English."
+          },
+          "ticket_categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "visibility": {
+            "type": "string",
+            "description": "internal | portal | public"
+          }
+        }
+      },
+      "EntrySummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "slug",
+          "visibility",
+          "status",
+          "language",
+          "fallback",
+          "title",
+          "snippet",
+          "tags",
+          "updated_at",
+          "view_count",
+          "helpful_yes",
+          "helpful_no"
+        ],
+        "properties": {
+          "category_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "fallback": {
+            "type": "boolean"
+          },
+          "helpful_no": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "helpful_yes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the title and snippet shown."
+          },
+          "number": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "float",
+            "description": "Relevance of a search match (higher is better)."
+          },
+          "slug": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string",
+            "description": "Plain text; matched words are wrapped in U+E000 / U+E001 when searching."
+          },
+          "status": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "view_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "visibility": {
+            "type": "string"
+          }
+        }
+      },
+      "EntryText": {
+        "type": "object",
+        "required": [
+          "language",
+          "title"
+        ],
+        "properties": {
+          "body": {
+            "type": "string",
+            "description": "Simple Markdown: headings, bold, italics, lists, links and images (`image:<file id>`)."
+          },
+          "language": {
+            "type": "string",
+            "description": "nl | fr | en | de | es"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "EntryVersion": {
+        "type": "object",
+        "required": [
+          "version",
+          "edited_at",
+          "texts"
+        ],
+        "properties": {
+          "edited_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "editor_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "editor_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "restored_from": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Set when this version was made by restoring an earlier one."
+          },
+          "texts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntryText"
+            }
+          },
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "ErrorBody": {
         "type": "object",
         "description": "Error body returned by every endpoint.",
@@ -8256,6 +11686,61 @@
           },
           "unit": {
             "type": "string"
+          }
+        }
+      },
+      "FileInfo": {
+        "type": "object",
+        "required": [
+          "id",
+          "filename",
+          "content_type",
+          "size_bytes",
+          "uploader_name",
+          "created_at"
+        ],
+        "properties": {
+          "content_type": {
+            "type": "string",
+            "description": "image/jpeg | image/png | image/webp | application/pdf"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "uploader_name": {
+            "type": "string"
+          }
+        }
+      },
+      "HelpdeskSettings": {
+        "type": "object",
+        "required": [
+          "csat_enabled"
+        ],
+        "properties": {
+          "csat_enabled": {
+            "type": "boolean",
+            "description": "Send a satisfaction survey when a ticket is closed."
+          },
+          "default_team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "New tickets from e-mail, the portal and the phone start in this team."
           }
         }
       },
@@ -8642,6 +12127,18 @@
           }
         }
       },
+      "KbVote": {
+        "type": "object",
+        "required": [
+          "helpful"
+        ],
+        "properties": {
+          "helpful": {
+            "type": "boolean",
+            "description": "true = helpful, false = not helpful"
+          }
+        }
+      },
       "LeadInput": {
         "type": "object",
         "properties": {
@@ -8761,6 +12258,21 @@
           }
         }
       },
+      "MemberInput": {
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "properties": {
+          "is_lead": {
+            "type": "boolean"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "Membership": {
         "type": "object",
         "required": [
@@ -8788,12 +12300,33 @@
           }
         }
       },
+      "MergeInput": {
+        "type": "object",
+        "required": [
+          "target_id"
+        ],
+        "properties": {
+          "target_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ticket that stays and receives everything."
+          }
+        }
+      },
       "MessageInput": {
         "type": "object",
         "required": [
           "body"
         ],
         "properties": {
+          "attachment_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Files uploaded to the ticket (`POST /portal/tickets/{id}/attachments`) to send along."
+          },
           "body": {
             "type": "string"
           }
@@ -8965,6 +12498,14 @@
           "body"
         ],
         "properties": {
+          "attachment_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Files uploaded to the ticket (`POST /tickets/{id}/attachments`) to attach to this note."
+          },
           "body": {
             "type": "string"
           },
@@ -9576,9 +13117,17 @@
           "direction",
           "author_name",
           "body",
-          "created_at"
+          "created_at",
+          "attachments"
         ],
         "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileInfo"
+            },
+            "description": "Files sent with the message. Files on internal notes are never shown."
+          },
           "author_name": {
             "type": "string"
           },
@@ -10957,6 +14506,223 @@
           }
         }
       },
+      "ReaderCategory": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "sort_order",
+          "entry_count"
+        ],
+        "properties": {
+          "entry_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Entries the reader can open in this category, sub-categories included."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "sort_order": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ReaderEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "slug",
+          "language",
+          "fallback",
+          "available_languages",
+          "title",
+          "summary",
+          "body",
+          "tags",
+          "related",
+          "images",
+          "updated_at"
+        ],
+        "properties": {
+          "available_languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "body": {
+            "type": "string",
+            "description": "Simple Markdown. Images are written as `image:<id>` and listed in `images`."
+          },
+          "category_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "fallback": {
+            "type": "boolean",
+            "description": "True when the text is not in the language asked for."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReaderImage"
+            }
+          },
+          "language": {
+            "type": "string",
+            "description": "The language of the text shown."
+          },
+          "my_vote": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "The vote of the logged-in contact (portal only): true = helpful."
+          },
+          "number": {
+            "type": "string"
+          },
+          "related": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReaderLink"
+            }
+          },
+          "slug": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReaderImage": {
+        "type": "object",
+        "required": [
+          "id",
+          "filename"
+        ],
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ReaderLink": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "title"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "ReaderSummary": {
+        "type": "object",
+        "description": "Public summary of a hit: nothing about counters or status.",
+        "required": [
+          "id",
+          "number",
+          "slug",
+          "language",
+          "fallback",
+          "title",
+          "snippet",
+          "tags",
+          "updated_at"
+        ],
+        "properties": {
+          "category_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "fallback": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "language": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string",
+            "description": "Plain text; matched words are wrapped in U+E000 / U+E001 when searching."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ReasonInput": {
         "type": "object",
         "properties": {
@@ -11013,6 +14779,30 @@
           }
         }
       },
+      "RelatedEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "status",
+          "title"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "RenderedAnswer": {
         "type": "object",
         "required": [
@@ -11039,6 +14829,48 @@
             "description": "Language of the text used."
           },
           "subject": {
+            "type": "string"
+          }
+        }
+      },
+      "RenderedEntry": {
+        "type": "object",
+        "required": [
+          "entry_id",
+          "language",
+          "fallback",
+          "title",
+          "summary",
+          "text"
+        ],
+        "properties": {
+          "entry_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fallback": {
+            "type": "boolean",
+            "description": "True when the ticket's language has no text and another was used."
+          },
+          "language": {
+            "type": "string",
+            "description": "Language of the text used."
+          },
+          "link": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Address of the entry in the customer portal; absent for internal entries or when the\ncompany has no portal address."
+          },
+          "summary": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "description": "The text without Markdown, ready for an e-mail."
+          },
+          "title": {
             "type": "string"
           }
         }
@@ -11356,6 +15188,14 @@
           "body"
         ],
         "properties": {
+          "attachment_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Files uploaded to the ticket (`POST /tickets/{id}/attachments`) to send with the e-mail."
+          },
           "body": {
             "type": "string"
           },
@@ -11798,6 +15638,24 @@
           }
         }
       },
+      "SettingsInput": {
+        "type": "object",
+        "required": [
+          "csat_enabled"
+        ],
+        "properties": {
+          "csat_enabled": {
+            "type": "boolean"
+          },
+          "default_team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
       "SitePhone": {
         "type": "object",
         "required": [
@@ -11810,6 +15668,42 @@
           },
           "number": {
             "type": "string"
+          }
+        }
+      },
+      "SlaPoliciesInput": {
+        "type": "object",
+        "required": [
+          "policies"
+        ],
+        "properties": {
+          "policies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SlaPolicy"
+            }
+          }
+        }
+      },
+      "SlaPolicy": {
+        "type": "object",
+        "required": [
+          "priority",
+          "first_response_minutes",
+          "resolution_minutes"
+        ],
+        "properties": {
+          "first_response_minutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "priority": {
+            "type": "string",
+            "description": "low | normal | high | urgent"
+          },
+          "resolution_minutes": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -11850,6 +15744,75 @@
           },
           "status": {
             "type": "string"
+          }
+        }
+      },
+      "TagCount": {
+        "type": "object",
+        "required": [
+          "tag",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tag": {
+            "type": "string"
+          }
+        }
+      },
+      "TagInput": {
+        "type": "object",
+        "required": [
+          "tag"
+        ],
+        "properties": {
+          "tag": {
+            "type": "string"
+          }
+        }
+      },
+      "TargetState": {
+        "type": "object",
+        "description": "What one target (first response or resolution) looks like at `now`.",
+        "required": [
+          "breached",
+          "at_risk"
+        ],
+        "properties": {
+          "at_risk": {
+            "type": "boolean",
+            "description": "Not breached, not met yet and less than 25 % of the window is left."
+          },
+          "breached": {
+            "type": "boolean",
+            "description": "The due time passed before it was met (or, if still open, it has passed)."
+          },
+          "due_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When it is due; empty when the ticket has no service level (internal tickets)."
+          },
+          "met_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When it was met (first response sent, ticket closed)."
+          },
+          "minutes_remaining": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Whole minutes left (negative when overdue). Empty once the target is met."
           }
         }
       },
@@ -11902,6 +15865,79 @@
           }
         }
       },
+      "Team": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "active",
+          "members",
+          "created_at"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamMember"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "TeamInput": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            },
+            "description": "The complete member list: members not listed are removed."
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "TeamMember": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "display_name",
+          "is_lead"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "is_lead": {
+            "type": "boolean"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "Technician": {
         "type": "object",
         "required": [
@@ -11933,7 +15969,10 @@
           "internal",
           "article_count",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "tags",
+          "time_minutes",
+          "sla"
         ],
         "properties": {
           "article_count": {
@@ -11969,6 +16008,26 @@
             "type": "string",
             "format": "date-time"
           },
+          "csat_comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "csat_rated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "csat_rating": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The customer's latest satisfaction rating: good | bad."
+          },
           "customer_id": {
             "type": [
               "string",
@@ -11999,6 +16058,20 @@
           "language": {
             "type": "string",
             "description": "nl | fr | en | de | es — the language to answer in."
+          },
+          "merged_into_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Set when this ticket was merged into another one (it is closed)."
+          },
+          "merged_into_number": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "number": {
             "type": "string"
@@ -12072,6 +16145,10 @@
               "null"
             ]
           },
+          "sla": {
+            "$ref": "#/components/schemas/TicketSla",
+            "description": "Due times, breach flags and minutes remaining."
+          },
           "status": {
             "type": "string",
             "description": "new | open | pending_customer | pending_internal | closed"
@@ -12085,6 +16162,31 @@
               "null"
             ],
             "description": "What the system guessed from the last incoming e-mail."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The queue the ticket waits in (the owner is the person working on it)."
+          },
+          "team_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time_minutes": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total logged time in minutes."
           },
           "updated_at": {
             "type": "string",
@@ -12195,6 +16297,122 @@
           "total": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "TicketSla": {
+        "type": "object",
+        "description": "The SLA of a ticket as the API shows it.",
+        "required": [
+          "state",
+          "paused",
+          "first_response",
+          "resolution",
+          "first_response_breached",
+          "resolution_breached"
+        ],
+        "properties": {
+          "first_response": {
+            "$ref": "#/components/schemas/TargetState"
+          },
+          "first_response_breached": {
+            "type": "boolean"
+          },
+          "paused": {
+            "type": "boolean",
+            "description": "The clock is stopped: the ticket waits for the customer."
+          },
+          "resolution": {
+            "$ref": "#/components/schemas/TargetState"
+          },
+          "resolution_breached": {
+            "type": "boolean"
+          },
+          "state": {
+            "type": "string",
+            "description": "none (no service level) | on_time | at_risk | breached"
+          }
+        }
+      },
+      "TimeEntries": {
+        "type": "object",
+        "required": [
+          "items",
+          "total_minutes",
+          "billable_minutes"
+        ],
+        "properties": {
+          "billable_minutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeEntry"
+            }
+          },
+          "total_minutes": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "TimeEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "user_name",
+          "minutes",
+          "note",
+          "billable",
+          "created_at"
+        ],
+        "properties": {
+          "billable": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "minutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "note": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_name": {
+            "type": "string"
+          }
+        }
+      },
+      "TimeEntryInput": {
+        "type": "object",
+        "required": [
+          "minutes"
+        ],
+        "properties": {
+          "billable": {
+            "type": "boolean"
+          },
+          "minutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "1 to 1440."
+          },
+          "note": {
+            "type": "string"
           }
         }
       },
@@ -12385,6 +16603,10 @@
     {
       "name": "helpdesk",
       "description": "Tickets, e-mail and prepared answers"
+    },
+    {
+      "name": "kb",
+      "description": "Knowledge base: entries in five languages, search, versions, public reading"
     },
     {
       "name": "repairs",

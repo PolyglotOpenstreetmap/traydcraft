@@ -1,4 +1,4 @@
-//! Photo storage. Files are checked by their signature (not their name or declared type), size
+//! Photo and document storage. Files are checked by their signature (not their name or declared type), size
 //! limited, and kept in PostgreSQL next to a metadata row. Modules link files to their own records
 //! and decide who may see them; this module only stores and loads.
 
@@ -14,7 +14,7 @@ pub const MAX_FILE_BYTES: usize = 12 * 1024 * 1024;
 pub struct FileInfo {
     pub id: Uuid,
     pub filename: String,
-    /// image/jpeg | image/png | image/webp
+    /// image/jpeg | image/png | image/webp | application/pdf
     pub content_type: String,
     pub size_bytes: i32,
     pub uploader_name: String,
@@ -34,6 +34,11 @@ pub fn sniff_image(bytes: &[u8]) -> Option<&'static str> {
     }
 }
 
+/// The content type of a ticket attachment: an image (see [`sniff_image`]) or a PDF document.
+pub fn sniff_document(bytes: &[u8]) -> Option<&'static str> {
+    sniff_image(bytes).or_else(|| bytes.starts_with(b"%PDF-").then_some("application/pdf"))
+}
+
 /// A file name that is safe to show and to put in a header: no path, no control characters.
 pub fn clean_filename(name: &str, content_type: &str) -> String {
     let base = name.rsplit(['/', '\\']).next().unwrap_or("");
@@ -47,6 +52,7 @@ pub fn clean_filename(name: &str, content_type: &str) -> String {
         let ext = match content_type {
             "image/png" => "png",
             "image/webp" => "webp",
+            "application/pdf" => return "document.pdf".to_string(),
             _ => "jpg",
         };
         format!("photo.{ext}")
@@ -67,6 +73,57 @@ pub async fn store_image(
     uploaded_by: Option<Uuid>,
     uploader_name: &str,
 ) -> AppResult<FileInfo> {
+    store(
+        conn,
+        company_id,
+        id,
+        filename,
+        bytes,
+        uploaded_by,
+        uploader_name,
+        sniff_image,
+        "only JPEG, PNG and WebP images are accepted",
+    )
+    .await
+}
+
+/// Stores a ticket attachment: a JPEG, PNG or WebP image or a PDF document. Same rules as
+/// [`store_image`].
+pub async fn store_document(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    id: Option<Uuid>,
+    filename: &str,
+    bytes: &[u8],
+    uploaded_by: Option<Uuid>,
+    uploader_name: &str,
+) -> AppResult<FileInfo> {
+    store(
+        conn,
+        company_id,
+        id,
+        filename,
+        bytes,
+        uploaded_by,
+        uploader_name,
+        sniff_document,
+        "only JPEG, PNG and WebP images and PDF documents are accepted",
+    )
+    .await
+}
+
+#[allow(clippy::too_many_arguments)]
+async fn store(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    id: Option<Uuid>,
+    filename: &str,
+    bytes: &[u8],
+    uploaded_by: Option<Uuid>,
+    uploader_name: &str,
+    sniff: fn(&[u8]) -> Option<&'static str>,
+    refusal: &str,
+) -> AppResult<FileInfo> {
     if bytes.is_empty() {
         return Err(AppError::Validation("the file is empty".into()));
     }
@@ -76,9 +133,7 @@ pub async fn store_image(
             MAX_FILE_BYTES / 1024 / 1024
         )));
     }
-    let content_type = sniff_image(bytes).ok_or_else(|| {
-        AppError::Validation("only JPEG, PNG and WebP images are accepted".into())
-    })?;
+    let content_type = sniff(bytes).ok_or_else(|| AppError::Validation(refusal.into()))?;
     let id = id.unwrap_or_else(new_id);
     if let Some(existing) = get_info(conn, company_id, id).await? {
         return Ok(existing);
@@ -158,6 +213,49 @@ pub fn image_response(content_type: &str, data: Vec<u8>) -> axum::response::Resp
         .into_response()
 }
 
+/// A download of a stored file: always an attachment (never rendered by the browser), with a
+/// cleaned file name and no content sniffing.
+pub fn attachment_response(
+    content_type: &str,
+    filename: &str,
+    data: Vec<u8>,
+) -> axum::response::Response {
+    use axum::response::IntoResponse;
+    let ascii: String = filename
+        .chars()
+        .map(|c| if c.is_ascii() { c } else { '_' })
+        .collect();
+    let encoded: String = filename
+        .bytes()
+        .map(|b| {
+            if b.is_ascii_alphanumeric() || b"-_.".contains(&b) {
+                (b as char).to_string()
+            } else {
+                format!("%{b:02X}")
+            }
+        })
+        .collect();
+    (
+        [
+            (axum::http::header::CONTENT_TYPE, content_type.to_string()),
+            (
+                axum::http::header::CONTENT_DISPOSITION,
+                format!("attachment; filename=\"{ascii}\"; filename*=UTF-8''{encoded}"),
+            ),
+            (
+                axum::http::header::CACHE_CONTROL,
+                "private, max-age=86400".to_string(),
+            ),
+            (
+                axum::http::header::X_CONTENT_TYPE_OPTIONS,
+                "nosniff".to_string(),
+            ),
+        ],
+        data,
+    )
+        .into_response()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -182,6 +280,19 @@ mod tests {
         );
         assert_eq!(sniff_image(b"RIFF\0\0\0\0WAVEfmt "), None);
         assert_eq!(sniff_image(b""), None);
+    }
+
+    #[test]
+    fn documents_are_images_or_pdf_only() {
+        assert_eq!(sniff_document(b"%PDF-1.7\n"), Some("application/pdf"));
+        assert_eq!(
+            sniff_document(&[0xFF, 0xD8, 0xFF, 0xE0]),
+            Some("image/jpeg")
+        );
+        assert_eq!(sniff_document(b"MZ\x90\x00"), None);
+        assert_eq!(sniff_document(b"plain text"), None);
+        assert_eq!(sniff_document(b"<svg/>"), None);
+        assert_eq!(clean_filename("", "application/pdf"), "document.pdf");
     }
 
     #[test]

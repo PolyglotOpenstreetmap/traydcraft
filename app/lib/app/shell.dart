@@ -31,6 +31,7 @@ final _allDestinations = [
   ),
   _Dest('/orders', (l) => l.orders, Icons.inventory_outlined, 'orders.read'),
   _Dest('/helpdesk', (l) => l.helpdesk, Icons.support_agent, 'helpdesk.read'),
+  _Dest('/kb', (l) => l.kbTitle, Icons.menu_book_outlined, 'kb.read'),
   _Dest(
     '/repairs',
     (l) => l.repairs,

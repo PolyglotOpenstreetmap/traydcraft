@@ -4,40 +4,52 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'ticket_sla.dart';
+
 part 'ticket.g.dart';
 
 @JsonSerializable()
 class Ticket {
   const Ticket({
-    required this.articleCount,
+    required this.id,
     required this.category,
+    required this.timeMinutes,
     required this.contactEmail,
+    required this.tags,
     required this.contactName,
     required this.createdAt,
-    required this.id,
-    required this.internal,
-    required this.language,
-    required this.number,
-    required this.priority,
     required this.status,
-    required this.subject,
+    required this.sla,
     required this.updatedAt,
-    this.closedAt,
-    this.contactId,
-    this.customerId,
+    required this.priority,
+    required this.number,
+    required this.language,
+    required this.articleCount,
+    required this.internal,
+    required this.subject,
+    this.mergedIntoId,
+    this.mergedIntoNumber,
     this.customerName,
-    this.firstResponseAt,
-    this.opportunityId,
+    this.customerId,
     this.opportunityNumber,
     this.orderId,
     this.orderNumber,
     this.ownerName,
     this.ownerUserId,
+    this.csatRating,
     this.quotationId,
     this.quotationNumber,
     this.quotationRevision,
     this.quotationStatus,
+    this.csatRatedAt,
+    this.csatComment,
+    this.opportunityId,
     this.suggestedCategory,
+    this.contactId,
+    this.teamId,
+    this.teamName,
+    this.closedAt,
+    this.firstResponseAt,
   });
   
   factory Ticket.fromJson(Map<String, Object?> json) => _$TicketFromJson(json);
@@ -59,6 +71,14 @@ class Ticket {
   final String contactName;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
+  @JsonKey(includeIfNull: false,name: 'csat_comment')
+  final String? csatComment;
+  @JsonKey(includeIfNull: false,name: 'csat_rated_at')
+  final DateTime? csatRatedAt;
+
+  /// The customer's latest satisfaction rating: good | bad.
+  @JsonKey(includeIfNull: false,name: 'csat_rating')
+  final String? csatRating;
   @JsonKey(includeIfNull: false,name: 'customer_id')
   final String? customerId;
   @JsonKey(includeIfNull: false,name: 'customer_name')
@@ -70,6 +90,12 @@ class Ticket {
 
   /// nl | fr | en | de | es — the language to answer in.
   final String language;
+
+  /// Set when this ticket was merged into another one (it is closed).
+  @JsonKey(includeIfNull: false,name: 'merged_into_id')
+  final String? mergedIntoId;
+  @JsonKey(includeIfNull: false,name: 'merged_into_number')
+  final String? mergedIntoNumber;
   final String number;
   @JsonKey(includeIfNull: false,name: 'opportunity_id')
   final String? opportunityId;
@@ -95,6 +121,9 @@ class Ticket {
   @JsonKey(includeIfNull: false,name: 'quotation_status')
   final String? quotationStatus;
 
+  /// Due times, breach flags and minutes remaining.
+  final TicketSla sla;
+
   /// new | open | pending_customer | pending_internal | closed
   final String status;
   final String subject;
@@ -102,6 +131,17 @@ class Ticket {
   /// What the system guessed from the last incoming e-mail.
   @JsonKey(includeIfNull: false,name: 'suggested_category')
   final String? suggestedCategory;
+  final List<String> tags;
+
+  /// The queue the ticket waits in (the owner is the person working on it).
+  @JsonKey(includeIfNull: false,name: 'team_id')
+  final String? teamId;
+  @JsonKey(includeIfNull: false,name: 'team_name')
+  final String? teamName;
+
+  /// Total logged time in minutes.
+  @JsonKey(name: 'time_minutes')
+  final int timeMinutes;
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
 

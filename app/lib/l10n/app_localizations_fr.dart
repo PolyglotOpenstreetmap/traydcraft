@@ -40,6 +40,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ajouter un composant par numéro de série (en stock)';
 
   @override
+  String get addMember => 'Ajouter un membre';
+
+  @override
   String get addNote => 'Ajouter la note';
 
   @override
@@ -56,6 +59,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get addRebate => 'Ajouter une remise';
+
+  @override
+  String get addTag => 'Ajouter une étiquette';
 
   @override
   String get addTask => 'Ajouter une tâche';
@@ -85,6 +91,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get allStatuses => 'Tous les statuts';
+
+  @override
+  String get allTags => 'Toutes les étiquettes';
+
+  @override
+  String get allTeams => 'Toutes les équipes';
 
   @override
   String get always => 'toujours';
@@ -118,6 +130,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get assignTo => 'Assigner à';
 
   @override
+  String get attachFile => 'Joindre un fichier';
+
+  @override
+  String get attachments => 'Pièces jointes';
+
+  @override
+  String get attachmentsHelp =>
+      'Images (JPEG, PNG, WebP) et PDF, jusqu\'à 12 Mo';
+
+  @override
   String get automatic => 'Automatique';
 
   @override
@@ -128,6 +150,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get billOfMaterials => 'Nomenclature';
+
+  @override
+  String get billable => 'Facturable';
 
   @override
   String get bomActive => 'active';
@@ -367,6 +392,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String get createRepair => 'Créer une réparation';
 
   @override
+  String get csatAlready => 'Cette enquête a déjà reçu une réponse.';
+
+  @override
+  String get csatBad => 'Pas satisfait';
+
+  @override
+  String get csatComment => 'Commentaire (facultatif)';
+
+  @override
+  String get csatEnabled =>
+      'Envoyer une enquête de satisfaction à la clôture d\'un ticket';
+
+  @override
+  String get csatExpired => 'Ce lien a expiré.';
+
+  @override
+  String get csatGood => 'Satisfait';
+
+  @override
+  String get csatNone => 'Pas encore d\'évaluation';
+
+  @override
+  String csatQuestion(String number) {
+    return 'Êtes-vous satisfait du traitement du ticket $number ?';
+  }
+
+  @override
+  String get csatThanks => 'Merci pour votre avis !';
+
+  @override
+  String get csatTitle => 'Satisfaction client';
+
+  @override
   String get current => 'Actuel';
 
   @override
@@ -396,6 +454,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get date => 'Date';
+
+  @override
+  String get defaultTeam => 'Équipe par défaut pour les nouveaux tickets';
 
   @override
   String get deliveryFailed => 'non envoyé';
@@ -511,6 +572,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get firstName => 'Prénom';
 
   @override
+  String get firstResponseMinutes => 'Première réponse (min)';
+
+  @override
   String get from => 'À partir du';
 
   @override
@@ -531,6 +595,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get helpdesk => 'Service client';
+
+  @override
+  String get helpdeskSettings => 'Paramètres du helpdesk';
 
   @override
   String get history => 'Historique';
@@ -638,6 +705,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get logCall => 'Enregistrer un appel';
 
   @override
+  String get logTime => 'Enregistrer du temps';
+
+  @override
   String get logWork => 'Enregistrer le travail';
 
   @override
@@ -682,10 +752,31 @@ class AppLocalizationsFr extends AppLocalizations {
   String get materialRequirements => 'Besoins en matières (révision active)';
 
   @override
+  String get mergeAction => 'Fusionner';
+
+  @override
+  String get mergeHelp =>
+      'Tous les messages, fichiers, étiquettes et temps enregistrés passent au ticket choisi du même client. Ce ticket est fermé. Cette action est irréversible.';
+
+  @override
+  String get mergeNoCandidates => 'Aucun autre ticket ouvert de ce client.';
+
+  @override
+  String get mergeTicket => 'Fusionner avec un autre ticket…';
+
+  @override
+  String mergedInto(String number) {
+    return 'Fusionné avec $number';
+  }
+
+  @override
   String get message => 'Message';
 
   @override
   String get messageSent => 'Message envoyé';
+
+  @override
+  String get minutes => 'Minutes';
 
   @override
   String minutesShort(String minutes) {
@@ -772,6 +863,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get newTeam => 'Nouvelle équipe';
+
+  @override
   String get newTicket => 'Nouveau ticket';
 
   @override
@@ -806,6 +900,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noOrdersYet => 'Vous n\'avez pas encore de commandes.';
 
   @override
+  String get noPermission =>
+      'Vous n\'avez pas le droit de modifier ces paramètres.';
+
+  @override
   String get noPhotos => 'Pas encore de photos.';
 
   @override
@@ -833,10 +931,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noSerialComponents => 'Aucun composant sérialisé.';
 
   @override
+  String get noTeam => 'Aucune équipe';
+
+  @override
   String get noTechnicians => 'Personne d\'assigné';
 
   @override
   String get noTicketsYet => 'Vous n\'avez pas encore de tickets.';
+
+  @override
+  String get noTimeEntries => 'Aucun temps enregistré.';
 
   @override
   String get nobodyFound => 'Personne trouvé avec ce numéro.';
@@ -1367,6 +1471,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get required => 'Obligatoire';
 
   @override
+  String get resolutionMinutes => 'Résolution (min)';
+
+  @override
   String get retry => 'Réessayer';
 
   @override
@@ -1542,6 +1649,58 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get sla => 'SLA';
+
+  @override
+  String get slaAtRisk => 'À risque';
+
+  @override
+  String get slaBreached => 'Dépassé';
+
+  @override
+  String slaDue(String date) {
+    return 'Échéance $date';
+  }
+
+  @override
+  String get slaFilterAny => 'Tout état SLA';
+
+  @override
+  String get slaFirstResponse => 'Première réponse';
+
+  @override
+  String slaLeft(String time) {
+    return 'encore $time';
+  }
+
+  @override
+  String get slaMet => 'Respecté';
+
+  @override
+  String get slaNone => 'Pas de SLA';
+
+  @override
+  String get slaOnTime => 'Dans les temps';
+
+  @override
+  String slaOverdue(String time) {
+    return '$time de retard';
+  }
+
+  @override
+  String get slaPaused => 'Chrono arrêté : en attente du client';
+
+  @override
+  String get slaPolicies => 'Niveaux de service (SLA)';
+
+  @override
+  String get slaPoliciesHelp =>
+      'Temps écoulé réel, les heures ouvrables ne sont pas prises en compte. Le chrono s\'arrête tant qu\'un ticket attend le client.';
+
+  @override
+  String get slaResolution => 'Résolution';
+
+  @override
   String get stage => 'Étape';
 
   @override
@@ -1615,6 +1774,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get tags => 'Étiquettes';
+
+  @override
   String get takePhoto => 'Prendre une photo';
 
   @override
@@ -1624,6 +1786,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String tasksProgress(String done, String total) {
     return '$done sur $total terminées';
   }
+
+  @override
+  String get team => 'Équipe';
+
+  @override
+  String get teamLead => 'Responsable';
+
+  @override
+  String get teamMembers => 'Membres';
+
+  @override
+  String get teamName => 'Nom de l\'équipe';
+
+  @override
+  String get teams => 'Équipes';
 
   @override
   String get technicians => 'Techniciens';
@@ -1639,6 +1816,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get ticketInProgress => 'En cours de traitement';
+
+  @override
+  String get ticketMerged => 'Tickets fusionnés';
 
   @override
   String get ticketOpened => 'Ticket créé';
@@ -1662,9 +1842,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get ticketWaitingForYou => 'En attente de votre réponse';
 
   @override
+  String get timeNote => 'Note';
+
+  @override
+  String timeTotal(String total, String billable) {
+    return 'Total $total, facturable $billable';
+  }
+
+  @override
   String timeTotals(String work, String travel) {
     return 'Travail $work · Déplacement $travel';
   }
+
+  @override
+  String get timeTracking => 'Suivi du temps';
 
   @override
   String get title => 'Titre';
@@ -1737,6 +1928,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get updated => 'Mis à jour';
+
+  @override
+  String get uploadingFile => 'Envoi…';
 
   @override
   String get uploadingPhotos => 'Envoi…';
@@ -1839,4 +2033,200 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get zonesNoneAll => 'Zones (aucune sélection = toutes)';
+
+  @override
+  String get kbTitle => 'Base de connaissances';
+
+  @override
+  String get kbNewArticle => 'Nouvel article';
+
+  @override
+  String get kbSearchHint => 'Rechercher des articles';
+
+  @override
+  String get kbAllCategories => 'Toutes les catégories';
+
+  @override
+  String get kbAllStatuses => 'Tous les statuts';
+
+  @override
+  String get kbAllAudiences => 'Tous les publics';
+
+  @override
+  String get kbManageCategories => 'Catégories';
+
+  @override
+  String get kbStatusPublished => 'Publié';
+
+  @override
+  String get kbStatusArchived => 'Archivé';
+
+  @override
+  String get kbAudience => 'Public';
+
+  @override
+  String get kbAudienceInternal => 'Interne (personnel uniquement)';
+
+  @override
+  String get kbAudiencePortal => 'Portail client';
+
+  @override
+  String get kbAudiencePublic => 'Public';
+
+  @override
+  String get kbArticleTitle => 'Titre';
+
+  @override
+  String get kbSummary => 'Résumé';
+
+  @override
+  String get kbBody => 'Texte (Markdown)';
+
+  @override
+  String get kbPreview => 'Aperçu';
+
+  @override
+  String get kbWriteTab => 'Rédiger';
+
+  @override
+  String get kbMarkdownHelp =>
+      'Utilisez # pour les titres, **gras**, *italique*, - pour les listes, [texte](https://…) pour les liens et ![description](image:ID) pour les images.';
+
+  @override
+  String get kbTagsLabel => 'Étiquettes (séparées par des virgules)';
+
+  @override
+  String get kbRelated => 'Articles liés';
+
+  @override
+  String get kbAddRelated => 'Ajouter un article lié';
+
+  @override
+  String get kbImages => 'Images';
+
+  @override
+  String get kbUploadImage => 'Téléverser une image';
+
+  @override
+  String get kbInsertImage => 'Insérer dans le texte';
+
+  @override
+  String get kbPublish => 'Publier';
+
+  @override
+  String get kbUnpublish => 'Dépublier';
+
+  @override
+  String get kbArchive => 'Archiver';
+
+  @override
+  String get kbHistory => 'Historique des versions';
+
+  @override
+  String kbVersionLine(int version, String name, String date) {
+    return 'Version $version · $name · $date';
+  }
+
+  @override
+  String get kbRestore => 'Restaurer cette version';
+
+  @override
+  String kbRestoredFrom(int version) {
+    return 'restaurée depuis la version $version';
+  }
+
+  @override
+  String kbFeedback(int yes, int no) {
+    return '$yes l\'ont trouvé utile, $no non';
+  }
+
+  @override
+  String kbViews(int count) {
+    return '$count vues';
+  }
+
+  @override
+  String get kbNoArticles => 'Aucun article trouvé.';
+
+  @override
+  String get kbNoCategory => 'Aucune catégorie';
+
+  @override
+  String get kbMainCategory => 'Catégorie principale';
+
+  @override
+  String get kbSortOrder => 'Ordre';
+
+  @override
+  String get kbNewCategory => 'Nouvelle catégorie';
+
+  @override
+  String get kbCategoryNames => 'Nom par langue';
+
+  @override
+  String get kbDelete => 'Supprimer';
+
+  @override
+  String get kbSuggestedArticles => 'Articles suggérés';
+
+  @override
+  String get kbNoSuggestions => 'Aucun article correspondant.';
+
+  @override
+  String get kbInsertText => 'Insérer le texte';
+
+  @override
+  String get kbInsertLink => 'Insérer le lien';
+
+  @override
+  String get kbInsertArticle => 'Insérer un article';
+
+  @override
+  String get kbNoPortalLink =>
+      'Cet article est interne : seul son texte peut être inséré.';
+
+  @override
+  String get kbHelp => 'Aide';
+
+  @override
+  String get kbHelpHeading => 'Comment pouvons-nous vous aider ?';
+
+  @override
+  String get kbHelpSearch => 'Rechercher dans les articles d\'aide';
+
+  @override
+  String get kbHelpEmpty =>
+      'Aucun article trouvé. Vous pouvez ouvrir un ticket.';
+
+  @override
+  String get kbWasHelpful => 'Cet article vous a-t-il aidé ?';
+
+  @override
+  String get kbYes => 'Oui';
+
+  @override
+  String get kbNo => 'Non';
+
+  @override
+  String get kbThanks => 'Merci pour votre retour.';
+
+  @override
+  String get kbStillNeedHelp => 'Besoin d\'aide ? Ouvrez un ticket.';
+
+  @override
+  String get kbRelatedReading => 'Articles liés';
+
+  @override
+  String get kbDeflectionTitle =>
+      'Ces articles répondent peut-être déjà à votre question';
+
+  @override
+  String kbShownIn(String language) {
+    return 'Non disponible dans votre langue ; affiché en $language.';
+  }
+
+  @override
+  String kbUpdatedOn(String date) {
+    return 'Mis à jour le $date';
+  }
 }

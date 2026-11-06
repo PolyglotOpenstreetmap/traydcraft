@@ -2883,6 +2883,7 @@ dependencies = [
  "traydcraft-engineering",
  "traydcraft-fieldservice",
  "traydcraft-helpdesk",
+ "traydcraft-kb",
  "traydcraft-portal",
  "traydcraft-products",
  "traydcraft-repairs",
@@ -2992,10 +2993,12 @@ dependencies = [
  "futures",
  "lettre",
  "mail-parser",
+ "rand 0.9.5",
  "rust_decimal",
  "rustls",
  "serde",
  "serde_json",
+ "sha2 0.10.9",
  "sqlx",
  "tokio",
  "tokio-rustls",
@@ -3008,6 +3011,21 @@ dependencies = [
  "utoipa-axum",
  "uuid",
  "webpki-roots 0.26.11",
+]
+
+[[package]]
+name = "traydcraft-kb"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "traydcraft-core",
+ "utoipa",
+ "utoipa-axum",
+ "uuid",
 ]
 
 [[package]]
@@ -3025,6 +3043,7 @@ dependencies = [
  "traydcraft-core",
  "traydcraft-crm",
  "traydcraft-helpdesk",
+ "traydcraft-kb",
  "traydcraft-repairs",
  "traydcraft-sales",
  "utoipa",

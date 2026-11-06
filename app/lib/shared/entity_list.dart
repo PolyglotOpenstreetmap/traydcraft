@@ -43,6 +43,7 @@ class EntityList<T> extends StatefulWidget {
     this.onCreate,
     this.createLabel,
     this.filters,
+    this.moreFilters,
     this.actions = const [],
   });
 
@@ -53,6 +54,9 @@ class EntityList<T> extends StatefulWidget {
   final Future<bool?> Function()? onCreate;
   final String? createLabel;
   final Widget? filters;
+
+  /// More filters, on a line of their own under the search box (for lists with many).
+  final Widget? moreFilters;
 
   /// Extra buttons next to the create button.
   final List<Widget> actions;
@@ -162,6 +166,10 @@ class EntityListState<T> extends State<EntityList<T>> {
               Text(context.l10n.countOf(_items.length, _total)),
             ],
           ),
+          if (widget.moreFilters != null) ...[
+            const SizedBox(height: 8),
+            widget.moreFilters!,
+          ],
           const SizedBox(height: 8),
           if (_error != null)
             MaterialBanner(

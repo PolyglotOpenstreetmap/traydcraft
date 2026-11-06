@@ -18,6 +18,8 @@ use utoipa_axum::routes;
 use uuid::Uuid;
 
 use crate::classify::ticket_tag;
+use crate::sla::{self, SlaInput, TicketSla};
+use traydcraft_core::files::FileInfo;
 
 type ErrorBody = traydcraft_core::error::ErrorBody;
 
@@ -77,6 +79,50 @@ pub struct Ticket {
     pub updated_at: DateTime<Utc>,
     pub first_response_at: Option<DateTime<Utc>>,
     pub closed_at: Option<DateTime<Utc>>,
+    /// The queue the ticket waits in (the owner is the person working on it).
+    pub team_id: Option<Uuid>,
+    pub team_name: Option<String>,
+    pub tags: Vec<String>,
+    /// Total logged time in minutes.
+    pub time_minutes: i64,
+    /// Set when this ticket was merged into another one (it is closed).
+    pub merged_into_id: Option<Uuid>,
+    pub merged_into_number: Option<String>,
+    /// The customer's latest satisfaction rating: good | bad.
+    pub csat_rating: Option<String>,
+    pub csat_comment: Option<String>,
+    pub csat_rated_at: Option<DateTime<Utc>>,
+    /// Due times, breach flags and minutes remaining.
+    #[sqlx(skip)]
+    pub sla: TicketSla,
+    #[serde(skip)]
+    sla_first_response_due_at: Option<DateTime<Utc>>,
+    #[serde(skip)]
+    sla_resolution_due_at: Option<DateTime<Utc>>,
+    #[serde(skip)]
+    sla_first_response_minutes: Option<i32>,
+    #[serde(skip)]
+    sla_resolution_minutes: Option<i32>,
+    #[serde(skip)]
+    sla_paused_at: Option<DateTime<Utc>>,
+}
+
+impl Ticket {
+    fn with_sla(mut self) -> Self {
+        self.sla = sla::evaluate(
+            &SlaInput {
+                first_response_due_at: self.sla_first_response_due_at,
+                resolution_due_at: self.sla_resolution_due_at,
+                first_response_minutes: self.sla_first_response_minutes,
+                resolution_minutes: self.sla_resolution_minutes,
+                paused_at: self.sla_paused_at,
+                first_response_at: self.first_response_at,
+                closed_at: self.closed_at,
+            },
+            Utc::now(),
+        );
+        self
+    }
 }
 
 #[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
@@ -104,6 +150,9 @@ pub struct Article {
     pub delivery_error: Option<String>,
     pub created_at: DateTime<Utc>,
     pub sent_at: Option<DateTime<Utc>>,
+    /// Files sent or received with the message.
+    #[sqlx(skip)]
+    pub attachments: Vec<FileInfo>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -128,6 +177,16 @@ pub struct ListParams {
     pub owner: Option<String>,
     pub customer_id: Option<Uuid>,
     pub category: Option<String>,
+    /// Tickets in this team.
+    pub team_id: Option<Uuid>,
+    /// Tickets that are mine: I own them, or nobody owns them and they are in one of my teams.
+    pub mine: Option<bool>,
+    /// Tickets with neither an owner nor a team.
+    pub unassigned: Option<bool>,
+    /// `breached` or `at_risk` (under 25 % of a window left).
+    pub sla: Option<String>,
+    /// Tickets with this tag.
+    pub tag: Option<String>,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
 }
@@ -180,6 +239,9 @@ pub struct TicketInput {
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct NoteInput {
     pub body: String,
+    /// Files uploaded to the ticket (`POST /tickets/{id}/attachments`) to attach to this note.
+    #[serde(default)]
+    pub attachment_ids: Vec<Uuid>,
     /// New ticket status; unchanged when omitted.
     pub status: Option<String>,
 }
@@ -194,6 +256,9 @@ pub struct ReplyInput {
     /// Defaults to "Re: <ticket subject>". The ticket tag is always added.
     pub subject: Option<String>,
     pub body: String,
+    /// Files uploaded to the ticket (`POST /tickets/{id}/attachments`) to send with the e-mail.
+    #[serde(default)]
+    pub attachment_ids: Vec<Uuid>,
     /// New ticket status; defaults to pending_customer.
     pub status: Option<String>,
 }
@@ -262,8 +327,19 @@ const SELECT: &str = "SELECT t.id, t.number, t.subject, t.status, t.priority, t.
         t.quotation_id, q.number AS quotation_number, q.revision AS quotation_revision, q.status AS quotation_status,
         t.opportunity_id, op.number AS opportunity_number, t.order_id, o.number AS order_number,
         (SELECT count(*) FROM helpdesk.articles a WHERE a.ticket_id = t.id) AS article_count,
-        t.created_at, t.updated_at, t.first_response_at, t.closed_at
+        t.created_at, t.updated_at, t.first_response_at, t.closed_at,
+        t.team_id, tm.name AS team_name,
+        coalesce((SELECT array_agg(g.tag ORDER BY g.tag) FROM helpdesk.ticket_tags g WHERE g.ticket_id = t.id), '{}') AS tags,
+        coalesce((SELECT sum(e.minutes) FROM helpdesk.time_entries e WHERE e.ticket_id = t.id), 0)::bigint AS time_minutes,
+        t.merged_into_id, (SELECT m.number FROM helpdesk.tickets m WHERE m.id = t.merged_into_id) AS merged_into_number,
+        cs.rating AS csat_rating, cs.comment AS csat_comment, cs.rated_at AS csat_rated_at,
+        t.first_response_due_at AS sla_first_response_due_at, t.resolution_due_at AS sla_resolution_due_at,
+        t.sla_first_response_minutes, t.sla_resolution_minutes, t.sla_paused_at
      FROM helpdesk.tickets t
+     LEFT JOIN helpdesk.teams tm ON tm.id = t.team_id
+     LEFT JOIN LATERAL (SELECT s.rating, s.comment, s.rated_at FROM helpdesk.csat_surveys s
+                        WHERE s.ticket_id = t.id AND s.rated_at IS NOT NULL
+                        ORDER BY s.rated_at DESC LIMIT 1) cs ON true
      LEFT JOIN crm.customers c ON c.id = t.customer_id
      LEFT JOIN core.users u ON u.id = t.owner_user_id
      LEFT JOIN sales.quotations q ON q.id = t.quotation_id
@@ -271,21 +347,22 @@ const SELECT: &str = "SELECT t.id, t.number, t.subject, t.status, t.priority, t.
      LEFT JOIN sales.orders o ON o.id = t.order_id";
 
 pub async fn load_ticket(conn: &mut PgConnection, company_id: Uuid, id: Uuid) -> AppResult<Ticket> {
-    sqlx::query_as(&format!("{SELECT} WHERE t.id = $1 AND t.company_id = $2"))
+    sqlx::query_as::<_, Ticket>(&format!("{SELECT} WHERE t.id = $1 AND t.company_id = $2"))
         .bind(id)
         .bind(company_id)
         .fetch_optional(conn)
         .await?
+        .map(Ticket::with_sla)
         .ok_or(AppError::NotFound("ticket"))
 }
 
-async fn load_detail(
+pub async fn load_detail(
     conn: &mut PgConnection,
     company_id: Uuid,
     id: Uuid,
 ) -> AppResult<TicketDetail> {
     let ticket = load_ticket(conn, company_id, id).await?;
-    let articles = sqlx::query_as(
+    let mut articles: Vec<Article> = sqlx::query_as(
         "SELECT a.id, a.kind, a.from_address, a.from_name, a.to_addresses, a.cc_addresses, a.subject, a.body,
                 a.language::text AS language, a.author_user_id, u.display_name AS author_name,
                 a.contact_id, nullif(btrim(ct.first_name || ' ' || ct.last_name), '') AS contact_name,
@@ -295,8 +372,13 @@ async fn load_detail(
          WHERE a.ticket_id = $1 ORDER BY a.created_at, a.id",
     )
     .bind(id)
-    .fetch_all(conn)
+    .fetch_all(&mut *conn)
     .await?;
+    let ids: Vec<Uuid> = articles.iter().map(|a| a.id).collect();
+    let mut files = crate::attachments::for_articles(conn, &ids).await?;
+    for a in &mut articles {
+        a.attachments = files.remove(&a.id).unwrap_or_default();
+    }
     Ok(TicketDetail { ticket, articles })
 }
 
@@ -317,7 +399,7 @@ async fn next_ticket_number(conn: &mut PgConnection, company_id: Uuid) -> AppRes
     Ok(format!("T{year}-{n:05}"))
 }
 
-async fn add_note(
+pub(crate) async fn add_note(
     conn: &mut PgConnection,
     user: &CurrentUser,
     ticket_id: Uuid,
@@ -351,6 +433,11 @@ pub async fn add_linked_note(
 
 async fn set_status(conn: &mut PgConnection, ticket_id: Uuid, status: &str) -> AppResult<()> {
     check_one_of("status", status, &STATUSES)?;
+    let was_closed: bool =
+        sqlx::query_scalar("SELECT status = 'closed' FROM helpdesk.tickets WHERE id = $1")
+            .bind(ticket_id)
+            .fetch_one(&mut *conn)
+            .await?;
     sqlx::query(
         "UPDATE helpdesk.tickets SET status = $2, updated_at = now(),
                 closed_at = CASE WHEN $2 = 'closed' THEN coalesce(closed_at, now()) ELSE NULL END
@@ -358,8 +445,12 @@ async fn set_status(conn: &mut PgConnection, ticket_id: Uuid, status: &str) -> A
     )
     .bind(ticket_id)
     .bind(status)
-    .execute(conn)
+    .execute(&mut *conn)
     .await?;
+    sla::sync(conn, ticket_id).await?;
+    if status == "closed" && !was_closed {
+        crate::csat::queue_survey(conn, ticket_id).await?;
+    }
     Ok(())
 }
 
@@ -406,18 +497,44 @@ async fn list_tickets(
         ),
         None => (None, false),
     };
-    let filter = "WHERE t.company_id = $1
+    let sla_filter = match p.sla.as_deref() {
+        None => None,
+        Some("breached") => Some(sla::sql::breached()),
+        Some("at_risk") => Some(sla::sql::at_risk()),
+        Some(_) => {
+            return Err(AppError::Validation(
+                "sla must be breached or at_risk".into(),
+            ))
+        }
+    };
+    let tag = p
+        .tag
+        .as_deref()
+        .map(crate::extras::normalize_tag)
+        .transpose()?;
+    let filter = format!(
+        "WHERE t.company_id = $1
           AND ($2::text IS NULL OR lower(t.number) LIKE $2 OR lower(t.subject) LIKE $2
                OR lower(t.contact_email) LIKE $2 OR lower(t.contact_name) LIKE $2 OR lower(coalesce(c.name, '')) LIKE $2)
           AND ($3::text IS NULL OR ($3 = 'active' AND t.status <> 'closed') OR t.status = $3)
           AND ($4::uuid IS NULL OR t.owner_user_id = $4)
           AND (NOT $5 OR t.owner_user_id IS NULL)
           AND ($6::uuid IS NULL OR t.customer_id = $6)
-          AND ($7::text IS NULL OR t.category = $7)";
-    let items = sqlx::query_as(&format!(
+          AND ($7::text IS NULL OR t.category = $7)
+          AND ($8::uuid IS NULL OR t.team_id = $8)
+          AND (NOT $9 OR t.owner_user_id = $10
+               OR (t.owner_user_id IS NULL AND t.team_id IN (SELECT m.team_id FROM helpdesk.team_members m WHERE m.user_id = $10)))
+          AND (NOT $11 OR (t.owner_user_id IS NULL AND t.team_id IS NULL))
+          AND ($12::text IS NULL OR EXISTS (SELECT 1 FROM helpdesk.ticket_tags g WHERE g.ticket_id = t.id AND g.tag = $12))
+          AND {}",
+        sla_filter.as_deref().unwrap_or("true")
+    );
+    let mine = p.mine.unwrap_or(false);
+    let only_unassigned = p.unassigned.unwrap_or(false);
+    let items: Vec<Ticket> = sqlx::query_as(&format!(
         "{SELECT} {filter}
          ORDER BY CASE t.priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 ELSE 2 END, t.updated_at DESC
-         LIMIT $8 OFFSET $9"
+         LIMIT $13 OFFSET $14"
     ))
     .bind(user.company_id)
     .bind(&pattern)
@@ -426,10 +543,16 @@ async fn list_tickets(
     .bind(unassigned)
     .bind(p.customer_id)
     .bind(&p.category)
+    .bind(p.team_id)
+    .bind(mine)
+    .bind(user.user_id)
+    .bind(only_unassigned)
+    .bind(&tag)
     .bind(p.limit.unwrap_or(50).clamp(1, 500))
     .bind(p.offset.unwrap_or(0).max(0))
     .fetch_all(&state.db)
     .await?;
+    let items = items.into_iter().map(Ticket::with_sla).collect();
     let total = sqlx::query_scalar(&format!(
         "SELECT count(*) FROM helpdesk.tickets t LEFT JOIN crm.customers c ON c.id = t.customer_id {filter}"
     ))
@@ -440,6 +563,11 @@ async fn list_tickets(
     .bind(unassigned)
     .bind(p.customer_id)
     .bind(&p.category)
+    .bind(p.team_id)
+    .bind(mine)
+    .bind(user.user_id)
+    .bind(only_unassigned)
+    .bind(&tag)
     .fetch_one(&state.db)
     .await?;
     Ok(Json(TicketPage { items, total }))
@@ -528,6 +656,8 @@ async fn create_ticket(
     .execute(&mut *tx)
     .await?;
     add_note(&mut tx, &user, id, &input.body).await?;
+    crate::teams::assign_default_team(&mut tx, user.company_id, id).await?;
+    sla::sync(&mut tx, id).await?;
     audit::record(
         &mut tx,
         &user,
@@ -669,7 +799,8 @@ async fn add_note_handler(
     }
     let mut tx = state.db.begin().await?;
     load_ticket(&mut tx, user.company_id, id).await?;
-    add_note(&mut tx, &user, id, &input.body).await?;
+    let note_id = add_note(&mut tx, &user, id, &input.body).await?;
+    crate::attachments::link(&mut tx, id, note_id, &input.attachment_ids, None).await?;
     match &input.status {
         Some(s) => set_status(&mut tx, id, s).await?,
         None => {
@@ -791,6 +922,7 @@ async fn reply(
     .bind(user.user_id)
     .execute(&mut *tx)
     .await?;
+    crate::attachments::link(&mut tx, id, article_id, &input.attachment_ids, None).await?;
     sqlx::query(
         "UPDATE helpdesk.tickets SET first_response_at = coalesce(first_response_at, now()),
                 owner_user_id = coalesce(owner_user_id, $2) WHERE id = $1",
@@ -1128,6 +1260,7 @@ async fn log_call(
             .bind(user.user_id)
             .execute(&mut *tx)
             .await?;
+            crate::teams::assign_default_team(&mut tx, user.company_id, id).await?;
             id
         }
     };
@@ -1165,6 +1298,7 @@ async fn log_call(
     .bind(kind == "call_out")
     .execute(&mut *tx)
     .await?;
+    sla::sync(&mut tx, ticket_id).await?;
     audit::record(
         &mut tx,
         &user,
@@ -1211,4 +1345,9 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(production_question))
         .routes(routes!(log_call))
         .routes(routes!(inbound))
+        .merge(crate::teams::router())
+        .merge(crate::sla::router())
+        .merge(crate::attachments::router())
+        .merge(crate::extras::router())
+        .merge(crate::csat::router())
 }

@@ -40,6 +40,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Component toevoegen op serienummer (in stock)';
 
   @override
+  String get addMember => 'Lid toevoegen';
+
+  @override
   String get addNote => 'Notitie toevoegen';
 
   @override
@@ -56,6 +59,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get addRebate => 'Korting toevoegen';
+
+  @override
+  String get addTag => 'Label toevoegen';
 
   @override
   String get addTask => 'Taak toevoegen';
@@ -85,6 +91,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get allStatuses => 'Alle statussen';
+
+  @override
+  String get allTags => 'Alle labels';
+
+  @override
+  String get allTeams => 'Alle teams';
 
   @override
   String get always => 'altijd';
@@ -118,6 +130,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get assignTo => 'Toewijzen aan';
 
   @override
+  String get attachFile => 'Bestand bijvoegen';
+
+  @override
+  String get attachments => 'Bijlagen';
+
+  @override
+  String get attachmentsHelp =>
+      'Afbeeldingen (JPEG, PNG, WebP) en PDF, tot 12 MB';
+
+  @override
   String get automatic => 'Automatisch';
 
   @override
@@ -128,6 +150,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get billOfMaterials => 'Stuklijst';
+
+  @override
+  String get billable => 'Factureerbaar';
 
   @override
   String get bomActive => 'actief';
@@ -366,6 +391,39 @@ class AppLocalizationsNl extends AppLocalizations {
   String get createRepair => 'Herstelling aanmaken';
 
   @override
+  String get csatAlready => 'Deze enquête werd al beantwoord.';
+
+  @override
+  String get csatBad => 'Niet tevreden';
+
+  @override
+  String get csatComment => 'Opmerking (optioneel)';
+
+  @override
+  String get csatEnabled =>
+      'Tevredenheidsenquête sturen bij het sluiten van een ticket';
+
+  @override
+  String get csatExpired => 'Deze link is verlopen.';
+
+  @override
+  String get csatGood => 'Tevreden';
+
+  @override
+  String get csatNone => 'Nog geen beoordeling';
+
+  @override
+  String csatQuestion(String number) {
+    return 'Hoe tevreden bent u over de afhandeling van ticket $number?';
+  }
+
+  @override
+  String get csatThanks => 'Bedankt voor uw feedback!';
+
+  @override
+  String get csatTitle => 'Klanttevredenheid';
+
+  @override
   String get current => 'Huidig';
 
   @override
@@ -395,6 +453,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get date => 'Datum';
+
+  @override
+  String get defaultTeam => 'Standaardteam voor nieuwe tickets';
 
   @override
   String get deliveryFailed => 'niet verzonden';
@@ -509,6 +570,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get firstName => 'Voornaam';
 
   @override
+  String get firstResponseMinutes => 'Eerste reactie (min)';
+
+  @override
   String get from => 'Vanaf';
 
   @override
@@ -529,6 +593,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get helpdesk => 'Helpdesk';
+
+  @override
+  String get helpdeskSettings => 'Helpdesk-instellingen';
 
   @override
   String get history => 'Geschiedenis';
@@ -636,6 +703,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get logCall => 'Gesprek registreren';
 
   @override
+  String get logTime => 'Tijd registreren';
+
+  @override
   String get logWork => 'Werk registreren';
 
   @override
@@ -680,10 +750,31 @@ class AppLocalizationsNl extends AppLocalizations {
   String get materialRequirements => 'Materiaalbehoefte (actieve revisie)';
 
   @override
+  String get mergeAction => 'Samenvoegen';
+
+  @override
+  String get mergeHelp =>
+      'Alle berichten, bestanden, labels en tijdsregistraties gaan naar het gekozen ticket van dezelfde klant. Dit ticket wordt gesloten. Dit kan niet ongedaan gemaakt worden.';
+
+  @override
+  String get mergeNoCandidates => 'Geen ander open ticket van deze klant.';
+
+  @override
+  String get mergeTicket => 'Samenvoegen met ander ticket…';
+
+  @override
+  String mergedInto(String number) {
+    return 'Samengevoegd met $number';
+  }
+
+  @override
   String get message => 'Bericht';
 
   @override
   String get messageSent => 'Bericht verzonden';
+
+  @override
+  String get minutes => 'Minuten';
 
   @override
   String minutesShort(String minutes) {
@@ -770,6 +861,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get newTeam => 'Nieuw team';
+
+  @override
   String get newTicket => 'Nieuw ticket';
 
   @override
@@ -804,6 +898,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noOrdersYet => 'U hebt nog geen orders.';
 
   @override
+  String get noPermission =>
+      'U hebt geen toelating om deze instellingen te wijzigen.';
+
+  @override
   String get noPhotos => 'Nog geen foto\'s.';
 
   @override
@@ -831,10 +929,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noSerialComponents => 'Geen componenten met serienummer.';
 
   @override
+  String get noTeam => 'Geen team';
+
+  @override
   String get noTechnicians => 'Niemand toegewezen';
 
   @override
   String get noTicketsYet => 'U hebt nog geen tickets.';
+
+  @override
+  String get noTimeEntries => 'Nog geen tijd geregistreerd.';
 
   @override
   String get nobodyFound => 'Niemand gevonden met dit nummer.';
@@ -1365,6 +1469,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get required => 'Verplicht';
 
   @override
+  String get resolutionMinutes => 'Oplossing (min)';
+
+  @override
   String get retry => 'Opnieuw';
 
   @override
@@ -1540,6 +1647,58 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get sla => 'SLA';
+
+  @override
+  String get slaAtRisk => 'Dreigt te laat';
+
+  @override
+  String get slaBreached => 'Overschreden';
+
+  @override
+  String slaDue(String date) {
+    return 'Uiterlijk $date';
+  }
+
+  @override
+  String get slaFilterAny => 'Elke SLA-status';
+
+  @override
+  String get slaFirstResponse => 'Eerste reactie';
+
+  @override
+  String slaLeft(String time) {
+    return 'nog $time';
+  }
+
+  @override
+  String get slaMet => 'Gehaald';
+
+  @override
+  String get slaNone => 'Geen SLA';
+
+  @override
+  String get slaOnTime => 'Op schema';
+
+  @override
+  String slaOverdue(String time) {
+    return '$time te laat';
+  }
+
+  @override
+  String get slaPaused => 'Klok gestopt: wacht op de klant';
+
+  @override
+  String get slaPolicies => 'Servicelevels (SLA)';
+
+  @override
+  String get slaPoliciesHelp =>
+      'Gewone verstreken tijd, werkuren tellen niet mee. De klok stopt zolang een ticket op de klant wacht.';
+
+  @override
+  String get slaResolution => 'Oplossing';
+
+  @override
   String get stage => 'Fase';
 
   @override
@@ -1613,6 +1772,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get tags => 'Labels';
+
+  @override
   String get takePhoto => 'Foto nemen';
 
   @override
@@ -1622,6 +1784,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String tasksProgress(String done, String total) {
     return '$done van $total klaar';
   }
+
+  @override
+  String get team => 'Team';
+
+  @override
+  String get teamLead => 'Teamleider';
+
+  @override
+  String get teamMembers => 'Leden';
+
+  @override
+  String get teamName => 'Teamnaam';
+
+  @override
+  String get teams => 'Teams';
 
   @override
   String get technicians => 'Technici';
@@ -1637,6 +1814,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get ticketInProgress => 'In behandeling';
+
+  @override
+  String get ticketMerged => 'Tickets samengevoegd';
 
   @override
   String get ticketOpened => 'Ticket aangemaakt';
@@ -1660,9 +1840,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String get ticketWaitingForYou => 'Wacht op uw antwoord';
 
   @override
+  String get timeNote => 'Notitie';
+
+  @override
+  String timeTotal(String total, String billable) {
+    return 'Totaal $total, factureerbaar $billable';
+  }
+
+  @override
   String timeTotals(String work, String travel) {
     return 'Werk $work · Verplaatsing $travel';
   }
+
+  @override
+  String get timeTracking => 'Tijdsregistratie';
 
   @override
   String get title => 'Titel';
@@ -1735,6 +1926,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get updated => 'Bijgewerkt';
+
+  @override
+  String get uploadingFile => 'Uploaden…';
 
   @override
   String get uploadingPhotos => 'Uploaden…';
@@ -1837,4 +2031,200 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get zonesNoneAll => 'Zones (geen selectie = alle)';
+
+  @override
+  String get kbTitle => 'Kennisbank';
+
+  @override
+  String get kbNewArticle => 'Nieuw artikel';
+
+  @override
+  String get kbSearchHint => 'Artikels zoeken';
+
+  @override
+  String get kbAllCategories => 'Alle categorieën';
+
+  @override
+  String get kbAllStatuses => 'Alle statussen';
+
+  @override
+  String get kbAllAudiences => 'Alle doelgroepen';
+
+  @override
+  String get kbManageCategories => 'Categorieën';
+
+  @override
+  String get kbStatusPublished => 'Gepubliceerd';
+
+  @override
+  String get kbStatusArchived => 'Gearchiveerd';
+
+  @override
+  String get kbAudience => 'Doelgroep';
+
+  @override
+  String get kbAudienceInternal => 'Intern (alleen personeel)';
+
+  @override
+  String get kbAudiencePortal => 'Klantenportaal';
+
+  @override
+  String get kbAudiencePublic => 'Publiek';
+
+  @override
+  String get kbArticleTitle => 'Titel';
+
+  @override
+  String get kbSummary => 'Samenvatting';
+
+  @override
+  String get kbBody => 'Tekst (Markdown)';
+
+  @override
+  String get kbPreview => 'Voorbeeld';
+
+  @override
+  String get kbWriteTab => 'Schrijven';
+
+  @override
+  String get kbMarkdownHelp =>
+      'Gebruik # voor titels, **vet**, *cursief*, - voor lijsten, [tekst](https://…) voor links en ![omschrijving](image:ID) voor afbeeldingen.';
+
+  @override
+  String get kbTagsLabel => 'Labels (gescheiden door komma)';
+
+  @override
+  String get kbRelated => 'Gerelateerde artikels';
+
+  @override
+  String get kbAddRelated => 'Gerelateerd artikel toevoegen';
+
+  @override
+  String get kbImages => 'Afbeeldingen';
+
+  @override
+  String get kbUploadImage => 'Afbeelding uploaden';
+
+  @override
+  String get kbInsertImage => 'In tekst invoegen';
+
+  @override
+  String get kbPublish => 'Publiceren';
+
+  @override
+  String get kbUnpublish => 'Depubliceren';
+
+  @override
+  String get kbArchive => 'Archiveren';
+
+  @override
+  String get kbHistory => 'Versiegeschiedenis';
+
+  @override
+  String kbVersionLine(int version, String name, String date) {
+    return 'Versie $version · $name · $date';
+  }
+
+  @override
+  String get kbRestore => 'Deze versie herstellen';
+
+  @override
+  String kbRestoredFrom(int version) {
+    return 'hersteld van versie $version';
+  }
+
+  @override
+  String kbFeedback(int yes, int no) {
+    return '$yes vonden dit nuttig, $no niet';
+  }
+
+  @override
+  String kbViews(int count) {
+    return '$count weergaven';
+  }
+
+  @override
+  String get kbNoArticles => 'Geen artikels gevonden.';
+
+  @override
+  String get kbNoCategory => 'Geen categorie';
+
+  @override
+  String get kbMainCategory => 'Hoofdcategorie';
+
+  @override
+  String get kbSortOrder => 'Volgorde';
+
+  @override
+  String get kbNewCategory => 'Nieuwe categorie';
+
+  @override
+  String get kbCategoryNames => 'Naam per taal';
+
+  @override
+  String get kbDelete => 'Verwijderen';
+
+  @override
+  String get kbSuggestedArticles => 'Voorgestelde artikels';
+
+  @override
+  String get kbNoSuggestions => 'Geen passende artikels.';
+
+  @override
+  String get kbInsertText => 'Tekst invoegen';
+
+  @override
+  String get kbInsertLink => 'Link invoegen';
+
+  @override
+  String get kbInsertArticle => 'Artikel invoegen';
+
+  @override
+  String get kbNoPortalLink =>
+      'Dit artikel is intern: enkel de tekst kan worden ingevoegd.';
+
+  @override
+  String get kbHelp => 'Hulp';
+
+  @override
+  String get kbHelpHeading => 'Hoe kunnen we helpen?';
+
+  @override
+  String get kbHelpSearch => 'Zoek in de hulpartikels';
+
+  @override
+  String get kbHelpEmpty =>
+      'Geen artikels gevonden. U kunt in plaats daarvan een ticket openen.';
+
+  @override
+  String get kbWasHelpful => 'Was dit artikel nuttig?';
+
+  @override
+  String get kbYes => 'Ja';
+
+  @override
+  String get kbNo => 'Nee';
+
+  @override
+  String get kbThanks => 'Bedankt voor uw feedback.';
+
+  @override
+  String get kbStillNeedHelp => 'Nog hulp nodig? Open een ticket.';
+
+  @override
+  String get kbRelatedReading => 'Gerelateerde artikels';
+
+  @override
+  String get kbDeflectionTitle =>
+      'Deze artikels beantwoorden uw vraag misschien al';
+
+  @override
+  String kbShownIn(String language) {
+    return 'Niet beschikbaar in uw taal; getoond in $language.';
+  }
+
+  @override
+  String kbUpdatedOn(String date) {
+    return 'Bijgewerkt op $date';
+  }
 }

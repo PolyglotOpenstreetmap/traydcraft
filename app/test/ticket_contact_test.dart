@@ -24,6 +24,7 @@ Map<String, Object?> _ticket() => {
   'article_count': 3,
   'created_at': '2026-11-06T10:00:00Z',
   'updated_at': '2026-11-06T10:00:00Z',
+  ...ticketExtras(),
 };
 
 Map<String, Object?> _article(
@@ -39,6 +40,7 @@ Map<String, Object?> _article(
   'cc_addresses': <String>[],
   'subject': '',
   'body': 'x',
+  'attachments': <Object?>[],
   'created_at': '2026-11-06T10:00:00Z',
   ...extra,
 };
@@ -115,6 +117,7 @@ void main() {
         findsOneWidget,
       );
 
+      await tester.ensureVisible(find.text('Save changes'));
       await tester.tap(find.text('Save changes'));
       await tester.pumpAndSettle();
       final sent = http.bodies['PUT /api/v1/tickets/t1'] as Map;

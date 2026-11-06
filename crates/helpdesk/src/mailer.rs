@@ -77,7 +77,15 @@ struct Queued {
 
 const MAX_ATTEMPTS: i32 = 5;
 
-fn build(q: &Queued) -> anyhow::Result<Message> {
+/// A file stored on the ticket and sent along with a reply.
+#[derive(FromRow)]
+struct FileToSend {
+    filename: String,
+    content_type: String,
+    data: Vec<u8>,
+}
+
+fn build(q: &Queued, files: &[FileToSend]) -> anyhow::Result<Message> {
     let from: Mailbox = format!(
         "{} <{}>",
         q.from_name.replace(['<', '>', '"'], ""),
@@ -107,7 +115,17 @@ fn build(q: &Queued) -> anyhow::Result<Message> {
                 .join(" "),
         );
     }
-    let mut m = b.body(q.body.clone())?;
+    let mut m = if files.is_empty() {
+        b.body(q.body.clone())?
+    } else {
+        let mut parts = MultiPart::mixed().singlepart(SinglePart::plain(q.body.clone()));
+        for f in files {
+            let content_type = f.content_type.parse().context("invalid attachment type")?;
+            parts = parts
+                .singlepart(Attachment::new(f.filename.clone()).body(f.data.clone(), content_type));
+        }
+        b.multipart(parts)?
+    };
     m.headers_mut().insert_raw(HeaderValue::new(
         HeaderName::new_from_ascii_str("X-Traydcraft-Article"),
         q.id.to_string(),
@@ -136,7 +154,16 @@ pub async fn process_outbox(db: &PgPool, mailer: &Mailer, batch: i64) -> anyhow:
         .fetch_optional(&mut *tx)
         .await?;
         let Some(q) = next else { break };
-        let result = match build(&q) {
+        let files: Vec<FileToSend> = sqlx::query_as(
+            "SELECT f.filename, f.content_type, b.data
+             FROM helpdesk.ticket_attachments ta JOIN core.files f ON f.id = ta.file_id
+             JOIN core.file_blobs b ON b.file_id = f.id
+             WHERE ta.article_id = $1 ORDER BY ta.created_at, f.id",
+        )
+        .bind(q.id)
+        .fetch_all(&mut *tx)
+        .await?;
+        let result = match build(&q, &files) {
             Ok(m) => mailer.send(m, q.id).await,
             Err(e) => Err(e),
         };

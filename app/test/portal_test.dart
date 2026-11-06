@@ -45,6 +45,7 @@ Map<String, Object?> _detail(String status) => {
       'direction': 'incoming',
       'author_name': 'Sofie Maes',
       'body': 'De pomp lekt sinds gisteren.',
+      'attachments': <Object?>[],
       'created_at': '2026-11-05T10:00:00Z',
     },
     {
@@ -52,6 +53,7 @@ Map<String, Object?> _detail(String status) => {
       'direction': 'outgoing',
       'author_name': 'Support Agent',
       'body': 'We komen langs.',
+      'attachments': <Object?>[],
       'created_at': '2026-11-05T11:00:00Z',
     },
   ],
@@ -251,6 +253,7 @@ void main() {
 
     expect(http.bodies['POST /api/v1/portal/tickets/t1/messages'], {
       'body': 'Het lekt nog.',
+      'attachment_ids': <Object?>[],
     });
     expect(
       find.text('In progress'),

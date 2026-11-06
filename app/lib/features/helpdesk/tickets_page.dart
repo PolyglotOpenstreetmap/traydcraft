@@ -8,6 +8,8 @@ import '../../shared/entity_list.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
 import 'call_dialogs.dart';
+import 'ticket_extras.dart';
+import 'ticket_screen.dart' show teamsProvider;
 
 const ticketStatuses = [
   'new',
@@ -28,6 +30,10 @@ const ticketCategories = [
   'other',
 ];
 
+final _tagsProvider = FutureProvider.autoDispose<List<TagCount>>(
+  (ref) => ref.watch(apiProvider).helpdesk.listTags(),
+);
+
 /// Ticket overview: my tickets, unassigned or all; open ones first.
 class TicketsPage extends ConsumerStatefulWidget {
   const TicketsPage({super.key});
@@ -40,6 +46,9 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
   final _list = GlobalKey<EntityListState<Ticket>>();
   String _owner = 'me';
   String _status = 'active';
+  String? _team;
+  String? _sla;
+  String? _tag;
 
   void _reload() => _list.currentState?.reload();
 
@@ -48,13 +57,19 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
     final l = context.l10n;
     final api = ref.watch(apiProvider);
     final perms = ref.watch(meProvider).value?.permissions ?? const [];
+    final teams = ref.watch(teamsProvider).value ?? const <Team>[];
+    final tags = ref.watch(_tagsProvider).value ?? const <TagCount>[];
     return EntityList<Ticket>(
       key: _list,
       title: l.helpdesk,
       load: (q, offset, limit) async {
         final page = await api.helpdesk.listTickets(
           q: q,
-          owner: _owner == 'all' ? null : _owner,
+          mine: _owner == 'me' ? true : null,
+          unassigned: _owner == 'none' ? true : null,
+          teamId: _team,
+          sla: _sla,
+          tag: _tag,
           status: _status == 'all' ? null : _status,
           offset: offset,
           limit: limit,
@@ -92,7 +107,71 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
           ),
         ],
       ),
+      moreFilters: Wrap(
+        spacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          DropdownButton<String?>(
+            key: const ValueKey('filter-team'),
+            value: teams.any((t) => t.id == _team) ? _team : null,
+            items: [
+              DropdownMenuItem<String?>(value: null, child: Text(l.allTeams)),
+              for (final t in teams)
+                DropdownMenuItem<String?>(value: t.id, child: Text(t.name)),
+            ],
+            onChanged: (v) {
+              setState(() => _team = v);
+              _reload();
+            },
+          ),
+          DropdownButton<String?>(
+            key: const ValueKey('filter-sla'),
+            value: _sla,
+            items: [
+              DropdownMenuItem<String?>(
+                value: null,
+                child: Text(l.slaFilterAny),
+              ),
+              DropdownMenuItem<String?>(
+                value: 'breached',
+                child: Text(l.slaBreached),
+              ),
+              DropdownMenuItem<String?>(
+                value: 'at_risk',
+                child: Text(l.slaAtRisk),
+              ),
+            ],
+            onChanged: (v) {
+              setState(() => _sla = v);
+              _reload();
+            },
+          ),
+          if (tags.isNotEmpty)
+            DropdownButton<String?>(
+              key: const ValueKey('filter-tag'),
+              value: tags.any((t) => t.tag == _tag) ? _tag : null,
+              items: [
+                DropdownMenuItem<String?>(value: null, child: Text(l.allTags)),
+                for (final t in tags)
+                  DropdownMenuItem<String?>(
+                    value: t.tag,
+                    child: Text('${t.tag} (${t.count})'),
+                  ),
+              ],
+              onChanged: (v) {
+                setState(() => _tag = v);
+                _reload();
+              },
+            ),
+        ],
+      ),
       actions: [
+        if (perms.contains('helpdesk.admin'))
+          OutlinedButton.icon(
+            icon: const Icon(Icons.settings_outlined),
+            label: Text(l.helpdeskSettings),
+            onPressed: () => context.push('/helpdesk/settings'),
+          ),
         if (perms.contains('helpdesk.write'))
           FilledButton.tonalIcon(
             icon: const Icon(Icons.phone_in_talk_outlined),
@@ -125,6 +204,13 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
         EntityColumn(l.category, (t) => l.ticketCategory(t.category)),
         EntityColumn(l.status, (t) => l.ticketStatus(t.status)),
         EntityColumn(l.priority, (t) => l.ticketPriority(t.priority)),
+        EntityColumn(
+          l.sla,
+          (t) => slaSummary(l, t.sla),
+          flex: 2,
+          cell: (_, t) => SlaBadge(sla: t.sla),
+        ),
+        EntityColumn(l.team, (t) => t.teamName ?? '—'),
         EntityColumn(l.owner, (t) => t.ownerName ?? '—'),
         EntityColumn(l.updated, (t) => date(t.updatedAt)),
       ],

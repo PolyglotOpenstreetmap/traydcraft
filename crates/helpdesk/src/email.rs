@@ -1,6 +1,6 @@
 //! Parsing incoming e-mail (RFC 5322) into the fields the helpdesk needs.
 
-use mail_parser::{Address, MessageParser};
+use mail_parser::{Address, MessageParser, MimeHeaders};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct InboundEmail {
@@ -15,6 +15,14 @@ pub struct InboundEmail {
     pub subject: String,
     /// Plain text body (HTML converted to text when there is no text part).
     pub body: String,
+    /// Files attached to the message (name as sent, may be empty).
+    pub attachments: Vec<InboundAttachment>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct InboundAttachment {
+    pub filename: String,
+    pub data: Vec<u8>,
 }
 
 fn addresses(a: Option<&Address>) -> Vec<String> {
@@ -71,6 +79,13 @@ pub fn parse(raw: &[u8]) -> Option<InboundEmail> {
             .replace('\u{a0}', " ")
             .trim()
             .to_string(),
+        attachments: m
+            .attachments()
+            .map(|a| InboundAttachment {
+                filename: a.attachment_name().unwrap_or_default().to_string(),
+                data: a.contents().to_vec(),
+            })
+            .collect(),
     })
 }
 
@@ -129,6 +144,21 @@ Akkoord, u mag leveren.\r\n";
         assert_eq!(e.references, vec!["first@example.com", "out-1@example.com"]);
         assert_eq!(e.cc, vec!["boss@alpha.example"]);
         assert_eq!(e.body, "Akkoord, u mag leveren.");
+    }
+
+    #[test]
+    fn attachments_are_extracted() {
+        let raw = b"From: x@y.example\r\nSubject: Photo\r\nMIME-Version: 1.0\r\n\
+Content-Type: multipart/mixed; boundary=\"b1\"\r\n\r\n\
+--b1\r\nContent-Type: text/plain\r\n\r\nSee attached\r\n\
+--b1\r\nContent-Type: application/pdf; name=\"plan.pdf\"\r\n\
+Content-Disposition: attachment; filename=\"plan.pdf\"\r\n\
+Content-Transfer-Encoding: base64\r\n\r\nJVBERi0xLjQK\r\n--b1--\r\n";
+        let e = parse(raw).unwrap();
+        assert_eq!(e.body, "See attached");
+        assert_eq!(e.attachments.len(), 1);
+        assert_eq!(e.attachments[0].filename, "plan.pdf");
+        assert_eq!(e.attachments[0].data, b"%PDF-1.4\n");
     }
 
     #[test]

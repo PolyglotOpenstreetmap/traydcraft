@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,8 @@ import 'package:intl/intl.dart';
 
 import '../api/generated/export.dart';
 import '../l10n/l10n.dart';
+import '../shared/attachments.dart';
+import 'portal_help.dart' show PortalKbSuggestions;
 import 'portal_state.dart';
 
 final _when = DateFormat('dd/MM/yyyy HH:mm');
@@ -257,8 +260,11 @@ class PortalTicketsPage extends ConsumerWidget {
 }
 
 class PortalTicketPage extends ConsumerStatefulWidget {
-  const PortalTicketPage({super.key, required this.id});
+  const PortalTicketPage({super.key, required this.id, this.pickFiles});
   final String id;
+
+  /// How files are chosen; replaceable in tests.
+  final AttachmentPicker? pickFiles;
 
   @override
   ConsumerState<PortalTicketPage> createState() => _PortalTicketPageState();
@@ -268,6 +274,7 @@ class _PortalTicketPageState extends ConsumerState<PortalTicketPage> {
   final _body = TextEditingController();
   bool _busy = false;
   String? _error;
+  List<FileInfo> _attached = [];
 
   @override
   void dispose() {
@@ -286,9 +293,13 @@ class _PortalTicketPageState extends ConsumerState<PortalTicketPage> {
           .read(portalApiProvider)
           .addPortalMessage(
             id: widget.id,
-            body: MessageInput(body: _body.text.trim()),
+            body: MessageInput(
+              body: _body.text.trim(),
+              attachmentIds: [for (final f in _attached) f.id],
+            ),
           );
       _body.clear();
+      _attached = [];
       ref.invalidate(portalTicketProvider(widget.id));
       ref.invalidate(portalTicketsProvider);
       if (mounted) {
@@ -336,7 +347,12 @@ class _PortalTicketPageState extends ConsumerState<PortalTicketPage> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                for (final m in d.messages) _MessageBubble(message: m),
+                for (final m in d.messages)
+                  _MessageBubble(
+                    message: m,
+                    dio: ref.read(portalDioProvider),
+                    ticketId: widget.id,
+                  ),
               ],
             ),
           ),
@@ -352,6 +368,15 @@ class _PortalTicketPageState extends ConsumerState<PortalTicketPage> {
                     minLines: 3,
                     maxLines: 8,
                     decoration: InputDecoration(labelText: l.yourMessage),
+                  ),
+                  const SizedBox(height: 8),
+                  AttachmentComposer(
+                    dio: ref.read(portalDioProvider),
+                    uploadPath:
+                        '/api/v1/portal/tickets/${widget.id}/attachments',
+                    files: _attached,
+                    pick: widget.pickFiles ?? pickAttachmentFiles,
+                    onChanged: (f) => setState(() => _attached = f),
                   ),
                   if (_error != null)
                     Padding(
@@ -381,8 +406,14 @@ class _PortalTicketPageState extends ConsumerState<PortalTicketPage> {
 }
 
 class _MessageBubble extends StatelessWidget {
-  const _MessageBubble({required this.message});
+  const _MessageBubble({
+    required this.message,
+    required this.dio,
+    required this.ticketId,
+  });
   final PortalMessage message;
+  final Dio dio;
+  final String ticketId;
 
   @override
   Widget build(BuildContext context) {
@@ -408,6 +439,12 @@ class _MessageBubble extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 SelectableText(message.body),
+                AttachmentChips(
+                  files: message.attachments,
+                  dio: dio,
+                  pathFor: (id) =>
+                      '/api/v1/portal/tickets/$ticketId/attachments/$id',
+                ),
               ],
             ),
           ),
@@ -492,6 +529,7 @@ class _PortalNewTicketPageState extends ConsumerState<PortalNewTicketPage> {
           controller: _subject,
           decoration: InputDecoration(labelText: l.subject),
         ),
+        PortalKbSuggestions(controller: _subject),
         gap,
         DropdownButtonFormField<String>(
           initialValue: _category,

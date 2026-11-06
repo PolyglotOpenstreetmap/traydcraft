@@ -7,6 +7,7 @@
 use chrono::{DateTime, Datelike, Utc};
 use serde::Serialize;
 use sqlx::{FromRow, PgConnection};
+use traydcraft_core::files::FileInfo;
 use traydcraft_core::{audit, new_id, AppError, AppResult};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -49,7 +50,13 @@ pub struct PortalMessage {
     pub author_name: String,
     pub body: String,
     pub created_at: DateTime<Utc>,
+    /// Files sent with the message. Files on internal notes are never shown.
+    #[sqlx(skip)]
+    pub attachments: Vec<FileInfo>,
 }
+
+/// The article kinds a customer may see (and so the files linked to them).
+pub const VISIBLE_KINDS: [&str; 3] = ["email_in", "email_out", "portal_in"];
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct PortalTicketDetail {
@@ -63,7 +70,8 @@ const SELECT: &str = "SELECT t.id, t.number, t.subject,
         t.category, t.contact_name, t.created_at, t.updated_at, t.closed_at
      FROM helpdesk.tickets t";
 
-const VISIBLE: &str = "t.company_id = $1 AND NOT t.internal AND t.customer_id = $2
+const VISIBLE: &str =
+    "t.company_id = $1 AND NOT t.internal AND t.merged_into_id IS NULL AND t.customer_id = $2
      AND ($3 = 'customer' OR t.contact_id = $4)";
 
 pub async fn list(conn: &mut PgConnection, v: &Viewer) -> AppResult<Vec<PortalTicket>> {
@@ -88,7 +96,7 @@ pub async fn get(conn: &mut PgConnection, v: &Viewer, id: Uuid) -> AppResult<Por
         .fetch_optional(&mut *conn)
         .await?
         .ok_or(AppError::NotFound("ticket"))?;
-    let messages = sqlx::query_as(
+    let mut messages: Vec<PortalMessage> = sqlx::query_as(
         "SELECT a.id,
                 CASE WHEN a.kind = 'email_out' THEN 'outgoing' ELSE 'incoming' END AS direction,
                 CASE WHEN a.kind = 'email_out' THEN coalesce(u.display_name, a.from_name)
@@ -101,8 +109,13 @@ pub async fn get(conn: &mut PgConnection, v: &Viewer, id: Uuid) -> AppResult<Por
          ORDER BY a.created_at, a.id",
     )
     .bind(id)
-    .fetch_all(conn)
+    .fetch_all(&mut *conn)
     .await?;
+    let ids: Vec<Uuid> = messages.iter().map(|m| m.id).collect();
+    let mut files = crate::attachments::for_articles(conn, &ids).await?;
+    for m in &mut messages {
+        m.attachments = files.remove(&m.id).unwrap_or_default();
+    }
     Ok(PortalTicketDetail { ticket, messages })
 }
 
@@ -167,6 +180,8 @@ pub async fn open(
     .execute(&mut *conn)
     .await?;
     insert_message(conn, id, &contact, &email, subject.trim(), body).await?;
+    crate::teams::assign_default_team(conn, v.company_id, id).await?;
+    crate::sla::sync(conn, id).await?;
     audit::record_system(
         conn,
         v.company_id,
@@ -186,12 +201,13 @@ async fn insert_message(
     email: &str,
     subject: &str,
     body: &str,
-) -> AppResult<()> {
+) -> AppResult<Uuid> {
+    let article_id = new_id();
     sqlx::query(
         "INSERT INTO helpdesk.articles (id, ticket_id, kind, from_address, from_name, subject, body, language, contact_id)
          VALUES ($1, $2, 'portal_in', $3, $4, $5, $6, $7, $8)",
     )
-    .bind(new_id())
+    .bind(article_id)
     .bind(ticket_id)
     .bind(email)
     .bind(&contact.full_name)
@@ -201,7 +217,7 @@ async fn insert_message(
     .bind(contact.id)
     .execute(conn)
     .await?;
-    Ok(())
+    Ok(article_id)
 }
 
 /// A customer adds a message. Like a reply by e-mail, it reopens a ticket that waited for the
@@ -211,13 +227,22 @@ pub async fn add_message(
     v: &Viewer,
     ticket_id: Uuid,
     body: &str,
+    attachment_ids: &[Uuid],
 ) -> AppResult<PortalTicketDetail> {
     check_text(None, body)?;
     // Only a ticket the customer may see can be answered; this also checks the company.
     let visible = get(conn, v, ticket_id).await?;
     let contact = traydcraft_crm::contacts::get_contact(conn, v.contact_id).await?;
     let email = contact.primary_email().unwrap_or_default().to_string();
-    insert_message(conn, ticket_id, &contact, &email, "", body).await?;
+    let article_id = insert_message(conn, ticket_id, &contact, &email, "", body).await?;
+    crate::attachments::link(
+        conn,
+        ticket_id,
+        article_id,
+        attachment_ids,
+        Some(contact.id),
+    )
+    .await?;
     sqlx::query(
         "UPDATE helpdesk.tickets SET
             status = CASE WHEN status IN ('pending_customer', 'closed') THEN 'open' ELSE status END,
@@ -227,6 +252,7 @@ pub async fn add_message(
     .bind(ticket_id)
     .execute(&mut *conn)
     .await?;
+    crate::sla::sync(conn, ticket_id).await?;
     audit::record_system(
         conn,
         v.company_id,
@@ -237,4 +263,49 @@ pub async fn add_message(
     )
     .await?;
     get(conn, v, ticket_id).await
+}
+
+/// A customer uploads a file to a ticket they can see (JPEG, PNG, WebP or PDF). It becomes part
+/// of the conversation when it is passed in `attachment_ids` of the next message.
+pub async fn upload_attachment(
+    conn: &mut PgConnection,
+    v: &Viewer,
+    ticket_id: Uuid,
+    params: &crate::attachments::UploadParams,
+    bytes: &[u8],
+) -> AppResult<FileInfo> {
+    get(conn, v, ticket_id).await?;
+    let contact = traydcraft_crm::contacts::get_contact(conn, v.contact_id).await?;
+    crate::attachments::upload(
+        conn,
+        v.company_id,
+        ticket_id,
+        params,
+        bytes,
+        crate::attachments::Uploader {
+            user_id: None,
+            contact_id: Some(contact.id),
+            name: &contact.full_name,
+        },
+    )
+    .await
+}
+
+/// A file of a message the customer can see. Files of internal notes are "not found".
+pub async fn attachment_data(
+    conn: &mut PgConnection,
+    v: &Viewer,
+    ticket_id: Uuid,
+    file_id: Uuid,
+) -> AppResult<(String, String, Vec<u8>)> {
+    get(conn, v, ticket_id).await?;
+    crate::attachments::data(
+        conn,
+        v.company_id,
+        ticket_id,
+        file_id,
+        Some(&VISIBLE_KINDS),
+        Some(v.contact_id),
+    )
+    .await
 }

@@ -199,3 +199,17 @@ Map<String, Object?> departmentJson(
   'members': members,
   'open_repairs': 0,
 };
+
+/// The fields every ticket carries since the helpdesk got SLA, tags and time tracking.
+Map<String, Object?> ticketExtras() => {
+  'tags': <String>[],
+  'time_minutes': 0,
+  'sla': {
+    'state': 'none',
+    'paused': false,
+    'first_response': {'breached': false, 'at_risk': false},
+    'resolution': {'breached': false, 'at_risk': false},
+    'first_response_breached': false,
+    'resolution_breached': false,
+  },
+};

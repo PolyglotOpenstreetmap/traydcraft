@@ -1,6 +1,7 @@
 //! Background worker.
 //!
 //! * Polls the helpdesk mailbox over IMAP (when IMAP_HOST is set) and turns mails into tickets.
+//! * Escalates tickets whose SLA ran out (one internal e-mail per ticket and kind of breach).
 //! * Sends queued outgoing e-mails (ticket replies and system mail such as portal login links)
 //!   over SMTP, or writes them as .eml files when
 //!   MAIL_TRANSPORT=files (development).
@@ -105,6 +106,11 @@ async fn main() -> anyhow::Result<()> {
                 Ok(n) => tracing::info!(n, "e-mails fetched"),
                 Err(e) => tracing::error!(error = ?e, "IMAP poll failed"),
             }
+        }
+        match traydcraft_helpdesk::sla::escalate(&db).await {
+            Ok(0) => {}
+            Ok(n) => tracing::info!(n, "SLA breaches escalated"),
+            Err(e) => tracing::error!(error = ?e, "SLA escalation failed"),
         }
         match process_outbox(&db, &mailer, 50).await {
             Ok(0) => {}

@@ -9,6 +9,8 @@ import 'package:traydcraft_app/app/api.dart';
 import 'package:traydcraft_app/features/helpdesk/ticket_screen.dart';
 import 'package:traydcraft_app/l10n/app_localizations.dart';
 
+import 'fake_http.dart';
+
 Map<String, Object?> _ticket({bool internal = false}) => {
   'id': 't1',
   'number': 'T2026-00007',
@@ -28,6 +30,7 @@ Map<String, Object?> _ticket({bool internal = false}) => {
   'article_count': 1,
   'created_at': '2026-11-05T10:00:00Z',
   'updated_at': '2026-11-05T10:00:00Z',
+  ...ticketExtras(),
 };
 
 class _Fake implements HttpClientAdapter {
@@ -56,6 +59,7 @@ class _Fake implements HttpClientAdapter {
             'cc_addresses': <String>[],
             'subject': 'Frage zur Lieferzeit',
             'body': 'Wie lange ist die Lieferzeit?',
+            'attachments': <Object?>[],
             'created_at': '2026-11-05T10:00:00Z',
           },
         ],

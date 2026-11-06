@@ -21,3 +21,5 @@ accepted one; mark superseded records as such.
 | [0014](0014-contacts-calls-and-customer-portal.md) | Contacts with language and address form, phone calls, customer portal | Accepted |
 | [0015](0015-repairs-field-service-and-photos.md) | Repairs and departments, field jobs for technicians, photo storage | Accepted |
 | [0016](0016-order-lifecycle.md) | Order lifecycle: revisions, customer confirmation, priority | Accepted |
+| [0017](0017-helpdesk-sla-teams-attachments.md) | Helpdesk: SLA and escalation, teams, attachments, tags, merge, time, satisfaction | Accepted |
+| [0018](0018-knowledge-base.md) | Knowledge base: five languages, full-text search, versions, portal and public reading | Accepted |

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../api/generated/export.dart';
 import '../l10n/l10n.dart';
+import 'portal_csat.dart';
+import 'portal_help.dart';
 import 'portal_orders.dart';
 import 'portal_pages.dart';
 import 'portal_repairs.dart';
@@ -18,12 +20,19 @@ final portalRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     refreshListenable: signedIn,
     redirect: (context, state) {
+      // The satisfaction survey needs no login: the link is the credential.
+      if (state.matchedLocation == '/csat') return null;
       final atLogin = state.matchedLocation == '/login';
       if (!signedIn.value) return atLogin ? null : '/login';
       return atLogin ? '/' : null;
     },
     routes: [
       GoRoute(path: '/login', builder: (_, _) => const PortalLoginPage()),
+      GoRoute(
+        path: '/csat',
+        builder: (_, _) =>
+            PortalCsatPage(link: ref.read(initialCsatLinkProvider)),
+      ),
       ShellRoute(
         builder: (context, state, child) => PortalShell(child: child),
         routes: [
@@ -47,6 +56,14 @@ final portalRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/repairs/:id',
             builder: (_, s) => PortalRepairPage(id: s.pathParameters['id']!),
+          ),
+          GoRoute(path: '/help', builder: (_, _) => const PortalHelpPage()),
+          GoRoute(
+            path: '/help/:id',
+            builder: (_, s) => PortalHelpArticlePage(
+              key: ValueKey(s.pathParameters['id']),
+              id: s.pathParameters['id']!,
+            ),
           ),
           GoRoute(path: '/orders', builder: (_, _) => const PortalOrdersPage()),
           GoRoute(
@@ -124,6 +141,10 @@ class PortalShell extends ConsumerWidget {
           TextButton(
             onPressed: () => context.go('/orders'),
             child: Text(l.myOrders),
+          ),
+          TextButton(
+            onPressed: () => context.go('/help'),
+            child: Text(l.kbHelp),
           ),
           TextButton(
             onPressed: () => context.go('/repairs'),
