@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use anyhow::Context;
 use lettre::message::header::{HeaderName, HeaderValue};
-use lettre::message::{Mailbox, Message};
+use lettre::message::{Attachment, Mailbox, Message, MultiPart, SinglePart};
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{AsyncSmtpTransport, AsyncTransport, Tokio1Executor};
 use sqlx::{FromRow, PgPool};
@@ -179,6 +179,9 @@ struct QueuedSystem {
     subject: String,
     body: String,
     attempts: i32,
+    attachment_name: Option<String>,
+    attachment_type: Option<String>,
+    attachment_data: Option<Vec<u8>>,
     company_name: String,
     company_email: Option<String>,
 }
@@ -197,11 +200,26 @@ fn build_system(q: &QueuedSystem) -> anyhow::Result<Message> {
     .parse()
     .or_else(|_| from_address.parse())
     .context("invalid from address")?;
-    let mut m = Message::builder()
+    let builder = Message::builder()
         .from(from)
         .to(q.to_address.parse().context("invalid recipient address")?)
-        .subject(&q.subject)
-        .body(q.body.clone())?;
+        .subject(&q.subject);
+    let mut m = match (&q.attachment_name, &q.attachment_data) {
+        (Some(name), Some(data)) => {
+            let content_type = q
+                .attachment_type
+                .as_deref()
+                .unwrap_or("application/octet-stream")
+                .parse()
+                .context("invalid attachment type")?;
+            builder.multipart(
+                MultiPart::mixed()
+                    .singlepart(SinglePart::plain(q.body.clone()))
+                    .singlepart(Attachment::new(name.clone()).body(data.clone(), content_type)),
+            )?
+        }
+        _ => builder.body(q.body.clone())?,
+    };
     m.headers_mut().insert_raw(HeaderValue::new(
         HeaderName::new_from_ascii_str("X-Traydcraft-Mail"),
         q.id.to_string(),
@@ -220,7 +238,8 @@ pub async fn process_system_mail(
     for _ in 0..batch {
         let mut tx = db.begin().await?;
         let next: Option<QueuedSystem> = sqlx::query_as(
-            "SELECT m.id, m.to_address, m.subject, m.body, m.attempts, co.name AS company_name, co.email AS company_email
+            "SELECT m.id, m.to_address, m.subject, m.body, m.attempts,
+                    m.attachment_name, m.attachment_type, m.attachment_data, co.name AS company_name, co.email AS company_email
              FROM core.mail_outbox m JOIN core.companies co ON co.id = m.company_id
              WHERE m.delivery = 'queued'
              ORDER BY m.created_at

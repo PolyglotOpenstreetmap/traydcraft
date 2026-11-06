@@ -24,6 +24,8 @@ use traydcraft_helpdesk::portal::{self, PortalTicket, PortalTicketDetail};
 use traydcraft_repairs::portal::{
     self as repair_portal, Announcement, PortalRepair, PortalRepairDetail,
 };
+use traydcraft_sales::order_portal::{self, PortalOrder, PortalOrderDetail, PortalViewer};
+use traydcraft_sales::order_priority::PriorityRequest;
 use utoipa::{IntoParams, ToSchema};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
@@ -521,6 +523,108 @@ async fn get_repair_photo(
     Ok(traydcraft_core::files::image_response(&content_type, data))
 }
 
+// ---------------------------------------------------------------------------------------------
+// Orders
+// ---------------------------------------------------------------------------------------------
+
+fn order_viewer(user: &PortalUser) -> PortalViewer {
+    PortalViewer {
+        company_id: user.company_id,
+        customer_id: user.customer_id,
+        contact_id: user.contact_id,
+        scope: user.scope.clone(),
+    }
+}
+
+/// Orders of the customer: the latest revision that was sent or confirmed, never a draft.
+#[utoipa::path(get, path = "/portal/orders", tag = "portal", operation_id = "list_portal_orders",
+    responses((status = 200, body = Vec<PortalOrder>), (status = 401, body = ErrorBody)))]
+async fn list_orders(
+    State(state): State<AppState>,
+    user: PortalUser,
+) -> AppResult<Json<Vec<PortalOrder>>> {
+    let mut conn = state.db.acquire().await?;
+    Ok(Json(
+        order_portal::list(&mut conn, &order_viewer(&user)).await?,
+    ))
+}
+
+#[utoipa::path(get, path = "/portal/orders/{id}", tag = "portal", operation_id = "get_portal_order", params(("id" = Uuid, Path)),
+    responses((status = 200, body = PortalOrderDetail), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody)))]
+async fn get_order(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+) -> AppResult<Json<PortalOrderDetail>> {
+    let mut conn = state.db.acquire().await?;
+    Ok(Json(
+        order_portal::get(&mut conn, &order_viewer(&user), id).await?,
+    ))
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct ConfirmPortalOrder {
+    /// The revision the customer is looking at; refused when it is no longer the latest.
+    pub revision: i32,
+    #[serde(default)]
+    pub note: String,
+}
+
+/// The customer confirms their order. Only the latest sent revision can be confirmed.
+#[utoipa::path(post, path = "/portal/orders/{id}/confirm", tag = "portal", operation_id = "confirm_portal_order",
+    params(("id" = Uuid, Path)), request_body = ConfirmPortalOrder,
+    responses((status = 200, body = PortalOrderDetail), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody),
+              (status = 409, body = ErrorBody)))]
+async fn confirm_order(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+    Json(input): Json<ConfirmPortalOrder>,
+) -> AppResult<Json<PortalOrderDetail>> {
+    let mut tx = state.db.begin().await?;
+    let d = order_portal::confirm(
+        &mut tx,
+        &order_viewer(&user),
+        id,
+        input.revision,
+        &input.note,
+    )
+    .await?;
+    tx.commit().await?;
+    Ok(Json(d))
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct NewPriorityRequest {
+    /// expedite | low
+    pub priority: String,
+    pub message: String,
+}
+
+/// Asks staff to treat the order as more or less urgent. Staff decide.
+#[utoipa::path(post, path = "/portal/orders/{id}/priority-requests", tag = "portal", operation_id = "request_portal_order_priority",
+    params(("id" = Uuid, Path)), request_body = NewPriorityRequest,
+    responses((status = 201, body = PriorityRequest), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody),
+              (status = 422, body = ErrorBody)))]
+async fn request_priority(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+    Json(input): Json<NewPriorityRequest>,
+) -> AppResult<(StatusCode, Json<PriorityRequest>)> {
+    let mut tx = state.db.begin().await?;
+    let r = order_portal::request_priority(
+        &mut tx,
+        &order_viewer(&user),
+        id,
+        &input.priority,
+        &input.message,
+    )
+    .await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(r)))
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(request_login_link))
@@ -533,6 +637,10 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list_repairs, announce_repair))
         .routes(routes!(get_repair))
         .routes(routes!(get_repair_photo))
+        .routes(routes!(list_orders))
+        .routes(routes!(get_order))
+        .routes(routes!(confirm_order))
+        .routes(routes!(request_priority))
         // Photos are large: raise the body limit for the upload route only.
         .merge(
             OpenApiRouter::new()
