@@ -143,6 +143,19 @@ counts and adjustments, rebuilding balances; admin) and `inventory.cost`. A new 
 added. Technicians get nothing yet (A3 decides how they use van stock). Every table has `company_id`
 and every query filters on it; an id of another company is "not found".
 
+## Details settled in the implementation
+* A new warehouse or van gets one location (`MAIN`, for a van `VAN`) so it is usable at once.
+* Order lines now carry their `id` in the order API; reservations are made against it.
+* Posting a count and adjusting need `inventory.admin`, counting (entering quantities) only
+  `inventory.write`. A date sent as a date-time (what the generated Dart client does) is accepted
+  for expiry dates, as for other dates.
+* The balance row of a location is locked before an issue or transfer checks the stock and the
+  reservations, so two concurrent moves cannot both take the last unit.
+* Moves are not audited one by one (the ledger is the record); configuration, reversals,
+  adjustments, counts, reservation changes and balance rebuilds write `audit.events`.
+* `sales` calls `inventory::release_for_order` when an order is cancelled; `inventory` reads the
+  sales tables with SQL only, so the crate dependency points one way (sales to inventory).
+
 ## Consequences
 * Availability is a cheap read of the balance table; history is complete and auditable
   (`audit.events` for configuration, the ledger itself for moves).

@@ -13,7 +13,7 @@ Module overview: [ARCHITECTURE.md](ARCHITECTURE.md).
 | A1 Helpdesk SLA, teams, attachments, tags, merge, time, CSAT | Done, ADR 0017 (PR #2) |
 | A2 Knowledge base | Done, ADR 0018 (PR #2) |
 | A3 Field service completion | Open |
-| B1 Inventory foundation | Open |
+| B1 Inventory foundation | Done, [ADR 0019](adr/0019-inventory-stock-ledger.md) |
 | B2 Purchasing | Open (needs B1) |
 | B3 Delivery | Open (needs B1) |
 | C1 Production orders | Open (needs B1) |
@@ -41,12 +41,13 @@ Remaining knowledge base gaps (ADR 0018): non-image attachments, analytics, sema
 
 ## Track B - Supply chain (sequential)
 
-**B1 Inventory foundation** (large), finalise [ADR 0007](adr/0007-ledgers.md)
+**B1 Inventory foundation** (large, done), [ADR 0019](adr/0019-inventory-stock-ledger.md) finalises the stock part of [ADR 0007](adr/0007-ledgers.md)
 - Crate `inventory`: warehouses and locations (including service vans), an immutable `stock_moves` ledger
   with reversal corrections, a balance table updated in the same transaction, units of measure and
   conversions, lot/batch tracking (extend `tracking`), counts, adjustments, transfers.
 - Product additions: cost, reorder min/max, lead time, barcode. Cost is hidden from sales ([ADR 0004](adr/0004-authentication.md)).
 - Reservations against confirmed orders; availability (ATP) on the order screen.
+- Deferred to later items: two-step transfers, valuation beyond the standard-cost snapshot, a UI for product-specific units, van stock for technicians (A3), open POs/MOs in ATP (B2, C1).
 
 **B2 Purchasing** (large)
 - Crate `purchasing`: suppliers, supplier price lists, product codes, MOQ and lead times;

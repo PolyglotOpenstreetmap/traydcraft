@@ -18,7 +18,7 @@ system is proven (see [ADR 0008](adr/0008-accounting-stays-external.md)).
 Flutter app (Windows desktop for office, Android/iOS for technicians, web optional)
         │  HTTPS · REST/JSON · OpenAPI (generated Dart client)
 Rust API (Axum) — modular monolith
-  core · crm · products/pricing · sales · helpdesk · portal · (inventory · production · service · finance)
+  core · crm · products/pricing · sales · inventory · helpdesk · portal · (production · service · finance)
         │  SQLx, one transaction per business operation
 PostgreSQL — one database, one schema per module
   + object storage (documents, photos)
@@ -36,7 +36,7 @@ PostgreSQL — one database, one schema per module
 * **Multi-company from day one** ([ADR 0003](adr/0003-multi-company.md)).
 * **Documents are snapshots**: a sent quotation never changes; changes create a revision.
 * **History is never overwritten**: prices are dated rows, audit events are append-only;
-  stock will be a movement ledger plus a balance projection ([ADR 0007](adr/0007-ledgers.md)).
+  stock is a movement ledger plus a balance projection ([ADR 0019](adr/0019-inventory-stock-ledger.md), [ADR 0007](adr/0007-ledgers.md)).
 
 ## Modules
 
@@ -49,7 +49,7 @@ PostgreSQL — one database, one schema per module
 | documents | slice | PDF rendering (Typst) |
 | engineering | slice | BOM revisions (multi-level via subassemblies), explosion, serial units and as-built genealogy ([ADR 0011](adr/0011-bom-revisions-and-serial-genealogy.md)); routings and configurator planned |
 | purchasing | planned | suppliers, purchase orders, receipts |
-| inventory | planned | warehouses, locations (incl. service vans), movements, reservations |
+| inventory | slice | warehouses and locations (incl. service vans), units of measure, lot and serial tracking, an append-only stock move ledger with a balance projection, transfers, adjustments and counts, reservations for confirmed order lines and availability (ATP) on the order ([ADR 0019](adr/0019-inventory-stock-ledger.md)); other modules post moves through `inventory::post_move`; purchasing receipts, delivery, valuation and MRP planned |
 | production | planned | production orders, work orders, consumption, MTS/MTO planning |
 | quality | planned | inspections, non-conformances, traceability |
 | service | planned | installed assets (builds on serial units), warranties |
@@ -73,7 +73,7 @@ PostgreSQL — one database, one schema per module
 ## Roadmap
 
 1. **Foundation & sales** — customers, opportunities, quotations; next: contacts, activities, sales orders, e-mailing quotes.
-2. **Engineering & inventory** — BOM revisions and serial numbers (done); next: routings, configurator, warehouses, stock ledger, purchasing.
+2. **Engineering & inventory** — BOM revisions and serial numbers, warehouses, stock ledger, lots, reservations and counts (done); next: routings, configurator, purchasing.
 3. **Manufacturing** — MRP for MTS and MTO, production orders, labour, quality.
 4. **Service** — installed assets, repairs, field service planning, mobile app with offline sync.
 5. **Helpdesk & portal** — tickets from e-mail, prepared answers, orders, contacts, phone calls and a ticket portal (done); SLA, teams, attachments, tags, merge, time entries and satisfaction surveys (done, ADR 0017); knowledge base with portal help and ticket deflection (done, ADR 0018; remaining: attachments other than images, comments and ratings text, analytics, AI/semantic search, translation workflow, SEO export); next: automation rules, ticket split, reporting, business hours in the SLA, quotations in the portal.
