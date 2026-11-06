@@ -11,7 +11,7 @@ accepted one; mark superseded records as such.
 | [0004](0004-authentication.md) | OIDC authentication, roles per company in the ERP | Accepted |
 | [0005](0005-api-contract-and-codegen.md) | OpenAPI generated from Rust, Dart client generated from OpenAPI | Accepted |
 | [0006](0006-offline-sync.md) | Narrow, append-only offline sync for technicians | Proposed |
-| [0007](0007-ledgers.md) | Ledgers with projections for stock and money | Proposed |
+| [0007](0007-ledgers.md) | Ledgers with projections for stock and money | Accepted for stock (0019); finance Proposed |
 | [0008](0008-accounting-stays-external.md) | Statutory accounting stays in Exact; Peppol via an access point | Accepted |
 | [0009](0009-pdf-with-typst.md) | PDF documents with Typst | Accepted |
 | [0010](0010-flutter-desktop-first.md) | Flutter, desktop-first for the office | Accepted |
@@ -23,3 +23,4 @@ accepted one; mark superseded records as such.
 | [0016](0016-order-lifecycle.md) | Order lifecycle: revisions, customer confirmation, priority | Accepted |
 | [0017](0017-helpdesk-sla-teams-attachments.md) | Helpdesk: SLA and escalation, teams, attachments, tags, merge, time, satisfaction | Accepted |
 | [0018](0018-knowledge-base.md) | Knowledge base: five languages, full-text search, versions, portal and public reading | Accepted |
+| [0019](0019-inventory-stock-ledger.md) | Inventory: stock ledger, balances, lots, reservations, counts | Accepted |
