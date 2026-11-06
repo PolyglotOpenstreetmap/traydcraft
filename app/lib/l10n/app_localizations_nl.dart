@@ -40,6 +40,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Component toevoegen op serienummer (in stock)';
 
   @override
+  String get addEquipment => 'Installatie toevoegen';
+
+  @override
   String get addMember => 'Lid toevoegen';
 
   @override
@@ -47,6 +50,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get addNoteHint => 'Interne opmerking toevoegen';
+
+  @override
+  String get addPart => 'Onderdeel toevoegen';
 
   @override
   String get addPhone => 'Telefoonnummer toevoegen';
@@ -79,6 +85,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get addressInformal => 'Informeel (je)';
+
+  @override
+  String get addVisit => 'Bezoek toevoegen';
 
   @override
   String get agreed => 'Afgesproken';
@@ -141,6 +150,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get automatic => 'Automatisch';
+
+  @override
+  String get autoRenew => 'Automatisch verlengen';
 
   @override
   String get backIntoWork => 'Terug in behandeling';
@@ -233,6 +245,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get cannotConfirmOther => 'Deze order kan niet worden bevestigd.';
 
   @override
+  String get captureSignature => 'Handtekening vastleggen';
+
+  @override
   String get category => 'Categorie';
 
   @override
@@ -269,6 +284,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get changePriority => 'Prioriteit wijzigen';
 
   @override
+  String get checklistOnePerLine => 'Checklist (één taak per regel)';
+
+  @override
   String get chooseCustomerAndLine =>
       'Kies een klant en voeg minstens één geldige lijn toe.';
 
@@ -284,6 +302,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get city => 'Gemeente';
+
+  @override
+  String get clear => 'Wissen';
 
   @override
   String get close => 'Sluiten';
@@ -367,6 +388,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get contacts => 'Contactpersonen';
 
   @override
+  String get contractEnded => 'Beëindigd';
+
+  @override
+  String get contractJobs => 'Opdrachten van dit contract';
+
+  @override
+  String contractLabel(String number) {
+    return 'Contract $number';
+  }
+
+  @override
+  String contractOpenJobs(String count) {
+    return '$count open opdrachten';
+  }
+
+  @override
+  String get contracts => 'Contracten';
+
+  @override
+  String get contractSuspended => 'Opgeschort';
+
+  @override
   String get convertHelp =>
       'Wil de klant nog iets wijzigen? Maak eerst een nieuwe revisie van de offerte, koppel die hier en zet ze dan om.';
 
@@ -430,6 +473,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get customer => 'Klant';
 
   @override
+  String get customerDeclinedToSign => 'De klant weigerde te tekenen';
+
+  @override
+  String get customerEquipment => 'Installaties van de klant';
+
+  @override
   String get customerLanguage => 'Taal klant';
 
   @override
@@ -452,7 +501,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get customers => 'Klanten';
 
   @override
+  String get customerSignature => 'Handtekening klant';
+
+  @override
   String get date => 'Datum';
+
+  @override
+  String declinedToSignWithReason(String reason) {
+    return 'Weigerde te tekenen: $reason';
+  }
 
   @override
   String get defaultTeam => 'Standaardteam voor nieuwe tickets';
@@ -507,6 +564,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get draftSaved => 'Concept opgeslagen';
 
   @override
+  String get drawSignatureFirst => 'Teken eerst een handtekening';
+
+  @override
+  String dueOnDate(String date) {
+    return 'Uit te voeren op $date';
+  }
+
+  @override
   String get edit => 'Bewerken';
 
   @override
@@ -525,12 +590,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get emailAddresses => 'E-mailadressen (het eerste is het hoofdadres)';
 
   @override
+  String get endContract => 'Contract beëindigen';
+
+  @override
+  String get endDate => 'Einddatum';
+
+  @override
   String get enterChange => 'Geef de wijziging in, bv. 4,5 voor +4,5 %.';
 
   @override
   String enterValidNumbersLine(int line) {
     return 'Lijn $line: geef geldige getallen in.';
   }
+
+  @override
+  String get equipment => 'Installatie';
+
+  @override
+  String get estimatedMinutes => 'Geschatte minuten';
 
   @override
   String get expectedClose => 'Verwachte afsluiting';
@@ -565,6 +642,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get faultDescription => 'Wat is er mis';
+
+  @override
+  String get firstDueDate => 'Eerste uitvoerdatum';
 
   @override
   String get firstName => 'Voornaam';
@@ -638,10 +718,23 @@ class AppLocalizationsNl extends AppLocalizations {
       'Een vraag tussen collega\'s; er wordt niets naar de klant gestuurd.';
 
   @override
+  String get interval => 'Interval';
+
+  @override
   String get jobCancelled => 'Geannuleerd';
 
   @override
   String get jobCompleted => 'Afgewerkt';
+
+  @override
+  String jobCount(String count) {
+    return '$count opdrachten';
+  }
+
+  @override
+  String jobCreatedOnDate(String date) {
+    return 'opdracht wordt aangemaakt op $date';
+  }
 
   @override
   String get jobInProgress => 'Bezig';
@@ -689,6 +782,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get leadCreated => 'Lead aangemaakt';
+
+  @override
+  String get leadDays => 'Opdracht aanmaken (dagen vooraf)';
 
   @override
   String get lineDiscount => 'Lijnkorting';
@@ -782,6 +878,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get months => 'Maanden';
+
+  @override
   String get myJobs => 'Mijn opdrachten';
 
   @override
@@ -810,6 +909,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get newContact => 'Nieuwe contactpersoon';
+
+  @override
+  String get newContract => 'Nieuw contract';
 
   @override
   String get newCustomer => 'Nieuwe klant';
@@ -883,7 +985,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get noContacts => 'Nog geen contactpersonen.';
 
   @override
+  String get noContracts => 'Geen contracten';
+
+  @override
+  String get noCustomerEquipment =>
+      'Deze klant heeft geen geïnstalleerde toestellen';
+
+  @override
   String get noCustomerLinked => 'Geen klant gekoppeld';
+
+  @override
+  String get noEquipment => 'Geen installatie gekoppeld';
 
   @override
   String get noExpectedClose => 'Geen verwachte afsluitdatum';
@@ -896,6 +1008,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get noOrdersYet => 'U hebt nog geen orders.';
+
+  @override
+  String get noParts => 'Geen onderdelen geregistreerd';
 
   @override
   String get noPermission =>
@@ -927,6 +1042,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get noSerialComponents => 'Geen componenten met serienummer.';
+
+  @override
+  String get noSignature => 'Nog niet getekend';
 
   @override
   String get noTeam => 'Geen team';
@@ -963,6 +1081,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get notes => 'Opmerkingen';
+
+  @override
+  String get noUpcomingVisits => 'Geen bezoeken gepland';
 
   @override
   String get number => 'Nummer';
@@ -1063,6 +1184,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get owner => 'Verantwoordelijke';
+
+  @override
+  String get partFreeTextHint => 'Kies een product of typ een omschrijving';
+
+  @override
+  String get partsUsed => 'Gebruikte onderdelen';
 
   @override
   String get paymentDays => 'Betalingstermijn (dagen)';
@@ -1346,6 +1473,15 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get recurrenceMonthList => 'In gekozen maanden';
+
+  @override
+  String get recurrenceMonths => 'Om de N maanden';
+
+  @override
+  String get recurrenceWeeks => 'Om de N weken';
+
+  @override
   String registerProduct(String product) {
     return '$product registreren';
   }
@@ -1434,10 +1570,27 @@ class AppLocalizationsNl extends AppLocalizations {
   String get repairs => 'Herstellingen';
 
   @override
+  String get replaceSignature => 'Handtekening vervangen';
+
+  @override
   String get replyQueued => 'Antwoord klaar voor verzending';
 
   @override
   String get replyToCustomer => 'Antwoord aan klant';
+
+  @override
+  String get reportQueued => 'De werkbon wordt verstuurd';
+
+  @override
+  String get reportSend => 'Werkbon per e-mail versturen';
+
+  @override
+  String reportSentTo(String to, String date) {
+    return 'Verstuurd naar $to op $date';
+  }
+
+  @override
+  String get reportView => 'Werkbon bekijken (PDF)';
 
   @override
   String repricingFailed(String error) {
@@ -1469,7 +1622,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get required => 'Verplicht';
 
   @override
+  String get resolutionHours => 'Oplossing binnen (uren)';
+
+  @override
   String get resolutionMinutes => 'Oplossing (min)';
+
+  @override
+  String get responseHours => 'Reactie binnen (uren)';
 
   @override
   String get retry => 'Opnieuw';
@@ -1616,7 +1775,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get server => 'Server';
 
   @override
+  String get serviceReport => 'Werkbon';
+
+  @override
+  String get setWarranty => 'Garantie instellen';
+
+  @override
   String get showInactive => 'Toon inactieve';
+
+  @override
+  String signedByOn(String name, String date) {
+    return 'Getekend door $name op $date';
+  }
+
+  @override
+  String get signerName => 'Naam van de ondertekenaar';
+
+  @override
+  String get signHere => 'Teken hier';
 
   @override
   String get signIn => 'Aanmelden';
@@ -1720,6 +1896,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get stageWon => 'gewonnen';
 
   @override
+  String get startDate => 'Startdatum';
+
+  @override
   String get startJob => 'Start opdracht';
 
   @override
@@ -1770,6 +1949,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String suggested(String value) {
     return 'Voorstel: $value';
   }
+
+  @override
+  String get suspendContract => 'Opschorten';
 
   @override
   String get tags => 'Labels';
@@ -1922,6 +2104,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get until => 'Tot';
 
   @override
+  String get upcomingVisits => 'Geplande bezoeken';
+
+  @override
   String get updateToCurrentPrices => 'Bijwerken naar huidige prijzen';
 
   @override
@@ -1970,7 +2155,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get viaPortal => 'Via het klantenportaal';
 
   @override
+  String get visitTemplates => 'Bezoeken';
+
+  @override
+  String get visitTitleRequired => 'Elk bezoek heeft een titel nodig';
+
+  @override
   String get warranty => 'Garantie';
+
+  @override
+  String get warrantyExpired => 'Garantie verlopen';
 
   @override
   String get warrantyIn => 'Onder garantie';
@@ -1980,6 +2174,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get warrantyUnknown => 'Onbekend';
+
+  @override
+  String warrantyUntilDate(String date) {
+    return 'tot $date';
+  }
+
+  @override
+  String get warrantyUntilLabel => 'Garantie tot';
 
   @override
   String weighted(String amount) {

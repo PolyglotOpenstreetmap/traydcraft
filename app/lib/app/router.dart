@@ -11,6 +11,9 @@ import '../features/field/job_screen.dart';
 import '../features/kb/kb_categories_page.dart';
 import '../features/kb/kb_entry_screen.dart';
 import '../features/kb/kb_page.dart';
+import '../features/field/contract_screen.dart';
+import '../features/field/contracts_page.dart';
+import '../features/field/customer_equipment_page.dart';
 import '../features/field/jobs_page.dart';
 import '../features/orders/order_screen.dart';
 import '../features/orders/orders_page.dart';
@@ -96,6 +99,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, s) => RepairScreen(id: s.pathParameters['id']!),
           ),
           GoRoute(path: '/jobs', builder: (_, _) => const JobsPage()),
+          GoRoute(
+            path: '/jobs/contracts',
+            builder: (_, _) => const ContractsPage(),
+          ),
+          GoRoute(
+            path: '/jobs/contracts/:id',
+            builder: (_, s) => ContractScreen(
+              id: s.pathParameters['id'] == 'new'
+                  ? null
+                  : s.pathParameters['id'],
+            ),
+          ),
+          GoRoute(
+            path: '/jobs/equipment/:customerId',
+            builder: (_, s) => CustomerEquipmentPage(
+              customerId: s.pathParameters['customerId']!,
+            ),
+          ),
           GoRoute(
             path: '/jobs/:id',
             builder: (_, s) => JobScreen(id: s.pathParameters['id']!),

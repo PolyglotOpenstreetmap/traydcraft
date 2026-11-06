@@ -40,6 +40,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add component by serial number (in stock)';
 
   @override
+  String get addEquipment => 'Add equipment';
+
+  @override
   String get addMember => 'Add member';
 
   @override
@@ -47,6 +50,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addNoteHint => 'Add an internal note';
+
+  @override
+  String get addPart => 'Add part';
 
   @override
   String get addPhone => 'Add phone number';
@@ -79,6 +85,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addressInformal => 'Informal (Hi Sam)';
+
+  @override
+  String get addVisit => 'Add visit';
 
   @override
   String get agreed => 'Agreed';
@@ -140,6 +149,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get automatic => 'Automatic';
+
+  @override
+  String get autoRenew => 'Renew automatically';
 
   @override
   String get backIntoWork => 'Back into work';
@@ -232,6 +244,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cannotConfirmOther => 'This order cannot be confirmed.';
 
   @override
+  String get captureSignature => 'Capture signature';
+
+  @override
   String get category => 'Category';
 
   @override
@@ -268,6 +283,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePriority => 'Change priority';
 
   @override
+  String get checklistOnePerLine => 'Checklist (one task per line)';
+
+  @override
   String get chooseCustomerAndLine =>
       'Choose a customer and add at least one valid line.';
 
@@ -283,6 +301,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get city => 'City';
+
+  @override
+  String get clear => 'Clear';
 
   @override
   String get close => 'Close';
@@ -366,6 +387,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contacts => 'Contacts';
 
   @override
+  String get contractEnded => 'Ended';
+
+  @override
+  String get contractJobs => 'Jobs of this contract';
+
+  @override
+  String contractLabel(String number) {
+    return 'Contract $number';
+  }
+
+  @override
+  String contractOpenJobs(String count) {
+    return '$count open jobs';
+  }
+
+  @override
+  String get contracts => 'Contracts';
+
+  @override
+  String get contractSuspended => 'Suspended';
+
+  @override
   String get convertHelp =>
       'Does the customer want changes? Make a new revision of the quotation first, link it here, then convert.';
 
@@ -429,6 +472,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customer => 'Customer';
 
   @override
+  String get customerDeclinedToSign => 'The customer declined to sign';
+
+  @override
+  String get customerEquipment => 'Customer equipment';
+
+  @override
   String get customerLanguage => 'Customer language';
 
   @override
@@ -451,7 +500,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customers => 'Customers';
 
   @override
+  String get customerSignature => 'Customer signature';
+
+  @override
   String get date => 'Date';
+
+  @override
+  String declinedToSignWithReason(String reason) {
+    return 'Declined to sign: $reason';
+  }
 
   @override
   String get defaultTeam => 'Default team for new tickets';
@@ -506,6 +563,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get draftSaved => 'Draft saved';
 
   @override
+  String get drawSignatureFirst => 'Draw a signature first';
+
+  @override
+  String dueOnDate(String date) {
+    return 'Due $date';
+  }
+
+  @override
   String get edit => 'Edit';
 
   @override
@@ -524,12 +589,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailAddresses => 'E-mail addresses (the first is primary)';
 
   @override
+  String get endContract => 'End contract';
+
+  @override
+  String get endDate => 'End date';
+
+  @override
   String get enterChange => 'Enter the change, e.g. 4.5 for +4.5 %.';
 
   @override
   String enterValidNumbersLine(int line) {
     return 'Line $line: enter valid numbers.';
   }
+
+  @override
+  String get equipment => 'Equipment';
+
+  @override
+  String get estimatedMinutes => 'Estimated minutes';
 
   @override
   String get expectedClose => 'Expected close';
@@ -564,6 +641,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faultDescription => 'What is wrong';
+
+  @override
+  String get firstDueDate => 'First due date';
 
   @override
   String get firstName => 'First name';
@@ -637,10 +717,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'A question between colleagues; nothing is sent to the customer.';
 
   @override
+  String get interval => 'Interval';
+
+  @override
   String get jobCancelled => 'Cancelled';
 
   @override
   String get jobCompleted => 'Completed';
+
+  @override
+  String jobCount(String count) {
+    return '$count jobs';
+  }
+
+  @override
+  String jobCreatedOnDate(String date) {
+    return 'job created on $date';
+  }
 
   @override
   String get jobInProgress => 'In progress';
@@ -688,6 +781,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get leadCreated => 'Lead created';
+
+  @override
+  String get leadDays => 'Create the job (days before)';
 
   @override
   String get lineDiscount => 'Line disc.';
@@ -781,6 +877,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get months => 'Months';
+
+  @override
   String get myJobs => 'My jobs';
 
   @override
@@ -809,6 +908,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get newContact => 'New contact';
+
+  @override
+  String get newContract => 'New contract';
 
   @override
   String get newCustomer => 'New customer';
@@ -882,7 +984,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noContacts => 'No contacts yet.';
 
   @override
+  String get noContracts => 'No contracts';
+
+  @override
+  String get noCustomerEquipment => 'This customer has no installed units';
+
+  @override
   String get noCustomerLinked => 'No customer linked';
+
+  @override
+  String get noEquipment => 'No equipment linked';
 
   @override
   String get noExpectedClose => 'No expected close date';
@@ -895,6 +1006,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noOrdersYet => 'You have no orders yet.';
+
+  @override
+  String get noParts => 'No parts recorded';
 
   @override
   String get noPermission =>
@@ -926,6 +1040,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noSerialComponents => 'No serialised components.';
+
+  @override
+  String get noSignature => 'Not signed yet';
 
   @override
   String get noTeam => 'No team';
@@ -962,6 +1079,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notes => 'Notes';
+
+  @override
+  String get noUpcomingVisits => 'No visits due';
 
   @override
   String get number => 'Number';
@@ -1062,6 +1182,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get owner => 'Owner';
+
+  @override
+  String get partFreeTextHint => 'Pick a product or type a description';
+
+  @override
+  String get partsUsed => 'Parts used';
 
   @override
   String get paymentDays => 'Payment days';
@@ -1345,6 +1471,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get recurrenceMonthList => 'In chosen months';
+
+  @override
+  String get recurrenceMonths => 'Every N months';
+
+  @override
+  String get recurrenceWeeks => 'Every N weeks';
+
+  @override
   String registerProduct(String product) {
     return 'Register $product';
   }
@@ -1433,10 +1568,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get repairs => 'Repairs';
 
   @override
+  String get replaceSignature => 'Replace signature';
+
+  @override
   String get replyQueued => 'Reply queued for sending';
 
   @override
   String get replyToCustomer => 'Reply to customer';
+
+  @override
+  String get reportQueued => 'The report will be sent';
+
+  @override
+  String get reportSend => 'Send report by e-mail';
+
+  @override
+  String reportSentTo(String to, String date) {
+    return 'Sent to $to on $date';
+  }
+
+  @override
+  String get reportView => 'View report (PDF)';
 
   @override
   String repricingFailed(String error) {
@@ -1468,7 +1620,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get required => 'Required';
 
   @override
+  String get resolutionHours => 'Resolution within (hours)';
+
+  @override
   String get resolutionMinutes => 'Resolution (min)';
+
+  @override
+  String get responseHours => 'Response within (hours)';
 
   @override
   String get retry => 'Retry';
@@ -1615,7 +1773,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get server => 'Server';
 
   @override
+  String get serviceReport => 'Service report';
+
+  @override
+  String get setWarranty => 'Set warranty';
+
+  @override
   String get showInactive => 'Show inactive';
+
+  @override
+  String signedByOn(String name, String date) {
+    return 'Signed by $name on $date';
+  }
+
+  @override
+  String get signerName => 'Name of the signer';
+
+  @override
+  String get signHere => 'Sign here';
 
   @override
   String get signIn => 'Sign in';
@@ -1719,6 +1894,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stageWon => 'won';
 
   @override
+  String get startDate => 'Start date';
+
+  @override
   String get startJob => 'Start job';
 
   @override
@@ -1769,6 +1947,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String suggested(String value) {
     return 'Suggested: $value';
   }
+
+  @override
+  String get suspendContract => 'Suspend';
 
   @override
   String get tags => 'Tags';
@@ -1921,6 +2102,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get until => 'Until';
 
   @override
+  String get upcomingVisits => 'Upcoming visits';
+
+  @override
   String get updateToCurrentPrices => 'Update to current prices';
 
   @override
@@ -1969,7 +2153,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viaPortal => 'Via the customer portal';
 
   @override
+  String get visitTemplates => 'Visits';
+
+  @override
+  String get visitTitleRequired => 'Every visit needs a title';
+
+  @override
   String get warranty => 'Warranty';
+
+  @override
+  String get warrantyExpired => 'Warranty expired';
 
   @override
   String get warrantyIn => 'In warranty';
@@ -1979,6 +2172,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get warrantyUnknown => 'Unknown';
+
+  @override
+  String warrantyUntilDate(String date) {
+    return 'until $date';
+  }
+
+  @override
+  String get warrantyUntilLabel => 'Warranty until';
 
   @override
   String weighted(String amount) {

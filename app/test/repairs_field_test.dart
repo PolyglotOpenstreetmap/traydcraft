@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -274,6 +273,7 @@ void main() {
       ],
       'tasks_total': 2,
       'tasks_done': task1 ? 1 : 0,
+      'report_sent_to': '',
     },
     'contact_phones': [
       {'label': 'mobile', 'number': '0475 00 00 22'},
@@ -295,6 +295,8 @@ void main() {
     ],
     'work_logs': <Object?>[],
     'photos': <Object?>[],
+    'equipment': <Object?>[],
+    'parts': <Object?>[],
     'work_minutes': 0,
     'travel_minutes': 0,
   };

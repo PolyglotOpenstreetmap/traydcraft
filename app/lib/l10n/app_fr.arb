@@ -9,9 +9,11 @@
   "activeSince": "Active depuis le {date}. Les modifications passent par une nouvelle révision.",
   "addComponent": "Ajouter un composant",
   "addComponentBySerial": "Ajouter un composant par numéro de série (en stock)",
+  "addEquipment": "Ajouter une installation",
   "addMember": "Ajouter un membre",
   "addNote": "Ajouter la note",
   "addNoteHint": "Ajouter une note interne",
+  "addPart": "Ajouter une pièce",
   "addPhone": "Ajouter un numéro",
   "addPhoto": "Ajouter une photo",
   "addProduct": "Ajouter un produit",
@@ -22,6 +24,7 @@
   "addressForm": "Forme d'adresse",
   "addressFormal": "Formel (vous)",
   "addressInformal": "Informel (tu)",
+  "addVisit": "Ajouter une visite",
   "agreed": "Convenu",
   "all": "Tous",
   "allProducts": "Tous les produits",
@@ -41,6 +44,7 @@
   "attachments": "Pièces jointes",
   "attachmentsHelp": "Images (JPEG, PNG, WebP) et PDF, jusqu'à 12 Mo",
   "automatic": "Automatique",
+  "autoRenew": "Renouveler automatiquement",
   "backIntoWork": "Remettre en cours",
   "backToCurrentRevision": "Retour à la révision actuelle",
   "billOfMaterials": "Nomenclature",
@@ -69,6 +73,7 @@
   "cancelledReason": "Annulée : {reason}",
   "cannotConfirmNewer": "Une révision plus récente de cette commande est en préparation. Vous pourrez la confirmer dès qu'elle vous aura été envoyée.",
   "cannotConfirmOther": "Cette commande ne peut pas être confirmée.",
+  "captureSignature": "Recueillir la signature",
   "category": "Catégorie",
   "categoryComplaint": "réclamation",
   "categoryLead": "prospect (nouvelle demande)",
@@ -81,11 +86,13 @@
   "cc": "Cc",
   "change": "Modification",
   "changePriority": "Modifier la priorité",
+  "checklistOnePerLine": "Liste de contrôle (une tâche par ligne)",
   "chooseCustomerAndLine": "Choisissez un client et ajoutez au moins une ligne valide.",
   "choosePhoto": "Choisir dans la galerie",
   "chooseRebateTarget": "Choisissez un produit ou une famille et saisissez un pourcentage.",
   "chooseZonePrice": "Choisissez une zone et saisissez un prix.",
   "city": "Localité",
+  "clear": "Effacer",
   "close": "Fermer",
   "code": "Code",
   "codeNameVatRequired": "Le code, le nom et le taux de TVA sont obligatoires.",
@@ -111,6 +118,26 @@
   "contactName": "Nom du contact",
   "contactPerson": "Personne de contact",
   "contacts": "Contacts",
+  "contractEnded": "Terminé",
+  "contractJobs": "Interventions de ce contrat",
+  "contractLabel": "Contrat {number}",
+  "@contractLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "contractOpenJobs": "{count} interventions ouvertes",
+  "@contractOpenJobs": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "contracts": "Contrats",
+  "contractSuspended": "Suspendu",
   "convertHelp": "Le client souhaite des modifications ? Créez d'abord une nouvelle révision de l'offre, liez-la ici, puis convertissez.",
   "convertToOrder": "Convertir en commande",
   "countOf": "{count} sur {total}",
@@ -130,13 +157,24 @@
   "csatTitle": "Satisfaction client",
   "current": "Actuel",
   "customer": "Client",
+  "customerDeclinedToSign": "Le client a refusé de signer",
+  "customerEquipment": "Installations du client",
   "customerLanguage": "Langue du client",
   "customerMainNumber": "Numéro principal de {name}",
   "customerNamed": "Client : {name}",
   "customerOptional": "Client (facultatif)",
   "customerReference": "Référence client",
   "customers": "Clients",
+  "customerSignature": "Signature du client",
   "date": "Date",
+  "declinedToSignWithReason": "A refusé de signer : {reason}",
+  "@declinedToSignWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "defaultTeam": "Équipe par défaut pour les nouveaux tickets",
   "deliveryFailed": "non envoyé",
   "deliveryQueued": "en attente d'envoi",
@@ -154,14 +192,27 @@
   "dismiss": "Rejeter",
   "dismissRequest": "Rejeter la demande",
   "draftSaved": "Brouillon enregistré",
+  "drawSignatureFirst": "Dessinez d'abord une signature",
+  "dueOnDate": "À faire le {date}",
+  "@dueOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "edit": "Modifier",
   "editContact": "Modifier le contact",
   "editDepartment": "Modifier le département",
   "editJob": "Modifier l'intervention",
   "email": "E-mail",
   "emailAddresses": "Adresses e-mail (la première est principale)",
+  "endContract": "Terminer le contrat",
+  "endDate": "Date de fin",
   "enterChange": "Saisissez la modification, p. ex. 4,5 pour +4,5 %.",
   "enterValidNumbersLine": "Ligne {line} : saisissez des nombres valides.",
+  "equipment": "Installation",
+  "estimatedMinutes": "Minutes estimées",
   "expectedClose": "Clôture prévue",
   "expectedCloseDate": "Clôture prévue le {date}",
   "expectedValue": "Valeur attendue",
@@ -172,6 +223,7 @@
   "family": "Famille",
   "familyNamed": "Famille {code}",
   "faultDescription": "Quel est le problème",
+  "firstDueDate": "Première échéance",
   "firstName": "Prénom",
   "firstResponseMinutes": "Première réponse (min)",
   "from": "À partir du",
@@ -192,8 +244,25 @@
   "internalQuestionHelp": "Question interne. Posez la question au client en {language} par une réponse, puis notez la réponse pour votre collègue en note interne.",
   "internalTicket": "Ticket interne",
   "internalTicketHelp": "Une question entre collègues ; rien n'est envoyé au client.",
+  "interval": "Intervalle",
   "jobCancelled": "Annulée",
   "jobCompleted": "Terminée",
+  "jobCount": "{count} interventions",
+  "@jobCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "jobCreatedOnDate": "intervention créée le {date}",
+  "@jobCreatedOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "jobInProgress": "En cours",
   "jobKindInspection": "Inspection",
   "jobKindInstallation": "Installation",
@@ -209,6 +278,7 @@
   "languageSameAsCustomer": "Comme l'entreprise ({language})",
   "lastName": "Nom",
   "leadCreated": "Opportunité créée",
+  "leadDays": "Créer l'intervention (jours avant)",
   "lineDiscount": "Remise ligne",
   "listPrice": "Prix catalogue",
   "loadMore": "Charger plus",
@@ -237,6 +307,7 @@
   "messageSent": "Message envoyé",
   "minutes": "Minutes",
   "minutesShort": "{minutes} min",
+  "months": "Mois",
   "myJobs": "Mes interventions",
   "myOrders": "Mes commandes",
   "myProfile": "Mes données",
@@ -247,6 +318,7 @@
   "netPrice": "Prix net",
   "newAnswer": "Nouvelle réponse",
   "newContact": "Nouveau contact",
+  "newContract": "Nouveau contrat",
   "newCustomer": "Nouveau client",
   "newDepartment": "Nouveau département",
   "newFamily": "Nouvelle famille",
@@ -269,11 +341,15 @@
   "noBom": "Pas encore de nomenclature.",
   "noContactLinked": "Aucune personne de contact liée",
   "noContacts": "Pas encore de contacts.",
+  "noContracts": "Aucun contrat",
+  "noCustomerEquipment": "Ce client n'a aucun appareil installé",
   "noCustomerLinked": "Aucun client lié",
+  "noEquipment": "Aucune installation liée",
   "noExpectedClose": "Pas de date de clôture prévue",
   "noJobsAssigned": "Aucune intervention ne vous est assignée.",
   "noLines": "Pas encore de lignes.",
   "noOrdersYet": "Vous n'avez pas encore de commandes.",
+  "noParts": "Aucune pièce enregistrée",
   "noPermission": "Vous n'avez pas le droit de modifier ces paramètres.",
   "noPhotos": "Pas encore de photos.",
   "noPrices": "Pas encore de prix.",
@@ -284,6 +360,7 @@
   "noRepairs": "Aucune réparation.",
   "noRepairsYet": "Vous n'avez pas encore de réparations.",
   "noSerialComponents": "Aucun composant sérialisé.",
+  "noSignature": "Pas encore signé",
   "noTeam": "Aucune équipe",
   "noTechnicians": "Personne d'assigné",
   "noTicketsYet": "Vous n'avez pas encore de tickets.",
@@ -296,6 +373,7 @@
   "noteAdded": "Note ajoutée",
   "noteOptional": "Remarque (facultatif)",
   "notes": "Remarques",
+  "noUpcomingVisits": "Aucune visite prévue",
   "number": "Numéro",
   "numberRequired": "Nombre",
   "obsoleteRevision": "Révision obsolète (lecture seule).",
@@ -325,6 +403,8 @@
   "orderStatusReadyForShipping": "prête à l'expédition",
   "orders": "Commandes",
   "owner": "Responsable",
+  "partFreeTextHint": "Choisissez un produit ou saisissez une description",
+  "partsUsed": "Pièces utilisées",
   "paymentDays": "Délai de paiement (jours)",
   "pdf": "PDF",
   "personTitle": "Titre",
@@ -409,6 +489,9 @@
   "rebateSourceGeneral": "générale",
   "rebateSourceProduct": "produit",
   "rebatesOf": "Remises · {customer}",
+  "recurrenceMonthList": "Les mois choisis",
+  "recurrenceMonths": "Tous les N mois",
+  "recurrenceWeeks": "Toutes les N semaines",
   "registerProduct": "Enregistrer {product}",
   "registerUnit": "Enregistrer une unité",
   "registered": "Enregistré",
@@ -436,8 +519,23 @@
   "repairStatusWaitingCustomer": "En attente du client",
   "repairStatusWaitingParts": "En attente de pièces",
   "repairs": "Réparations",
+  "replaceSignature": "Remplacer la signature",
   "replyQueued": "Réponse en file d'envoi",
   "replyToCustomer": "Répondre au client",
+  "reportQueued": "Le rapport va être envoyé",
+  "reportSend": "Envoyer le rapport par e-mail",
+  "reportSentTo": "Envoyé à {to} le {date}",
+  "@reportSentTo": {
+    "placeholders": {
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reportView": "Voir le rapport (PDF)",
   "repricingFailed": "Les prix du jour n'ont pas pu être calculés : {error}",
   "requestDismissedSnack": "Demande rejetée.",
   "requestLessUrgent": "Moins urgent",
@@ -447,7 +545,9 @@
   "requestStatusDismissed": "rejetée",
   "requestStatusOpen": "ouverte",
   "required": "Obligatoire",
+  "resolutionHours": "Résolution sous (heures)",
   "resolutionMinutes": "Résolution (min)",
+  "responseHours": "Réponse sous (heures)",
   "retry": "Réessayer",
   "revisionActivated": "Révision activée",
   "revisionItem": "Révision {revision} · {status} · {lines} lignes",
@@ -492,7 +592,22 @@
   "serialNumbersHelp": "Chaque unité reçoit son propre numéro de série et historique",
   "serialScrapped": "mis au rebut",
   "server": "Serveur",
+  "serviceReport": "Rapport d'intervention",
+  "setWarranty": "Définir la garantie",
   "showInactive": "Afficher les inactifs",
+  "signedByOn": "Signé par {name} le {date}",
+  "@signedByOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "signerName": "Nom du signataire",
+  "signHere": "Signez ici",
   "signIn": "Se connecter",
   "signOut": "Se déconnecter",
   "signedInAs": "Connecté en tant que {name}",
@@ -523,6 +638,7 @@
   "stageProposal": "proposition",
   "stageQualified": "qualifiée",
   "stageWon": "gagnée",
+  "startDate": "Date de début",
   "startJob": "Démarrer",
   "startWork": "Commencer le travail",
   "status": "Statut",
@@ -539,6 +655,7 @@
   "subject": "Objet",
   "subjectOptional": "Objet (facultatif)",
   "suggested": "Suggestion : {value}",
+  "suspendContract": "Suspendre",
   "tags": "Étiquettes",
   "takePhoto": "Prendre une photo",
   "tasks": "Tâches",
@@ -586,6 +703,7 @@
   "unitPriceExclVat": "Prix unitaire (HTVA)",
   "unknownCaller": "Appelant inconnu",
   "until": "Jusqu'au",
+  "upcomingVisits": "Visites à venir",
   "updateToCurrentPrices": "Mettre à jour aux prix actuels",
   "updated": "Mis à jour",
   "uploadingFile": "Envoi…",
@@ -600,10 +718,22 @@
   "vatOn": "TVA {rate} % sur {base}",
   "vatPercent": "TVA %",
   "viaPortal": "Via le portail client",
+  "visitTemplates": "Visites",
+  "visitTitleRequired": "Chaque visite doit avoir un titre",
   "warranty": "Garantie",
+  "warrantyExpired": "Garantie expirée",
   "warrantyIn": "Sous garantie",
   "warrantyOut": "Hors garantie",
   "warrantyUnknown": "Inconnue",
+  "warrantyUntilDate": "jusqu'au {date}",
+  "@warrantyUntilDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "warrantyUntilLabel": "Garantie jusqu'au",
   "weighted": "pondéré {amount}",
   "whatWasAsked": "Quelle est la demande ?",
   "whoIsCalling": "Qui appelle ?",

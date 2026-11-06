@@ -16,9 +16,11 @@
   },
   "addComponent": "Add component",
   "addComponentBySerial": "Add component by serial number (in stock)",
+  "addEquipment": "Add equipment",
   "addMember": "Add member",
   "addNote": "Add note",
   "addNoteHint": "Add an internal note",
+  "addPart": "Add part",
   "addPhone": "Add phone number",
   "addPhoto": "Add photo",
   "addProduct": "Add product",
@@ -39,6 +41,7 @@
   "addressForm": "Form of address",
   "addressFormal": "Formal (Dear Mr. Smith)",
   "addressInformal": "Informal (Hi Sam)",
+  "addVisit": "Add visit",
   "agreed": "Agreed",
   "all": "All",
   "allProducts": "All products",
@@ -75,6 +78,7 @@
   "attachments": "Attachments",
   "attachmentsHelp": "Images (JPEG, PNG, WebP) and PDF, up to 12 MB",
   "automatic": "Automatic",
+  "autoRenew": "Renew automatically",
   "backIntoWork": "Back into work",
   "backToCurrentRevision": "Back to current revision",
   "billOfMaterials": "Bill of materials",
@@ -117,6 +121,7 @@
   },
   "cannotConfirmNewer": "A newer revision of this order is being prepared. You can confirm it once it has been sent to you.",
   "cannotConfirmOther": "This order cannot be confirmed.",
+  "captureSignature": "Capture signature",
   "category": "Category",
   "categoryComplaint": "complaint",
   "categoryLead": "lead (new business)",
@@ -129,11 +134,13 @@
   "cc": "Cc",
   "change": "Change",
   "changePriority": "Change priority",
+  "checklistOnePerLine": "Checklist (one task per line)",
   "chooseCustomerAndLine": "Choose a customer and add at least one valid line.",
   "choosePhoto": "Choose from gallery",
   "chooseRebateTarget": "Choose a product or family and enter a percentage.",
   "chooseZonePrice": "Choose a zone and enter a price.",
   "city": "City",
+  "clear": "Clear",
   "close": "Close",
   "code": "Code",
   "codeNameVatRequired": "Code, name and VAT rate are required.",
@@ -176,6 +183,26 @@
   "contactName": "Contact name",
   "contactPerson": "Contact person",
   "contacts": "Contacts",
+  "contractEnded": "Ended",
+  "contractJobs": "Jobs of this contract",
+  "contractLabel": "Contract {number}",
+  "@contractLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "contractOpenJobs": "{count} open jobs",
+  "@contractOpenJobs": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "contracts": "Contracts",
+  "contractSuspended": "Suspended",
   "convertHelp": "Does the customer want changes? Make a new revision of the quotation first, link it here, then convert.",
   "convertToOrder": "Convert to order",
   "countOf": "{count} of {total}",
@@ -212,6 +239,8 @@
   "csatTitle": "Customer satisfaction",
   "current": "Current",
   "customer": "Customer",
+  "customerDeclinedToSign": "The customer declined to sign",
+  "customerEquipment": "Customer equipment",
   "customerLanguage": "Customer language",
   "customerMainNumber": "Main number of {name}",
   "@customerMainNumber": {
@@ -232,7 +261,16 @@
   "customerOptional": "Customer (optional)",
   "customerReference": "Customer reference",
   "customers": "Customers",
+  "customerSignature": "Customer signature",
   "date": "Date",
+  "declinedToSignWithReason": "Declined to sign: {reason}",
+  "@declinedToSignWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "defaultTeam": "Default team for new tickets",
   "deliveryFailed": "not sent",
   "deliveryQueued": "waiting to send",
@@ -250,12 +288,23 @@
   "dismiss": "Dismiss",
   "dismissRequest": "Dismiss request",
   "draftSaved": "Draft saved",
+  "drawSignatureFirst": "Draw a signature first",
+  "dueOnDate": "Due {date}",
+  "@dueOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "edit": "Edit",
   "editContact": "Edit contact",
   "editDepartment": "Edit department",
   "editJob": "Edit job",
   "email": "E-mail",
   "emailAddresses": "E-mail addresses (the first is primary)",
+  "endContract": "End contract",
+  "endDate": "End date",
   "enterChange": "Enter the change, e.g. 4.5 for +4.5 %.",
   "enterValidNumbersLine": "Line {line}: enter valid numbers.",
   "@enterValidNumbersLine": {
@@ -265,6 +314,8 @@
       }
     }
   },
+  "equipment": "Equipment",
+  "estimatedMinutes": "Estimated minutes",
   "expectedClose": "Expected close",
   "expectedCloseDate": "Expected close {date}",
   "@expectedCloseDate": {
@@ -289,6 +340,7 @@
     }
   },
   "faultDescription": "What is wrong",
+  "firstDueDate": "First due date",
   "firstName": "First name",
   "firstResponseMinutes": "First response (min)",
   "from": "From",
@@ -344,8 +396,25 @@
   },
   "internalTicket": "Internal ticket",
   "internalTicketHelp": "A question between colleagues; nothing is sent to the customer.",
+  "interval": "Interval",
   "jobCancelled": "Cancelled",
   "jobCompleted": "Completed",
+  "jobCount": "{count} jobs",
+  "@jobCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "jobCreatedOnDate": "job created on {date}",
+  "@jobCreatedOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "jobInProgress": "In progress",
   "jobKindInspection": "Inspection",
   "jobKindInstallation": "Installation",
@@ -368,6 +437,7 @@
   },
   "lastName": "Last name",
   "leadCreated": "Lead created",
+  "leadDays": "Create the job (days before)",
   "lineDiscount": "Line disc.",
   "listPrice": "List price",
   "loadMore": "Load more",
@@ -410,6 +480,7 @@
       }
     }
   },
+  "months": "Months",
   "myJobs": "My jobs",
   "myOrders": "My orders",
   "myProfile": "My details",
@@ -420,6 +491,7 @@
   "netPrice": "Net price",
   "newAnswer": "New answer",
   "newContact": "New contact",
+  "newContract": "New contract",
   "newCustomer": "New customer",
   "newDepartment": "New department",
   "newFamily": "New family",
@@ -456,11 +528,15 @@
   "noBom": "No bill of materials yet.",
   "noContactLinked": "No contact person linked",
   "noContacts": "No contacts yet.",
+  "noContracts": "No contracts",
+  "noCustomerEquipment": "This customer has no installed units",
   "noCustomerLinked": "No customer linked",
+  "noEquipment": "No equipment linked",
   "noExpectedClose": "No expected close date",
   "noJobsAssigned": "No jobs assigned to you.",
   "noLines": "No lines yet.",
   "noOrdersYet": "You have no orders yet.",
+  "noParts": "No parts recorded",
   "noPermission": "You do not have permission to change these settings.",
   "noPhotos": "No photos yet.",
   "noPrices": "No prices yet.",
@@ -471,6 +547,7 @@
   "noRepairs": "No repairs.",
   "noRepairsYet": "You have no repairs yet.",
   "noSerialComponents": "No serialised components.",
+  "noSignature": "Not signed yet",
   "noTeam": "No team",
   "noTechnicians": "Nobody assigned",
   "noTicketsYet": "You have no tickets yet.",
@@ -483,6 +560,7 @@
   "noteAdded": "Note added",
   "noteOptional": "Note (optional)",
   "notes": "Notes",
+  "noUpcomingVisits": "No visits due",
   "number": "Number",
   "numberRequired": "Number",
   "obsoleteRevision": "Obsolete revision (read-only).",
@@ -533,6 +611,8 @@
   "orderStatusReadyForShipping": "ready for shipping",
   "orders": "Orders",
   "owner": "Owner",
+  "partFreeTextHint": "Pick a product or type a description",
+  "partsUsed": "Parts used",
   "paymentDays": "Payment days",
   "pdf": "PDF",
   "personTitle": "Title",
@@ -719,6 +799,9 @@
       }
     }
   },
+  "recurrenceMonthList": "In chosen months",
+  "recurrenceMonths": "Every N months",
+  "recurrenceWeeks": "Every N weeks",
   "registerProduct": "Register {product}",
   "@registerProduct": {
     "placeholders": {
@@ -763,8 +846,23 @@
   "repairStatusWaitingCustomer": "Waiting for customer",
   "repairStatusWaitingParts": "Waiting for parts",
   "repairs": "Repairs",
+  "replaceSignature": "Replace signature",
   "replyQueued": "Reply queued for sending",
   "replyToCustomer": "Reply to customer",
+  "reportQueued": "The report will be sent",
+  "reportSend": "Send report by e-mail",
+  "reportSentTo": "Sent to {to} on {date}",
+  "@reportSentTo": {
+    "placeholders": {
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reportView": "View report (PDF)",
   "repricingFailed": "Today's prices could not be calculated: {error}",
   "@repricingFailed": {
     "placeholders": {
@@ -781,7 +879,9 @@
   "requestStatusDismissed": "dismissed",
   "requestStatusOpen": "open",
   "required": "Required",
+  "resolutionHours": "Resolution within (hours)",
   "resolutionMinutes": "Resolution (min)",
+  "responseHours": "Response within (hours)",
   "retry": "Retry",
   "revisionActivated": "Revision activated",
   "revisionItem": "Revision {revision} · {status} · {lines} lines",
@@ -873,7 +973,22 @@
   "serialNumbersHelp": "Every unit gets its own serial number and history",
   "serialScrapped": "scrapped",
   "server": "Server",
+  "serviceReport": "Service report",
+  "setWarranty": "Set warranty",
   "showInactive": "Show inactive",
+  "signedByOn": "Signed by {name} on {date}",
+  "@signedByOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "signerName": "Name of the signer",
+  "signHere": "Sign here",
   "signIn": "Sign in",
   "signOut": "Sign out",
   "signedInAs": "Signed in as {name}",
@@ -939,6 +1054,7 @@
   "stageProposal": "proposal",
   "stageQualified": "qualified",
   "stageWon": "won",
+  "startDate": "Start date",
   "startJob": "Start job",
   "startWork": "Start work",
   "status": "Status",
@@ -969,6 +1085,7 @@
       }
     }
   },
+  "suspendContract": "Suspend",
   "tags": "Tags",
   "takePhoto": "Take a photo",
   "tasks": "Tasks",
@@ -1059,6 +1176,7 @@
   "unitPriceExclVat": "Unit price (excl. VAT)",
   "unknownCaller": "Unknown caller",
   "until": "Until",
+  "upcomingVisits": "Upcoming visits",
   "updateToCurrentPrices": "Update to current prices",
   "updated": "Updated",
   "uploadingFile": "Uploading…",
@@ -1097,10 +1215,22 @@
   },
   "vatPercent": "VAT %",
   "viaPortal": "Via the customer portal",
+  "visitTemplates": "Visits",
+  "visitTitleRequired": "Every visit needs a title",
   "warranty": "Warranty",
+  "warrantyExpired": "Warranty expired",
   "warrantyIn": "In warranty",
   "warrantyOut": "Out of warranty",
   "warrantyUnknown": "Unknown",
+  "warrantyUntilDate": "until {date}",
+  "@warrantyUntilDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "warrantyUntilLabel": "Warranty until",
   "weighted": "weighted {amount}",
   "@weighted": {
     "placeholders": {
