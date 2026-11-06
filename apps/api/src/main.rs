@@ -39,12 +39,38 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("running migrations")?;
 
+    let auth_mode = env("AUTH_MODE").unwrap_or_else(|| "oidc".into());
+    let addr: SocketAddr = env("BIND_ADDR")
+        .unwrap_or_else(|| "127.0.0.1:8080".into())
+        .parse()
+        .context("BIND_ADDR must look like 127.0.0.1:8080")?;
+
+    // Development authentication trusts a client-supplied header, so it may only run where
+    // nobody else can reach it: on loopback, or when explicitly acknowledged (e.g. a container
+    // whose published port is bound to the host's loopback).
+    if auth_mode == "dev" {
+        let acknowledged = env("ALLOW_INSECURE_DEV_AUTH").as_deref() == Some("true");
+        if !addr.ip().is_loopback() && !acknowledged {
+            anyhow::bail!(
+                "AUTH_MODE=dev refuses to listen on {addr}: it trusts the X-Dev-User header. \
+                 Bind to 127.0.0.1, use AUTH_MODE=oidc, or set ALLOW_INSECURE_DEV_AUTH=true \
+                 if the port is not reachable from other machines."
+            );
+        }
+    }
+
+    if env("SEED_DEV_DATA").as_deref() == Some("true") {
+        anyhow::ensure!(
+            auth_mode == "dev",
+            "SEED_DEV_DATA=true creates well-known demo users and requires AUTH_MODE=dev"
+        );
+    }
     if env("SEED_DEV_DATA").as_deref() == Some("true") && traydcraft_api::seed_if_empty(&db).await?
     {
         tracing::info!("development seed data loaded");
     }
 
-    let auth = match env("AUTH_MODE").as_deref().unwrap_or("oidc") {
+    let auth = match auth_mode.as_str() {
         "dev" => {
             tracing::warn!("AUTH_MODE=dev: X-Dev-User header is trusted. Never use this on a reachable server.");
             AuthConfig::Dev {
@@ -68,9 +94,6 @@ async fn main() -> anyhow::Result<()> {
         auth: Arc::new(auth),
         documents: Arc::new(documents),
     };
-    let addr: SocketAddr = env("BIND_ADDR")
-        .unwrap_or_else(|| "0.0.0.0:8080".into())
-        .parse()?;
     let listener = tokio::net::TcpListener::bind(addr).await?;
     tracing::info!("listening on http://{addr} (API docs at /docs)");
     axum::serve(listener, traydcraft_api::app(state))

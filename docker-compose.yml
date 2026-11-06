@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: traydcraft
       POSTGRES_DB: traydcraft
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5433:5432"   # 5433: the host often already runs its own PostgreSQL on 5432
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -25,10 +25,13 @@ services:
     environment:
       DATABASE_URL: postgresql://traydcraft:traydcraft@db/traydcraft
       AUTH_MODE: dev            # never on a reachable server; use oidc in production
+      # Inside the container the API binds 0.0.0.0, which dev auth only accepts when
+      # acknowledged. This is safe solely because the port above is published on loopback.
+      ALLOW_INSECURE_DEV_AUTH: "true"
       SEED_DEV_DATA: "true"
       RUST_LOG: info
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"   # loopback only: dev auth trusts X-Dev-User
 
   worker:
     build: .
