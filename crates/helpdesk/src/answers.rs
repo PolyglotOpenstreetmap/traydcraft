@@ -353,6 +353,10 @@ pub async fn ticket_values(
         number: String,
         subject: String,
         contact_name: String,
+        contact_first_name: Option<String>,
+        contact_last_name: Option<String>,
+        contact_title: Option<String>,
+        contact_address_form: Option<String>,
         customer_name: Option<String>,
         company_name: String,
         company_language: String,
@@ -363,13 +367,15 @@ pub async fn ticket_values(
         order_reference: Option<String>,
     }
     let v: V = sqlx::query_as(
-        "SELECT t.language::text AS language, t.number, t.subject, t.contact_name, c.name AS customer_name,
-                co.name AS company_name, co.default_language::text AS company_language,
+        "SELECT t.language::text AS language, t.number, t.subject, t.contact_name, ct.first_name AS contact_first_name,
+                ct.last_name AS contact_last_name, ct.title AS contact_title, ct.address_form AS contact_address_form,
+                c.name AS customer_name, co.name AS company_name, co.default_language::text AS company_language,
                 q.number AS quotation_number, q.revision AS quotation_revision, q.total AS quotation_total,
                 o.number AS order_number, o.customer_reference AS order_reference
          FROM helpdesk.tickets t
          JOIN core.companies co ON co.id = t.company_id
          LEFT JOIN crm.customers c ON c.id = t.customer_id
+         LEFT JOIN crm.contacts ct ON ct.id = t.contact_id
          LEFT JOIN sales.quotations q ON q.id = t.quotation_id
          LEFT JOIN sales.orders o ON o.id = t.order_id
          WHERE t.id = $1 AND t.company_id = $2",
@@ -391,6 +397,33 @@ pub async fn ticket_values(
     let values = BTreeMap::from([
         ("customer.name".to_string(), customer),
         ("contact.name".to_string(), contact),
+        (
+            "contact.first_name".to_string(),
+            v.contact_first_name.clone().unwrap_or_default(),
+        ),
+        (
+            "contact.last_name".to_string(),
+            v.contact_last_name.clone().unwrap_or_default(),
+        ),
+        // The greeting in the language of the answer and the way this person wants to be
+        // addressed. Empty (so left visible) when the ticket has no known person.
+        (
+            "contact.salutation".to_string(),
+            match (
+                &v.contact_last_name,
+                &v.contact_title,
+                &v.contact_address_form,
+            ) {
+                (Some(last), Some(title), Some(form)) => traydcraft_crm::contacts::greeting(
+                    &v.language,
+                    title,
+                    form,
+                    v.contact_first_name.as_deref().unwrap_or_default(),
+                    last,
+                ),
+                _ => String::new(),
+            },
+        ),
         ("ticket.number".to_string(), v.number),
         ("ticket.subject".to_string(), v.subject),
         ("agent.name".to_string(), user.display_name.clone()),

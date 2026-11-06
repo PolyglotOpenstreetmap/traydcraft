@@ -9,11 +9,12 @@ import 'clients/crm_client.dart';
 import 'clients/helpdesk_client.dart';
 import 'clients/core_client.dart';
 import 'clients/sales_client.dart';
+import 'clients/portal_client.dart';
 import 'clients/products_client.dart';
 
 /// traydcraft API `v0.1.0`.
 ///
-/// Business platform API (CRM, products, pricing, sales, engineering).
+/// Business platform API (CRM, products, pricing, sales, engineering, helpdesk, customer portal).
 class TraydcraftApi {
   TraydcraftApi(
     Dio dio, {
@@ -31,6 +32,7 @@ class TraydcraftApi {
   HelpdeskClient? _helpdesk;
   CoreClient? _core;
   SalesClient? _sales;
+  PortalClient? _portal;
   ProductsClient? _products;
 
   EngineeringClient get engineering => _engineering ??= EngineeringClient(_dio, baseUrl: _baseUrl);
@@ -42,6 +44,8 @@ class TraydcraftApi {
   CoreClient get core => _core ??= CoreClient(_dio, baseUrl: _baseUrl);
 
   SalesClient get sales => _sales ??= SalesClient(_dio, baseUrl: _baseUrl);
+
+  PortalClient get portal => _portal ??= PortalClient(_dio, baseUrl: _baseUrl);
 
   ProductsClient get products => _products ??= ProductsClient(_dio, baseUrl: _baseUrl);
 }

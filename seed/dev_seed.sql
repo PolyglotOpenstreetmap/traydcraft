@@ -371,3 +371,32 @@ Atentamente,
 
 -- A German customer for the demo (Gamma is in Germany).
 UPDATE crm.customers SET language = 'de' WHERE code = 'C0003';
+
+-- ---------------------------------------------------------------------------------------------
+-- Contacts: the people at the customers. The customer has the language of the company; a person
+-- may speak another one (Luc is a Dutch-speaking technician at a French-speaking customer,
+-- Hans prefers English at a German one). Sofie is addressed informally.
+-- ---------------------------------------------------------------------------------------------
+UPDATE core.companies SET portal_url = 'https://portal.example.com'
+WHERE id = '00000000-0000-7000-8000-000000000001';
+
+INSERT INTO crm.contacts (id, customer_id, first_name, last_name, job_title, title, address_form, language, roles, portal_access, portal_scope) VALUES
+    ('00000000-0000-7000-8000-000000000601', '00000000-0000-7000-8000-000000000401', 'Jan', 'Peeters', 'Inkoper', 'mr', 'formal', NULL, '{sales_contact,purchasing}', true, 'customer'),
+    ('00000000-0000-7000-8000-000000000602', '00000000-0000-7000-8000-000000000401', 'Sofie', 'Maes', 'Technicus', 'ms', 'informal', NULL, '{technical}', true, 'own'),
+    ('00000000-0000-7000-8000-000000000603', '00000000-0000-7000-8000-000000000402', 'Marie', 'Dupont', 'Responsable achats', 'ms', 'formal', NULL, '{sales_contact,purchasing}', true, 'customer'),
+    ('00000000-0000-7000-8000-000000000604', '00000000-0000-7000-8000-000000000402', 'Luc', 'Claes', 'Technicien', 'mr', 'informal', 'nl', '{technical}', true, 'own'),
+    ('00000000-0000-7000-8000-000000000605', '00000000-0000-7000-8000-000000000403', 'Hans', 'Müller', 'Einkauf', 'mr', 'formal', 'en', '{sales_contact,purchasing}', false, 'own');
+
+INSERT INTO crm.contact_emails (id, contact_id, email, is_primary) VALUES
+    ('00000000-0000-7000-8000-000000000611', '00000000-0000-7000-8000-000000000601', 'jan.peeters@alpha.example', true),
+    ('00000000-0000-7000-8000-000000000612', '00000000-0000-7000-8000-000000000602', 'sofie.maes@alpha.example', true),
+    ('00000000-0000-7000-8000-000000000613', '00000000-0000-7000-8000-000000000603', 'marie.dupont@beta.example', true),
+    ('00000000-0000-7000-8000-000000000614', '00000000-0000-7000-8000-000000000604', 'luc.claes@beta.example', true),
+    ('00000000-0000-7000-8000-000000000615', '00000000-0000-7000-8000-000000000605', 'hans.mueller@gamma.example', true);
+
+INSERT INTO crm.contact_phones (id, contact_id, label, number, normalized) VALUES
+    ('00000000-0000-7000-8000-000000000621', '00000000-0000-7000-8000-000000000601', 'direct', '+32 3 000 00 11', '3230000011'),
+    ('00000000-0000-7000-8000-000000000622', '00000000-0000-7000-8000-000000000602', 'mobile', '0475 00 00 22', '32475000022'),
+    ('00000000-0000-7000-8000-000000000623', '00000000-0000-7000-8000-000000000603', 'direct', '+32 4 000 00 33', '3240000033'),
+    ('00000000-0000-7000-8000-000000000624', '00000000-0000-7000-8000-000000000604', 'mobile', '+32 478 00 00 44', '32478000044'),
+    ('00000000-0000-7000-8000-000000000625', '00000000-0000-7000-8000-000000000605', 'work', '+49 221 000 0055', '492210000055');

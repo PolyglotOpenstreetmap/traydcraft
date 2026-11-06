@@ -5,6 +5,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/call_input.dart';
 import '../models/convert_ticket_input.dart';
 import '../models/inbound_result.dart';
 import '../models/lead_input.dart';
@@ -24,6 +25,13 @@ part 'helpdesk_client.g.dart';
 @RestApi()
 abstract class HelpdeskClient {
   factory HelpdeskClient(Dio dio, {String? baseUrl}) = _HelpdeskClient;
+
+  /// Logs a phone call. The caller is looked up by phone number; the call is added to the given.
+  /// ticket, or a new ticket is opened for it.
+  @POST('/api/v1/helpdesk/calls')
+  Future<TicketDetail> logCall({
+    @Body() required CallInput body,
+  });
 
   /// Imports a raw e-mail (RFC 5322, e.g. a saved .eml file) as if it had arrived in the mailbox.
   @POST('/api/v1/helpdesk/inbound')

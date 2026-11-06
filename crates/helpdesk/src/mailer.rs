@@ -171,3 +171,94 @@ pub async fn process_outbox(db: &PgPool, mailer: &Mailer, batch: i64) -> anyhow:
     }
     Ok(sent)
 }
+
+#[derive(FromRow)]
+struct QueuedSystem {
+    id: Uuid,
+    to_address: String,
+    subject: String,
+    body: String,
+    attempts: i32,
+    company_name: String,
+    company_email: Option<String>,
+}
+
+fn build_system(q: &QueuedSystem) -> anyhow::Result<Message> {
+    let from_address = q
+        .company_email
+        .as_deref()
+        .filter(|e| e.contains('@'))
+        .context("the company has no e-mail address to send from")?;
+    let from: Mailbox = format!(
+        "{} <{}>",
+        q.company_name.replace(['<', '>', '"'], ""),
+        from_address
+    )
+    .parse()
+    .or_else(|_| from_address.parse())
+    .context("invalid from address")?;
+    let mut m = Message::builder()
+        .from(from)
+        .to(q.to_address.parse().context("invalid recipient address")?)
+        .subject(&q.subject)
+        .body(q.body.clone())?;
+    m.headers_mut().insert_raw(HeaderValue::new(
+        HeaderName::new_from_ascii_str("X-Traydcraft-Mail"),
+        q.id.to_string(),
+    ));
+    Ok(m)
+}
+
+/// Sends up to `batch` queued system e-mails (portal login links). Same rules as the ticket
+/// outbox: rows are locked while sent and given up after [`MAX_ATTEMPTS`].
+pub async fn process_system_mail(
+    db: &PgPool,
+    mailer: &Mailer,
+    batch: i64,
+) -> anyhow::Result<usize> {
+    let mut sent = 0;
+    for _ in 0..batch {
+        let mut tx = db.begin().await?;
+        let next: Option<QueuedSystem> = sqlx::query_as(
+            "SELECT m.id, m.to_address, m.subject, m.body, m.attempts, co.name AS company_name, co.email AS company_email
+             FROM core.mail_outbox m JOIN core.companies co ON co.id = m.company_id
+             WHERE m.delivery = 'queued'
+             ORDER BY m.created_at
+             LIMIT 1 FOR UPDATE OF m SKIP LOCKED",
+        )
+        .fetch_optional(&mut *tx)
+        .await?;
+        let Some(q) = next else { break };
+        let result = match build_system(&q) {
+            Ok(m) => mailer.send(m, q.id).await,
+            Err(e) => Err(e),
+        };
+        match result {
+            Ok(()) => {
+                sqlx::query("UPDATE core.mail_outbox SET delivery = 'sent', sent_at = now(), attempts = attempts + 1, delivery_error = NULL WHERE id = $1")
+                    .bind(q.id)
+                    .execute(&mut *tx)
+                    .await?;
+                sent += 1;
+            }
+            Err(e) => {
+                let failed = q.attempts + 1 >= MAX_ATTEMPTS;
+                tracing::warn!(mail = %q.id, error = %e, failed, "sending system e-mail failed");
+                sqlx::query(
+                    "UPDATE core.mail_outbox SET attempts = attempts + 1, delivery_error = $2,
+                            delivery = CASE WHEN $3 THEN 'failed' ELSE 'queued' END
+                     WHERE id = $1",
+                )
+                .bind(q.id)
+                .bind(e.to_string())
+                .bind(failed)
+                .execute(&mut *tx)
+                .await?;
+                tx.commit().await?;
+                break;
+            }
+        }
+        tx.commit().await?;
+    }
+    Ok(sent)
+}

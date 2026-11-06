@@ -14,6 +14,7 @@ class NewTicketInput {
     required this.subject,
     this.category,
     this.contactEmail,
+    this.contactId,
     this.contactName,
     this.customerId,
     this.internal,
@@ -28,6 +29,11 @@ class NewTicketInput {
   final String? category;
   @JsonKey(includeIfNull: false,name: 'contact_email')
   final String? contactEmail;
+
+  /// The person; fills in customer, name, e-mail address and language (their own, else the.
+  /// customer's) unless given.
+  @JsonKey(includeIfNull: false,name: 'contact_id')
+  final String? contactId;
   @JsonKey(includeIfNull: false,name: 'contact_name')
   final String? contactName;
   @JsonKey(includeIfNull: false,name: 'customer_id')
@@ -35,7 +41,7 @@ class NewTicketInput {
   @JsonKey(includeIfNull: false)
   final bool? internal;
 
-  /// Defaults to the customer's language, else the company's.
+  /// Defaults to the contact's language, else the customer's, else the company's.
   @JsonKey(includeIfNull: false)
   final String? language;
   final String subject;

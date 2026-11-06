@@ -5,10 +5,13 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/contact.dart';
+import '../models/contact_input.dart';
 import '../models/customer.dart';
 import '../models/customer_input.dart';
 import '../models/customer_page.dart';
 import '../models/customer_rebate.dart';
+import '../models/lookup_result.dart';
 import '../models/opportunity.dart';
 import '../models/opportunity_input.dart';
 import '../models/opportunity_page.dart';
@@ -21,6 +24,31 @@ part 'crm_client.g.dart';
 @RestApi()
 abstract class CrmClient {
   factory CrmClient(Dio dio, {String? baseUrl}) = _CrmClient;
+
+  /// Finds who is calling or writing: by phone number, e-mail address or name.
+  ///
+  /// [phone] - A phone number in any format, e.g. the caller id.
+  ///
+  /// [email] - An e-mail address.
+  ///
+  /// [q] - Part of a name (first, last or customer).
+  @GET('/api/v1/contacts/lookup')
+  Future<LookupResult> lookupContacts({
+    @Query('phone') String? phone,
+    @Query('email') String? email,
+    @Query('q') String? q,
+  });
+
+  @GET('/api/v1/contacts/{id}')
+  Future<Contact> getContact({
+    @Path('id') required String id,
+  });
+
+  @PUT('/api/v1/contacts/{id}')
+  Future<Contact> updateContact({
+    @Path('id') required String id,
+    @Body() required ContactInput body,
+  });
 
   /// [q] - Searches code, name, VAT number and city.
   @GET('/api/v1/customers')
@@ -44,6 +72,19 @@ abstract class CrmClient {
   Future<Customer> updateCustomer({
     @Path('id') required String id,
     @Body() required CustomerInput body,
+  });
+
+  /// [includeInactive] - Include contacts who left or are otherwise inactive.
+  @GET('/api/v1/customers/{id}/contacts')
+  Future<List<Contact>> listCustomerContacts({
+    @Path('id') required String id,
+    @Query('include_inactive') bool? includeInactive,
+  });
+
+  @POST('/api/v1/customers/{id}/contacts')
+  Future<Contact> createContact({
+    @Path('id') required String id,
+    @Body() required ContactInput body,
   });
 
   @GET('/api/v1/customers/{id}/rebates')

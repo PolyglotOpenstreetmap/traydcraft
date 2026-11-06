@@ -3,6 +3,7 @@
 //! Other modules use the public service functions here (e.g. [`get_customer_for_quoting`])
 //! and never query `crm.*` tables directly.
 
+pub mod contacts;
 pub mod opportunities;
 pub mod rebates;
 
@@ -366,6 +367,7 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(list_customers, create_customer))
         .routes(routes!(get_customer_handler, update_customer))
+        .merge(contacts::router())
         .merge(opportunities::router())
         .merge(rebates::router())
 }

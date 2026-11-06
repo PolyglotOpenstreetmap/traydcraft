@@ -17,7 +17,7 @@ pub const DEV_SEED_SQL: &str = include_str!("../../../seed/dev_seed.sql");
 
 #[derive(OpenApi)]
 #[openapi(
-    info(title = "traydcraft API", description = "Business platform API (CRM, products, pricing, sales, engineering)."),
+    info(title = "traydcraft API", description = "Business platform API (CRM, products, pricing, sales, engineering, helpdesk, customer portal)."),
     modifiers(&Security),
     security(("bearer" = [])),
     tags(
@@ -27,6 +27,7 @@ pub const DEV_SEED_SQL: &str = include_str!("../../../seed/dev_seed.sql");
         (name = "sales", description = "Quotations, pricing and orders"),
         (name = "engineering", description = "Bills of materials and serial numbers"),
         (name = "helpdesk", description = "Tickets, e-mail and prepared answers"),
+        (name = "portal", description = "Customer portal: login for contacts, their tickets and profile"),
     )
 )]
 struct ApiDoc;
@@ -55,7 +56,8 @@ fn api() -> (Router<AppState>, OpenApiDoc) {
         .merge(traydcraft_products::router())
         .merge(traydcraft_sales::router())
         .merge(traydcraft_engineering::router())
-        .merge(traydcraft_helpdesk::router());
+        .merge(traydcraft_helpdesk::router())
+        .merge(traydcraft_portal::router());
     OpenApiRouter::with_openapi(ApiDoc::openapi())
         .nest("/api/v1", v1)
         .split_for_parts()

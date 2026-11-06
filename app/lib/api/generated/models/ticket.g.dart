@@ -23,6 +23,7 @@ Ticket _$TicketFromJson(Map<String, dynamic> json) => Ticket(
   closedAt: json['closed_at'] == null
       ? null
       : DateTime.parse(json['closed_at'] as String),
+  contactId: json['contact_id'] as String?,
   customerId: json['customer_id'] as String?,
   customerName: json['customer_name'] as String?,
   firstResponseAt: json['first_response_at'] == null
@@ -46,6 +47,7 @@ Map<String, dynamic> _$TicketToJson(Ticket instance) => <String, dynamic>{
   'category': instance.category,
   'closed_at': ?instance.closedAt?.toIso8601String(),
   'contact_email': instance.contactEmail,
+  'contact_id': ?instance.contactId,
   'contact_name': instance.contactName,
   'created_at': instance.createdAt.toIso8601String(),
   'customer_id': ?instance.customerId,

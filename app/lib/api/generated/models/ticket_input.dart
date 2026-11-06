@@ -16,6 +16,7 @@ class TicketInput {
     required this.status,
     required this.subject,
     this.contactEmail,
+    this.contactId,
     this.contactName,
     this.customerId,
     this.opportunityId,
@@ -28,6 +29,8 @@ class TicketInput {
   final String category;
   @JsonKey(includeIfNull: false,name: 'contact_email')
   final String? contactEmail;
+  @JsonKey(includeIfNull: false,name: 'contact_id')
+  final String? contactId;
   @JsonKey(includeIfNull: false,name: 'contact_name')
   final String? contactName;
   @JsonKey(includeIfNull: false,name: 'customer_id')

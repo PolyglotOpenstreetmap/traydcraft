@@ -30,9 +30,12 @@ pub fn render(text: &str, values: &BTreeMap<String, String>) -> String {
 }
 
 /// Placeholders offered to authors of prepared answers.
-pub const PLACEHOLDERS: [&str; 11] = [
+pub const PLACEHOLDERS: [&str; 14] = [
     "customer.name",
     "contact.name",
+    "contact.first_name",
+    "contact.last_name",
+    "contact.salutation",
     "ticket.number",
     "ticket.subject",
     "agent.name",

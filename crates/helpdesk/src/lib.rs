@@ -9,6 +9,7 @@ pub mod imap;
 pub mod ingest;
 pub mod language;
 pub mod mailer;
+pub mod portal;
 pub mod render;
 pub mod tickets;
 

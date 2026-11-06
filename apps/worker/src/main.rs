@@ -1,7 +1,8 @@
 //! Background worker.
 //!
 //! * Polls the helpdesk mailbox over IMAP (when IMAP_HOST is set) and turns mails into tickets.
-//! * Sends queued outgoing e-mails (the outbox) over SMTP, or writes them as .eml files when
+//! * Sends queued outgoing e-mails (ticket replies and system mail such as portal login links)
+//!   over SMTP, or writes them as .eml files when
 //!   MAIL_TRANSPORT=files (development).
 //!
 //! Several workers may run at once: outbox rows are locked while sent, and IMAP messages are only
@@ -14,7 +15,7 @@ use anyhow::Context;
 use sqlx::postgres::PgPoolOptions;
 use tracing_subscriber::EnvFilter;
 use traydcraft_helpdesk::imap::{poll, ImapConfig};
-use traydcraft_helpdesk::mailer::{process_outbox, Mailer, SmtpSecurity};
+use traydcraft_helpdesk::mailer::{process_outbox, process_system_mail, Mailer, SmtpSecurity};
 use uuid::Uuid;
 
 fn env(name: &str) -> Option<String> {
@@ -109,6 +110,11 @@ async fn main() -> anyhow::Result<()> {
             Ok(0) => {}
             Ok(n) => tracing::info!(n, "e-mails sent"),
             Err(e) => tracing::error!(error = ?e, "sending the outbox failed"),
+        }
+        match process_system_mail(&db, &mailer, 50).await {
+            Ok(0) => {}
+            Ok(n) => tracing::info!(n, "system e-mails sent"),
+            Err(e) => tracing::error!(error = ?e, "sending system e-mail failed"),
         }
         tokio::select! {
             _ = tokio::time::sleep(interval) => {}

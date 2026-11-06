@@ -57,10 +57,12 @@ pub enum Permission {
     AnswersWrite,
     OrdersRead,
     OrdersWrite,
+    /// Create and change the people at customers (contacts) and their portal access.
+    ContactsWrite,
 }
 
 impl Permission {
-    pub const ALL: [Permission; 21] = [
+    pub const ALL: [Permission; 22] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -82,6 +84,7 @@ impl Permission {
         Permission::AnswersWrite,
         Permission::OrdersRead,
         Permission::OrdersWrite,
+        Permission::ContactsWrite,
     ];
 
     pub fn as_str(self) -> &'static str {
@@ -107,6 +110,7 @@ impl Permission {
             Permission::AnswersWrite => "answers.write",
             Permission::OrdersRead => "orders.read",
             Permission::OrdersWrite => "orders.write",
+            Permission::ContactsWrite => "contacts.write",
         }
     }
 }
@@ -135,6 +139,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskReply
                 | OrdersRead
                 | OrdersWrite
+                | ContactsWrite
         ),
         // First-line customer service: answers e-mails, maintains prepared answers.
         "support" => matches!(
@@ -150,6 +155,7 @@ pub fn role_grants(role: &str, p: Permission) -> bool {
                 | HelpdeskWrite
                 | HelpdeskReply
                 | AnswersWrite
+                | ContactsWrite
                 | OrdersRead
         ),
         // Production asks questions through internal notes; sales talks to the customer.
@@ -462,6 +468,16 @@ mod tests {
         assert!(role_grants("production", Permission::HelpdeskWrite));
         assert!(!role_grants("production", Permission::HelpdeskReply));
         assert!(role_grants("sales", Permission::HelpdeskReply));
+    }
+
+    #[test]
+    fn contacts_are_maintained_by_sales_and_support_only() {
+        for r in ["admin", "sales", "sales_manager", "support"] {
+            assert!(role_grants(r, Permission::ContactsWrite), "{r}");
+        }
+        for r in ["production", "product_manager", "viewer"] {
+            assert!(!role_grants(r, Permission::ContactsWrite), "{r}");
+        }
     }
 
     #[test]

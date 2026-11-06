@@ -20,9 +20,13 @@ class Article {
     required this.toAddresses,
     this.authorName,
     this.authorUserId,
+    this.contactId,
+    this.contactName,
     this.delivery,
     this.deliveryError,
+    this.durationSeconds,
     this.language,
+    this.phoneNumber,
     this.sentAt,
   });
   
@@ -35,6 +39,12 @@ class Article {
   final String body;
   @JsonKey(name: 'cc_addresses')
   final List<String> ccAddresses;
+
+  /// The person this message or call is from or to, when known.
+  @JsonKey(includeIfNull: false,name: 'contact_id')
+  final String? contactId;
+  @JsonKey(includeIfNull: false,name: 'contact_name')
+  final String? contactName;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
 
@@ -43,16 +53,22 @@ class Article {
   final String? delivery;
   @JsonKey(includeIfNull: false,name: 'delivery_error')
   final String? deliveryError;
+  @JsonKey(includeIfNull: false,name: 'duration_seconds')
+  final int? durationSeconds;
   @JsonKey(name: 'from_address')
   final String fromAddress;
   @JsonKey(name: 'from_name')
   final String fromName;
   final String id;
 
-  /// email_in | email_out | note
+  /// email_in | email_out | note | call_in | call_out | portal_in
   final String kind;
   @JsonKey(includeIfNull: false)
   final String? language;
+
+  /// For calls: the number as typed.
+  @JsonKey(includeIfNull: false,name: 'phone_number')
+  final String? phoneNumber;
   @JsonKey(includeIfNull: false,name: 'sent_at')
   final DateTime? sentAt;
   final String subject;

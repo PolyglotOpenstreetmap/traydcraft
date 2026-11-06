@@ -23,6 +23,7 @@ class Ticket {
     required this.subject,
     required this.updatedAt,
     this.closedAt,
+    this.contactId,
     this.customerId,
     this.customerName,
     this.firstResponseAt,
@@ -50,6 +51,10 @@ class Ticket {
   final DateTime? closedAt;
   @JsonKey(name: 'contact_email')
   final String contactEmail;
+
+  /// The person at the customer this ticket is about (see the contacts of the customer).
+  @JsonKey(includeIfNull: false,name: 'contact_id')
+  final String? contactId;
   @JsonKey(name: 'contact_name')
   final String contactName;
   @JsonKey(name: 'created_at')

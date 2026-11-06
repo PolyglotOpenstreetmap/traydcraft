@@ -92,3 +92,31 @@ pub async fn call_raw(
         serde_json::from_slice(&bytes).unwrap_or(Value::Null),
     )
 }
+
+/// A request without the staff header, optionally with a bearer token (the customer portal).
+pub async fn call_portal(
+    app: &axum::Router,
+    token: Option<&str>,
+    method: Method,
+    uri: &str,
+    body: Option<Value>,
+) -> (StatusCode, Value) {
+    let mut req = Request::builder().method(method).uri(uri);
+    if let Some(t) = token {
+        req = req.header("authorization", format!("Bearer {t}"));
+    }
+    let body = match body {
+        Some(b) => {
+            req = req.header("content-type", "application/json");
+            Body::from(b.to_string())
+        }
+        None => Body::empty(),
+    };
+    let res = app.clone().oneshot(req.body(body).unwrap()).await.unwrap();
+    let status = res.status();
+    let bytes = res.into_body().collect().await.unwrap().to_bytes();
+    (
+        status,
+        serde_json::from_slice(&bytes).unwrap_or(Value::Null),
+    )
+}

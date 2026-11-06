@@ -57,6 +57,8 @@ pub struct Ticket {
     pub language: String,
     pub customer_id: Option<Uuid>,
     pub customer_name: Option<String>,
+    /// The person at the customer this ticket is about (see the contacts of the customer).
+    pub contact_id: Option<Uuid>,
     pub contact_name: String,
     pub contact_email: String,
     pub owner_user_id: Option<Uuid>,
@@ -80,7 +82,7 @@ pub struct Ticket {
 #[derive(Debug, Clone, Serialize, FromRow, ToSchema)]
 pub struct Article {
     pub id: Uuid,
-    /// email_in | email_out | note
+    /// email_in | email_out | note | call_in | call_out | portal_in
     pub kind: String,
     pub from_address: String,
     pub from_name: String,
@@ -91,6 +93,12 @@ pub struct Article {
     pub language: Option<String>,
     pub author_user_id: Option<Uuid>,
     pub author_name: Option<String>,
+    /// The person this message or call is from or to, when known.
+    pub contact_id: Option<Uuid>,
+    pub contact_name: Option<String>,
+    /// For calls: the number as typed.
+    pub phone_number: Option<String>,
+    pub duration_seconds: Option<i32>,
     /// For outgoing e-mail: queued | sent | failed
     pub delivery: Option<String>,
     pub delivery_error: Option<String>,
@@ -129,11 +137,14 @@ pub struct ListParams {
 pub struct NewTicketInput {
     pub subject: String,
     pub customer_id: Option<Uuid>,
+    /// The person; fills in customer, name, e-mail address and language (their own, else the
+    /// customer's) unless given.
+    pub contact_id: Option<Uuid>,
     #[serde(default)]
     pub contact_name: String,
     #[serde(default)]
     pub contact_email: String,
-    /// Defaults to the customer's language, else the company's.
+    /// Defaults to the contact's language, else the customer's, else the company's.
     pub language: Option<String>,
     #[serde(default = "default_category")]
     pub category: String,
@@ -157,6 +168,7 @@ pub struct TicketInput {
     pub language: String,
     pub owner_user_id: Option<Uuid>,
     pub customer_id: Option<Uuid>,
+    pub contact_id: Option<Uuid>,
     #[serde(default)]
     pub contact_name: String,
     #[serde(default)]
@@ -211,6 +223,31 @@ pub struct ProductionQuestionInput {
     pub body: String,
 }
 
+/// A phone call, logged on a ticket (existing or new).
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct CallInput {
+    /// Add to this ticket; without it a new ticket is opened.
+    pub ticket_id: Option<Uuid>,
+    /// in (the customer called us) | out (we called the customer)
+    pub direction: String,
+    /// The number that called or was called, in any format. Used to find the person when
+    /// `contact_id` is not given.
+    #[serde(default)]
+    pub phone_number: String,
+    /// Who it was. Defaults to the contact with this phone number, if there is exactly one.
+    pub contact_id: Option<Uuid>,
+    /// New ticket only, for a caller who is not a known contact yet.
+    pub customer_id: Option<Uuid>,
+    pub duration_seconds: Option<i32>,
+    /// What was discussed.
+    pub summary: String,
+    /// New ticket only; defaults to the first line of the summary.
+    pub subject: Option<String>,
+    /// New ticket only.
+    #[serde(default = "default_category")]
+    pub category: String,
+}
+
 #[derive(Debug, Serialize, ToSchema)]
 pub struct InboundResult {
     pub ticket_id: Uuid,
@@ -220,7 +257,7 @@ pub struct InboundResult {
 }
 
 const SELECT: &str = "SELECT t.id, t.number, t.subject, t.status, t.priority, t.category, t.suggested_category,
-        t.language::text AS language, t.customer_id, c.name AS customer_name, t.contact_name, t.contact_email,
+        t.language::text AS language, t.customer_id, c.name AS customer_name, t.contact_id, t.contact_name, t.contact_email,
         t.owner_user_id, u.display_name AS owner_name, t.internal,
         t.quotation_id, q.number AS quotation_number, q.revision AS quotation_revision, q.status AS quotation_status,
         t.opportunity_id, op.number AS opportunity_number, t.order_id, o.number AS order_number,
@@ -250,9 +287,11 @@ async fn load_detail(
     let ticket = load_ticket(conn, company_id, id).await?;
     let articles = sqlx::query_as(
         "SELECT a.id, a.kind, a.from_address, a.from_name, a.to_addresses, a.cc_addresses, a.subject, a.body,
-                a.language::text AS language, a.author_user_id, u.display_name AS author_name, a.delivery,
-                a.delivery_error, a.created_at, a.sent_at
+                a.language::text AS language, a.author_user_id, u.display_name AS author_name,
+                a.contact_id, nullif(btrim(ct.first_name || ' ' || ct.last_name), '') AS contact_name,
+                a.phone_number, a.duration_seconds, a.delivery, a.delivery_error, a.created_at, a.sent_at
          FROM helpdesk.articles a LEFT JOIN core.users u ON u.id = a.author_user_id
+         LEFT JOIN crm.contacts ct ON ct.id = a.contact_id
          WHERE a.ticket_id = $1 ORDER BY a.created_at, a.id",
     )
     .bind(id)
@@ -419,6 +458,29 @@ async fn create_ticket(
     }
     check_one_of("category", &input.category, &CATEGORIES)?;
     let mut tx = state.db.begin().await?;
+    let contact = match input.contact_id {
+        Some(c) => Some(traydcraft_crm::contacts::get_contact(&mut tx, c).await?),
+        None => None,
+    };
+    if let (Some(c), Some(customer)) = (&contact, input.customer_id) {
+        if c.customer_id != customer {
+            return Err(AppError::Validation(
+                "the contact does not work for this customer".into(),
+            ));
+        }
+    }
+    let customer_id = contact
+        .as_ref()
+        .map(|c| c.customer_id)
+        .or(input.customer_id);
+    let contact_name = match (&contact, input.contact_name.trim()) {
+        (Some(c), "") => c.full_name.clone(),
+        (_, n) => n.to_string(),
+    };
+    let contact_email = match (&contact, input.contact_email.trim()) {
+        (Some(c), "") => c.primary_email().unwrap_or_default().to_string(),
+        (_, e) => e.to_lowercase(),
+    };
     let language = match &input.language {
         Some(l) if is_language(l) => l.clone(),
         Some(_) => {
@@ -427,14 +489,17 @@ async fn create_ticket(
                 LANGUAGES.join(", ")
             )))
         }
-        None => customer_language(&mut tx, input.customer_id, user.company_id).await?,
+        None => match &contact {
+            Some(c) => c.effective_language.clone(),
+            None => customer_language(&mut tx, customer_id, user.company_id).await?,
+        },
     };
     let number = next_ticket_number(&mut tx, user.company_id).await?;
     let id = new_id();
     sqlx::query(
         "INSERT INTO helpdesk.tickets (id, company_id, number, subject, status, category, language, customer_id,
-                                       contact_name, contact_email, owner_user_id, internal, created_by)
-         VALUES ($1, $2, $3, $4, 'open', $5, $6, $7, $8, $9, $10, $11, $10)",
+                                       contact_id, contact_name, contact_email, owner_user_id, internal, created_by)
+         VALUES ($1, $2, $3, $4, 'open', $5, $6, $7, $8, $9, $10, $11, $12, $11)",
     )
     .bind(id)
     .bind(user.company_id)
@@ -442,9 +507,10 @@ async fn create_ticket(
     .bind(input.subject.trim())
     .bind(&input.category)
     .bind(&language)
-    .bind(input.customer_id)
-    .bind(input.contact_name.trim())
-    .bind(input.contact_email.trim().to_lowercase())
+    .bind(customer_id)
+    .bind(contact.as_ref().map(|c| c.id))
+    .bind(&contact_name)
+    .bind(&contact_email)
     .bind(user.user_id)
     .bind(input.internal)
     .execute(&mut *tx)
@@ -482,6 +548,18 @@ async fn update_ticket(
     }
     let mut tx = state.db.begin().await?;
     load_ticket(&mut tx, user.company_id, id).await?;
+    let mut input = input;
+    if let Some(c) = input.contact_id {
+        let contact = traydcraft_crm::contacts::get_contact(&mut tx, c).await?;
+        match input.customer_id {
+            Some(customer) if customer != contact.customer_id => {
+                return Err(AppError::Validation(
+                    "the contact does not work for this customer".into(),
+                ))
+            }
+            _ => input.customer_id = Some(contact.customer_id),
+        }
+    }
     // Links must belong to this company and, when a customer is set, to that customer.
     if let Some(q) = input.quotation_id {
         let ok: bool = sqlx::query_scalar(
@@ -532,7 +610,7 @@ async fn update_ticket(
     sqlx::query(
         "UPDATE helpdesk.tickets SET subject = $2, priority = $3, category = $4, language = $5, owner_user_id = $6,
                 customer_id = $7, contact_name = $8, contact_email = $9, quotation_id = $10, opportunity_id = $11,
-                updated_at = now()
+                contact_id = $12, updated_at = now()
          WHERE id = $1",
     )
     .bind(id)
@@ -546,6 +624,7 @@ async fn update_ticket(
     .bind(input.contact_email.trim().to_lowercase())
     .bind(input.quotation_id)
     .bind(input.opportunity_id)
+    .bind(input.contact_id)
     .execute(&mut *tx)
     .await?;
     set_status(&mut tx, id, &input.status).await?;
@@ -911,6 +990,183 @@ async fn production_question(
     Ok((StatusCode::CREATED, Json(d)))
 }
 
+fn first_line(text: &str, max: usize) -> String {
+    let line = text
+        .lines()
+        .map(str::trim)
+        .find(|l| !l.is_empty())
+        .unwrap_or("");
+    line.chars().take(max).collect()
+}
+
+/// Logs a phone call. The caller is looked up by phone number; the call is added to the given
+/// ticket, or a new ticket is opened for it.
+#[utoipa::path(post, path = "/helpdesk/calls", tag = "helpdesk", request_body = CallInput,
+    responses((status = 201, body = TicketDetail), (status = 404, body = ErrorBody), (status = 422, body = ErrorBody)))]
+async fn log_call(
+    State(state): State<AppState>,
+    user: CurrentUser,
+    Json(input): Json<CallInput>,
+) -> AppResult<(StatusCode, Json<TicketDetail>)> {
+    user.require(Permission::HelpdeskWrite)?;
+    check_one_of("direction", &input.direction, &["in", "out"])?;
+    check_one_of("category", &input.category, &CATEGORIES)?;
+    if input.summary.trim().is_empty() {
+        return Err(AppError::Validation(
+            "describe what the call was about".into(),
+        ));
+    }
+    if input.duration_seconds.is_some_and(|d| d < 0) {
+        return Err(AppError::Validation("duration cannot be negative".into()));
+    }
+    let kind = if input.direction == "in" {
+        "call_in"
+    } else {
+        "call_out"
+    };
+    let phone = input.phone_number.trim();
+    let mut tx = state.db.begin().await?;
+    let country = traydcraft_core::company::get_company(&mut *tx, user.company_id)
+        .await?
+        .country_code;
+
+    let contact = match input.contact_id {
+        Some(c) => Some(traydcraft_crm::contacts::get_contact(&mut tx, c).await?),
+        None if !phone.is_empty() => {
+            let mut found =
+                traydcraft_crm::contacts::find_by_phone(&mut tx, phone, &country).await?;
+            // Several people share this number (a switchboard): the agent has to choose.
+            if found.len() == 1 {
+                found.pop()
+            } else {
+                None
+            }
+        }
+        None => None,
+    };
+
+    let ticket_id = match input.ticket_id {
+        Some(t) => {
+            let ticket = load_ticket(&mut tx, user.company_id, t).await?;
+            if let Some(c) = &contact {
+                if ticket.customer_id.is_some_and(|tc| tc != c.customer_id) {
+                    return Err(AppError::Validation(
+                        "the contact does not work for the customer of this ticket".into(),
+                    ));
+                }
+                // The first call that identifies the person completes the ticket.
+                if ticket.contact_id.is_none() {
+                    sqlx::query(
+                        "UPDATE helpdesk.tickets SET contact_id = $2, customer_id = coalesce(customer_id, $3),
+                                contact_name = CASE WHEN contact_name = '' THEN $4 ELSE contact_name END,
+                                contact_email = CASE WHEN contact_email = '' THEN $5 ELSE contact_email END
+                         WHERE id = $1",
+                    )
+                    .bind(t)
+                    .bind(c.id)
+                    .bind(c.customer_id)
+                    .bind(&c.full_name)
+                    .bind(c.primary_email().unwrap_or_default())
+                    .execute(&mut *tx)
+                    .await?;
+                }
+            }
+            t
+        }
+        None => {
+            if let (Some(c), Some(customer)) = (&contact, input.customer_id) {
+                if c.customer_id != customer {
+                    return Err(AppError::Validation(
+                        "the contact does not work for this customer".into(),
+                    ));
+                }
+            }
+            let customer_id = contact
+                .as_ref()
+                .map(|c| c.customer_id)
+                .or(input.customer_id);
+            let language = match &contact {
+                Some(c) => c.effective_language.clone(),
+                None => customer_language(&mut tx, customer_id, user.company_id).await?,
+            };
+            let subject = input
+                .subject
+                .as_deref()
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(str::to_string)
+                .unwrap_or_else(|| first_line(&input.summary, 80));
+            let number = next_ticket_number(&mut tx, user.company_id).await?;
+            let id = new_id();
+            sqlx::query(
+                "INSERT INTO helpdesk.tickets (id, company_id, number, subject, status, category, language, customer_id,
+                                               contact_id, contact_name, contact_email, owner_user_id, created_by)
+                 VALUES ($1, $2, $3, $4, 'open', $5, $6, $7, $8, $9, $10, $11, $11)",
+            )
+            .bind(id)
+            .bind(user.company_id)
+            .bind(&number)
+            .bind(&subject)
+            .bind(&input.category)
+            .bind(&language)
+            .bind(customer_id)
+            .bind(contact.as_ref().map(|c| c.id))
+            .bind(contact.as_ref().map(|c| c.full_name.as_str()).unwrap_or_default())
+            .bind(contact.as_ref().and_then(|c| c.primary_email()).unwrap_or_default())
+            .bind(user.user_id)
+            .execute(&mut *tx)
+            .await?;
+            id
+        }
+    };
+
+    let article_id = new_id();
+    sqlx::query(
+        "INSERT INTO helpdesk.articles (id, ticket_id, kind, from_name, body, contact_id, phone_number,
+                                        duration_seconds, author_user_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+    )
+    .bind(article_id)
+    .bind(ticket_id)
+    .bind(kind)
+    .bind(contact.as_ref().map(|c| c.full_name.as_str()).unwrap_or_default())
+    .bind(input.summary.trim())
+    .bind(contact.as_ref().map(|c| c.id))
+    .bind((!phone.is_empty()).then_some(phone))
+    .bind(input.duration_seconds)
+    .bind(user.user_id)
+    .execute(&mut *tx)
+    .await?;
+    // An incoming call is a customer reaction: it reopens a ticket that waited for the customer
+    // or was closed. Calling the customer back is a response.
+    sqlx::query(
+        "UPDATE helpdesk.tickets SET updated_at = now(), owner_user_id = coalesce(owner_user_id, $2),
+                first_response_at = CASE WHEN $3 THEN coalesce(first_response_at, now()) ELSE first_response_at END,
+                status = CASE WHEN $3 AND status = 'new' THEN 'open'
+                              WHEN NOT $3 AND status IN ('pending_customer', 'closed') THEN 'open'
+                              ELSE status END,
+                closed_at = CASE WHEN NOT $3 AND status = 'closed' THEN NULL ELSE closed_at END
+         WHERE id = $1",
+    )
+    .bind(ticket_id)
+    .bind(user.user_id)
+    .bind(kind == "call_out")
+    .execute(&mut *tx)
+    .await?;
+    audit::record(
+        &mut tx,
+        &user,
+        "ticket",
+        ticket_id,
+        "call_logged",
+        serde_json::json!({ "direction": input.direction, "article_id": article_id }),
+    )
+    .await?;
+    let d = load_detail(&mut tx, user.company_id, ticket_id).await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(d)))
+}
+
 /// Imports a raw e-mail (RFC 5322, e.g. a saved .eml file) as if it had arrived in the mailbox.
 #[utoipa::path(post, path = "/helpdesk/inbound", tag = "helpdesk",
     request_body(content = String, content_type = "message/rfc822"),
@@ -941,5 +1197,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(create_lead))
         .routes(routes!(convert))
         .routes(routes!(production_question))
+        .routes(routes!(log_call))
         .routes(routes!(inbound))
 }

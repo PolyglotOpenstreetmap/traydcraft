@@ -2882,6 +2882,7 @@ dependencies = [
  "traydcraft-crm",
  "traydcraft-engineering",
  "traydcraft-helpdesk",
+ "traydcraft-portal",
  "traydcraft-products",
  "traydcraft-sales",
  "utoipa",
@@ -2989,6 +2990,26 @@ dependencies = [
  "utoipa-axum",
  "uuid",
  "webpki-roots 0.26.11",
+]
+
+[[package]]
+name = "traydcraft-portal"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "chrono",
+ "rand 0.9.5",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "sqlx",
+ "tracing",
+ "traydcraft-core",
+ "traydcraft-crm",
+ "traydcraft-helpdesk",
+ "utoipa",
+ "utoipa-axum",
+ "uuid",
 ]
 
 [[package]]

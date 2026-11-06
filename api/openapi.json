@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "traydcraft API",
-    "description": "Business platform API (CRM, products, pricing, sales, engineering).",
+    "description": "Business platform API (CRM, products, pricing, sales, engineering, helpdesk, customer portal).",
     "license": {
       "name": "GPL-3.0-or-later",
       "identifier": "GPL-3.0-or-later"
@@ -136,6 +136,175 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Bom"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contacts/lookup": {
+      "get": {
+        "tags": [
+          "crm"
+        ],
+        "summary": "Finds who is calling or writing: by phone number, e-mail address or name.",
+        "operationId": "lookup_contacts",
+        "parameters": [
+          {
+            "name": "phone",
+            "in": "query",
+            "description": "A phone number in any format, e.g. the caller id.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "description": "An e-mail address.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Part of a name (first, last or customer).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/contacts/{id}": {
+      "get": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "get_contact",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contact"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "update_contact",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contact"
                 }
               }
             }
@@ -339,6 +508,118 @@
         }
       }
     },
+    "/api/v1/customers/{id}/contacts": {
+      "get": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "list_customer_contacts",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "include_inactive",
+            "in": "query",
+            "description": "Include contacts who left or are otherwise inactive.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Contact"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "crm"
+        ],
+        "operationId": "create_contact",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Contact"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/customers/{id}/rebates": {
       "get": {
         "tags": [
@@ -522,6 +803,57 @@
             "description": ""
           },
           "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/calls": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Logs a phone call. The caller is looked up by phone number; the call is added to the given\nticket, or a new ticket is opened for it.",
+        "operationId": "log_call",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CallInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -1001,6 +1333,383 @@
             }
           },
           "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/login-links": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Always answers 202, whether or not the address belongs to a portal user, so the endpoint\ncannot be used to find out who is a customer.",
+        "operationId": "request_login_link",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginLinkInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "If the address may use the portal, a login link was sent."
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/api/v1/portal/me": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "get_me",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "update_me",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/session": {
+      "delete": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Logs out: the session token stops working.",
+        "operationId": "end_session",
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/sessions": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Exchanges a login link for a session. A link works once.",
+        "operationId": "create_session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/api/v1/portal/tickets": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "list_portal_tickets",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalTicket"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "create_portal_ticket",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewTicket"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalTicketDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/tickets/{id}": {
+      "get": {
+        "tags": [
+          "portal"
+        ],
+        "operationId": "get_portal_ticket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalTicketDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/portal/tickets/{id}/messages": {
+      "post": {
+        "tags": [
+          "portal"
+        ],
+        "summary": "Adds a message to a ticket. A closed ticket is reopened.",
+        "operationId": "add_portal_message",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalTicketDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -3446,6 +4155,20 @@
               "type": "string"
             }
           },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The person this message or call is from or to, when known."
+          },
+          "contact_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -3463,6 +4186,13 @@
               "null"
             ]
           },
+          "duration_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
           "from_address": {
             "type": "string"
           },
@@ -3475,13 +4205,20 @@
           },
           "kind": {
             "type": "string",
-            "description": "email_in | email_out | note"
+            "description": "email_in | email_out | note | call_in | call_out | portal_in"
           },
           "language": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "phone_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "For calls: the number as typed."
           },
           "sent_at": {
             "type": [
@@ -3852,6 +4589,70 @@
           }
         }
       },
+      "CallInput": {
+        "type": "object",
+        "description": "A phone call, logged on a ticket (existing or new).",
+        "required": [
+          "direction",
+          "summary"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "New ticket only."
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Who it was. Defaults to the contact with this phone number, if there is exactly one."
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "New ticket only, for a caller who is not a known contact yet."
+          },
+          "direction": {
+            "type": "string",
+            "description": "in (the customer called us) | out (we called the customer)"
+          },
+          "duration_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "The number that called or was called, in any format. Used to find the person when\n`contact_id` is not given."
+          },
+          "subject": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "New ticket only; defaults to the first line of the summary."
+          },
+          "summary": {
+            "type": "string",
+            "description": "What was discussed."
+          },
+          "ticket_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Add to this ticket; without it a new ticket is opened."
+          }
+        }
+      },
       "ChangeKind": {
         "type": "string",
         "enum": [
@@ -3992,6 +4793,229 @@
           },
           "serial_number": {
             "type": "string"
+          }
+        }
+      },
+      "Contact": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_id",
+          "customer_code",
+          "customer_name",
+          "first_name",
+          "last_name",
+          "full_name",
+          "job_title",
+          "title",
+          "address_form",
+          "customer_language",
+          "effective_language",
+          "greeting",
+          "roles",
+          "notes",
+          "active",
+          "portal_access",
+          "portal_scope",
+          "emails",
+          "phones",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "address_form": {
+            "type": "string",
+            "description": "formal | informal"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_code": {
+            "type": "string"
+          },
+          "customer_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_language": {
+            "type": "string",
+            "description": "The language of the customer (company level)."
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "effective_language": {
+            "type": "string",
+            "description": "The language to write to this person in: their own, else the customer's."
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactEmail"
+            }
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "greeting": {
+            "type": "string",
+            "description": "Ready-made salutation in the effective language and address form."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_title": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The person's own language; null means the same as the customer."
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "phones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactPhone"
+            }
+          },
+          "portal_access": {
+            "type": "boolean"
+          },
+          "portal_scope": {
+            "type": "string",
+            "description": "own | customer"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "sales_contact | technical | purchasing | invoicing | management | quality | other"
+          },
+          "title": {
+            "type": "string",
+            "description": "mr | ms | none"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ContactEmail": {
+        "type": "object",
+        "required": [
+          "email",
+          "is_primary"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "is_primary": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ContactInput": {
+        "type": "object",
+        "required": [
+          "last_name"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "address_form": {
+            "type": "string",
+            "description": "formal | informal."
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The first one is the primary address."
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "job_title": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "nl | fr | en | de | es; null = same as the customer."
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "phones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PhoneInput"
+            }
+          },
+          "portal_access": {
+            "type": "boolean"
+          },
+          "portal_scope": {
+            "type": "string",
+            "description": "own | customer"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "mr | ms | none — used in the salutation."
+          }
+        }
+      },
+      "ContactPhone": {
+        "type": "object",
+        "required": [
+          "label",
+          "number",
+          "normalized"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "work | mobile | direct | other"
+          },
+          "normalized": {
+            "type": "string",
+            "description": "Digits with country code, used for lookup."
+          },
+          "number": {
+            "type": "string",
+            "description": "As entered."
           }
         }
       },
@@ -4169,6 +5193,36 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "CustomerMatch": {
+        "type": "object",
+        "description": "A customer found through its main phone number or e-mail address, when no contact matches.",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "language",
+          "matched_on"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "language": {
+            "type": "string"
+          },
+          "matched_on": {
+            "type": "string",
+            "description": "phone | email"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -4432,6 +5486,45 @@
           }
         }
       },
+      "LoginLinkInput": {
+        "type": "object",
+        "required": [
+          "company_id",
+          "email"
+        ],
+        "properties": {
+          "company_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The company whose portal this is."
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "LookupResult": {
+        "type": "object",
+        "required": [
+          "contacts",
+          "customers"
+        ],
+        "properties": {
+          "contacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Contact"
+            }
+          },
+          "customers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerMatch"
+            },
+            "description": "Customers whose main phone number or e-mail address matches. Useful when the caller is\nnot (yet) a known contact, or calls from the customer's switchboard."
+          }
+        }
+      },
       "Me": {
         "type": "object",
         "description": "The authenticated user, the active company and all companies they can switch to.",
@@ -4505,6 +5598,17 @@
           }
         }
       },
+      "MessageInput": {
+        "type": "object",
+        "required": [
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string"
+          }
+        }
+      },
       "NewBomInput": {
         "type": "object",
         "properties": {
@@ -4517,6 +5621,25 @@
             "description": "Copies the lines of this BOM (any revision of the same product). Default: the active BOM, if any."
           },
           "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "NewTicket": {
+        "type": "object",
+        "required": [
+          "subject",
+          "body"
+        ],
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "description": "question | service | complaint | other"
+          },
+          "subject": {
             "type": "string"
           }
         }
@@ -4539,6 +5662,14 @@
           "contact_email": {
             "type": "string"
           },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The person; fills in customer, name, e-mail address and language (their own, else the\ncustomer's) unless given."
+          },
           "contact_name": {
             "type": "string"
           },
@@ -4557,7 +5688,7 @@
               "string",
               "null"
             ],
-            "description": "Defaults to the customer's language, else the company's."
+            "description": "Defaults to the contact's language, else the customer's, else the company's."
           },
           "subject": {
             "type": "string"
@@ -4926,6 +6057,22 @@
           }
         }
       },
+      "PhoneInput": {
+        "type": "object",
+        "required": [
+          "number"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "work | mobile | direct | other"
+          },
+          "number": {
+            "type": "string",
+            "description": "Any common format. Without a country code the customer's country is assumed."
+          }
+        }
+      },
       "PipelineStage": {
         "type": "object",
         "required": [
@@ -4948,6 +6095,207 @@
           "weighted_value": {
             "type": "string",
             "description": "Sum of expected value × probability."
+          }
+        }
+      },
+      "PortalMessage": {
+        "type": "object",
+        "required": [
+          "id",
+          "direction",
+          "author_name",
+          "body",
+          "created_at"
+        ],
+        "properties": {
+          "author_name": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "direction": {
+            "type": "string",
+            "description": "incoming (from the customer) | outgoing (from us)"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "PortalProfile": {
+        "type": "object",
+        "description": "Who is logged in, as the portal shows it.",
+        "required": [
+          "contact_id",
+          "customer_name",
+          "first_name",
+          "last_name",
+          "full_name",
+          "job_title",
+          "title",
+          "address_form",
+          "customer_language",
+          "effective_language",
+          "greeting",
+          "roles",
+          "scope"
+        ],
+        "properties": {
+          "address_form": {
+            "type": "string",
+            "description": "formal | informal"
+          },
+          "contact_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_language": {
+            "type": "string"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "effective_language": {
+            "type": "string",
+            "description": "The language the portal and our e-mails use for this person."
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "greeting": {
+            "type": "string"
+          },
+          "job_title": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The person's own language; null means the same as the company."
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scope": {
+            "type": "string",
+            "description": "own | customer"
+          },
+          "title": {
+            "type": "string",
+            "description": "mr | ms | none"
+          }
+        }
+      },
+      "PortalSession": {
+        "type": "object",
+        "required": [
+          "token",
+          "expires_at",
+          "profile"
+        ],
+        "properties": {
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/PortalProfile"
+          },
+          "token": {
+            "type": "string",
+            "description": "Send as `Authorization: Bearer <token>` on every portal request."
+          }
+        }
+      },
+      "PortalTicket": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "subject",
+          "status",
+          "category",
+          "contact_name",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "contact_name": {
+            "type": "string",
+            "description": "Who raised it (colleagues' tickets are visible with the `customer` scope)."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "number": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "open | pending_customer (we wait for the customer) | closed"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PortalTicketDetail": {
+        "type": "object",
+        "required": [
+          "ticket",
+          "messages"
+        ],
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalMessage"
+            }
+          },
+          "ticket": {
+            "$ref": "#/components/schemas/PortalTicket"
           }
         }
       },
@@ -5339,6 +6687,31 @@
           },
           "subject": {
             "type": "string"
+          }
+        }
+      },
+      "ProfileInput": {
+        "type": "object",
+        "description": "What a customer may change about themselves: how they want to be addressed.",
+        "required": [
+          "address_form",
+          "title"
+        ],
+        "properties": {
+          "address_form": {
+            "type": "string",
+            "description": "formal | informal"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "nl | fr | en | de | es; null = same as the company."
+          },
+          "title": {
+            "type": "string",
+            "description": "mr | ms | none"
           }
         }
       },
@@ -6250,6 +7623,18 @@
           }
         }
       },
+      "SessionInput": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "The token from the login link."
+          }
+        }
+      },
       "StageInput": {
         "type": "object",
         "required": [
@@ -6311,6 +7696,14 @@
           },
           "contact_email": {
             "type": "string"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The person at the customer this ticket is about (see the contacts of the customer)."
           },
           "contact_name": {
             "type": "string"
@@ -6476,6 +7869,13 @@
           },
           "contact_email": {
             "type": "string"
+          },
+          "contact_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           },
           "contact_name": {
             "type": "string"
@@ -6651,6 +8051,10 @@
     {
       "name": "helpdesk",
       "description": "Tickets, e-mail and prepared answers"
+    },
+    {
+      "name": "portal",
+      "description": "Customer portal: login for contacts, their tickets and profile"
     }
   ]
 }

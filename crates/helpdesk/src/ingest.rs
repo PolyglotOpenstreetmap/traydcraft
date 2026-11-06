@@ -2,8 +2,9 @@
 //!
 //! Threading (like Zammad): a reply is attached to its ticket through the In-Reply-To /
 //! References headers, or through the `[Ticket#T2026-00012]` tag in the subject. Anything else
-//! opens a new ticket. The sender is matched to a customer by e-mail address, then by company
-//! domain; quotation numbers in the text are linked; the language and a category are suggested.
+//! opens a new ticket. The sender is matched to a person (contact) by e-mail address, which also
+//! gives the customer and the language to answer in; failing that to a customer by e-mail
+//! address, then by company domain; quotation numbers in the text are linked; the language and a category are suggested.
 
 use chrono::Datelike;
 use sqlx::{FromRow, PgConnection, PgPool};
@@ -177,7 +178,17 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
     } else {
         new_text
     };
-    let customer = match_customer(&mut tx, &mail.from_address).await?;
+    let contact = traydcraft_crm::contacts::find_by_email(&mut tx, &mail.from_address)
+        .await
+        .map_err(|e| anyhow::anyhow!("contact lookup failed: {e}"))?;
+    let customer = match &contact {
+        Some(c) => Some(CustomerMatch {
+            id: c.customer_id,
+            // The person's own language wins over the customer's.
+            language: c.effective_language.clone(),
+        }),
+        None => match_customer(&mut tx, &mail.from_address).await?,
+    };
     let quotation_numbers = find_quotation_numbers(&format!("{}\n{}", mail.subject, body));
     let quotation = find_quotation(
         &mut tx,
@@ -200,6 +211,7 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
                     closed_at = NULL,
                     quotation_id = coalesce(quotation_id, $2),
                     customer_id = coalesce(customer_id, $3),
+                    contact_id = coalesce(contact_id, $5),
                     suggested_category = $4,
                     updated_at = now()
                  WHERE id = $1",
@@ -208,6 +220,7 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             .bind(quotation.as_ref().map(|q| q.id))
             .bind(customer.as_ref().map(|c| c.id))
             .bind(suggestion)
+            .bind(contact.as_ref().map(|c| c.id))
             .execute(&mut *tx)
             .await?;
             (t.id, t.number)
@@ -231,8 +244,8 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             let id = traydcraft_core::new_id();
             sqlx::query(
                 "INSERT INTO helpdesk.tickets (id, company_id, number, subject, category, suggested_category, language,
-                                               customer_id, contact_name, contact_email, owner_user_id, quotation_id)
-                 VALUES ($1, $2, $3, $4, $5, $5, $6, $7, $8, $9, $10, $11)",
+                                               customer_id, contact_name, contact_email, owner_user_id, quotation_id, contact_id)
+                 VALUES ($1, $2, $3, $4, $5, $5, $6, $7, $8, $9, $10, $11, $12)",
             )
             .bind(id)
             .bind(company_id)
@@ -241,11 +254,17 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             .bind(suggestion)
             .bind(&language)
             .bind(customer.as_ref().map(|c| c.id))
-            .bind(&mail.from_name)
+            .bind(
+                contact
+                    .as_ref()
+                    .map(|c| c.full_name.as_str())
+                    .unwrap_or(&mail.from_name),
+            )
             .bind(&mail.from_address)
             // A reply about a quotation goes to the salesperson who made it.
             .bind(quotation.as_ref().map(|q| q.created_by))
             .bind(quotation.as_ref().map(|q| q.id))
+            .bind(contact.as_ref().map(|c| c.id))
             .execute(&mut *tx)
             .await?;
             (id, number)
@@ -255,8 +274,8 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
     let article_id = traydcraft_core::new_id();
     sqlx::query(
         "INSERT INTO helpdesk.articles (id, ticket_id, kind, from_address, from_name, to_addresses, cc_addresses,
-                                        subject, body, raw_message, language, message_id, in_reply_to)
-         VALUES ($1, $2, 'email_in', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+                                        subject, body, raw_message, language, message_id, in_reply_to, contact_id)
+         VALUES ($1, $2, 'email_in', $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
     )
     .bind(article_id)
     .bind(ticket_id)
@@ -270,6 +289,7 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
     .bind(detected)
     .bind(&mail.message_id)
     .bind(mail.references.last())
+    .bind(contact.as_ref().map(|c| c.id))
     .execute(&mut *tx)
     .await?;
     tx.commit().await?;

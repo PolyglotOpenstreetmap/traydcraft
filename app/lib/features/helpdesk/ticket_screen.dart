@@ -40,6 +40,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   String _language = 'nl';
   String? _ownerId;
   String? _customerId;
+  String? _contactId;
   String? _customerName;
   String? _quotationId;
   String? _opportunityId;
@@ -91,6 +92,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
       _language = t.language;
       _ownerId = t.ownerUserId;
       _customerId = t.customerId;
+      _contactId = t.contactId;
       _customerName = t.customerName;
       _quotationId = t.quotationId;
       _opportunityId = t.opportunityId;
@@ -148,6 +150,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         language: _language,
         ownerUserId: _ownerId,
         customerId: _customerId,
+        contactId: _contactId,
         contactName: _contactName.text.trim(),
         contactEmail: _contactEmail.text.trim(),
         quotationId: _quotationId,
@@ -630,6 +633,8 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
               (await _api.crm.listCustomers(q: q, limit: 20)).items,
           onSelected: (c) {
             setState(() {
+              // The person belongs to the previous customer.
+              if (c.id != _customerId) _contactId = null;
               _customerId = c.id;
               _customerName = c.name;
               _quotationId = null;

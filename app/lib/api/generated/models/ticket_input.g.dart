@@ -13,6 +13,7 @@ TicketInput _$TicketInputFromJson(Map<String, dynamic> json) => TicketInput(
   status: json['status'] as String,
   subject: json['subject'] as String,
   contactEmail: json['contact_email'] as String?,
+  contactId: json['contact_id'] as String?,
   contactName: json['contact_name'] as String?,
   customerId: json['customer_id'] as String?,
   opportunityId: json['opportunity_id'] as String?,
@@ -24,6 +25,7 @@ Map<String, dynamic> _$TicketInputToJson(TicketInput instance) =>
     <String, dynamic>{
       'category': instance.category,
       'contact_email': ?instance.contactEmail,
+      'contact_id': ?instance.contactId,
       'contact_name': ?instance.contactName,
       'customer_id': ?instance.customerId,
       'language': instance.language,
