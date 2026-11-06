@@ -16,12 +16,14 @@
   },
   "addComponent": "Add component",
   "addComponentBySerial": "Add component by serial number (in stock)",
+  "addMember": "Add member",
   "addNote": "Add note",
   "addNoteHint": "Add an internal note",
   "addPhone": "Add phone number",
   "addPhoto": "Add photo",
   "addProduct": "Add product",
   "addRebate": "Add rebate",
+  "addTag": "Add tag",
   "addTask": "Add task",
   "addedBy": "added {date} by {name}",
   "@addedBy": {
@@ -41,6 +43,8 @@
   "all": "All",
   "allProducts": "All products",
   "allStatuses": "All statuses",
+  "allTags": "All tags",
+  "allTeams": "All teams",
   "always": "always",
   "andMore": "… and {count} more",
   "@andMore": {
@@ -67,10 +71,14 @@
   "appTitle": "traydcraft",
   "apply": "Apply",
   "assignTo": "Assign to",
+  "attachFile": "Attach file",
+  "attachments": "Attachments",
+  "attachmentsHelp": "Images (JPEG, PNG, WebP) and PDF, up to 12 MB",
   "automatic": "Automatic",
   "backIntoWork": "Back into work",
   "backToCurrentRevision": "Back to current revision",
   "billOfMaterials": "Bill of materials",
+  "billable": "Billable",
   "bomActive": "active",
   "bomObsolete": "obsolete",
   "bomRev": "BOM rev.",
@@ -185,6 +193,23 @@
   "create": "Create",
   "createLead": "Create lead",
   "createRepair": "Create repair",
+  "csatAlready": "This survey was already answered.",
+  "csatBad": "Not satisfied",
+  "csatComment": "Comment (optional)",
+  "csatEnabled": "Send a satisfaction survey when a ticket is closed",
+  "csatExpired": "This survey link has expired.",
+  "csatGood": "Satisfied",
+  "csatNone": "No rating yet",
+  "csatQuestion": "How satisfied are you with the handling of ticket {number}?",
+  "@csatQuestion": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "csatThanks": "Thank you for your feedback!",
+  "csatTitle": "Customer satisfaction",
   "current": "Current",
   "customer": "Customer",
   "customerLanguage": "Customer language",
@@ -208,6 +233,7 @@
   "customerReference": "Customer reference",
   "customers": "Customers",
   "date": "Date",
+  "defaultTeam": "Default team for new tickets",
   "deliveryFailed": "not sent",
   "deliveryQueued": "waiting to send",
   "deliverySent": "sent",
@@ -264,6 +290,7 @@
   },
   "faultDescription": "What is wrong",
   "firstName": "First name",
+  "firstResponseMinutes": "First response (min)",
   "from": "From",
   "fromYou": "You",
   "generalRebateInfo": "General rebate on all products: {percent} % (net-priced products are never discounted).",
@@ -284,6 +311,7 @@
     }
   },
   "helpdesk": "Helpdesk",
+  "helpdeskSettings": "Helpdesk settings",
   "history": "History",
   "inactive": "inactive",
   "inactiveContact": "No longer active (left the company)",
@@ -344,6 +372,7 @@
   "listPrice": "List price",
   "loadMore": "Load more",
   "logCall": "Log call",
+  "logTime": "Log time",
   "logWork": "Log work",
   "loginLinkInvalid": "This login link has expired or was already used. Request a new one.",
   "loginLinkSent": "If this address may use the portal, a login link is on its way. Check your inbox.",
@@ -358,8 +387,21 @@
   "markWaitingCustomer": "Waiting for customer",
   "markWaitingParts": "Waiting for parts",
   "materialRequirements": "Material requirements (active revision)",
+  "mergeAction": "Merge",
+  "mergeHelp": "All messages, files, tags and time entries move to the chosen ticket of the same customer. This ticket is closed. This cannot be undone.",
+  "mergeNoCandidates": "No other open ticket of this customer.",
+  "mergeTicket": "Merge into another ticket…",
+  "mergedInto": "Merged into {number}",
+  "@mergedInto": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "message": "Message",
   "messageSent": "Message sent",
+  "minutes": "Minutes",
   "minutesShort": "{minutes} min",
   "@minutesShort": {
     "placeholders": {
@@ -407,6 +449,7 @@
       }
     }
   },
+  "newTeam": "New team",
   "newTicket": "New ticket",
   "noAccess": "Your account has no access to any section yet. Ask an administrator.",
   "noActiveBom": "No active bill of materials.",
@@ -418,6 +461,7 @@
   "noJobsAssigned": "No jobs assigned to you.",
   "noLines": "No lines yet.",
   "noOrdersYet": "You have no orders yet.",
+  "noPermission": "You do not have permission to change these settings.",
   "noPhotos": "No photos yet.",
   "noPrices": "No prices yet.",
   "noPriorityChanges": "No priority changes yet.",
@@ -427,8 +471,10 @@
   "noRepairs": "No repairs.",
   "noRepairsYet": "You have no repairs yet.",
   "noSerialComponents": "No serialised components.",
+  "noTeam": "No team",
   "noTechnicians": "Nobody assigned",
   "noTicketsYet": "You have no tickets yet.",
+  "noTimeEntries": "No time logged yet.",
   "nobodyFound": "Nobody found with this number.",
   "none": "None",
   "notClosed": "Not closed",
@@ -735,6 +781,7 @@
   "requestStatusDismissed": "dismissed",
   "requestStatusOpen": "open",
   "required": "Required",
+  "resolutionMinutes": "Resolution (min)",
   "retry": "Retry",
   "revisionActivated": "Revision activated",
   "revisionItem": "Revision {revision} · {status} · {lines} lines",
@@ -849,6 +896,42 @@
       }
     }
   },
+  "sla": "SLA",
+  "slaAtRisk": "At risk",
+  "slaBreached": "Breached",
+  "slaDue": "Due {date}",
+  "@slaDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "slaFilterAny": "Any SLA state",
+  "slaFirstResponse": "First response",
+  "slaLeft": "{time} left",
+  "@slaLeft": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "slaMet": "Met",
+  "slaNone": "No SLA",
+  "slaOnTime": "On time",
+  "slaOverdue": "{time} overdue",
+  "@slaOverdue": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "slaPaused": "Clock stopped: waiting for the customer",
+  "slaPolicies": "Service levels (SLA)",
+  "slaPoliciesHelp": "Plain elapsed time, business hours are not taken into account. The clock stops while a ticket waits for the customer.",
+  "slaResolution": "Resolution",
   "stage": "Stage",
   "stageLead": "lead",
   "stageLost": "lost",
@@ -886,6 +969,7 @@
       }
     }
   },
+  "tags": "Tags",
   "takePhoto": "Take a photo",
   "tasks": "Tasks",
   "tasksProgress": "{done} of {total} done",
@@ -899,11 +983,17 @@
       }
     }
   },
+  "team": "Team",
+  "teamLead": "Lead",
+  "teamMembers": "Members",
+  "teamName": "Team name",
+  "teams": "Teams",
   "technicians": "Technicians",
   "text": "Text",
   "ticketClosed": "Closed",
   "ticketDetails": "Ticket details",
   "ticketInProgress": "In progress",
+  "ticketMerged": "Tickets merged",
   "ticketOpened": "Ticket opened",
   "ticketStatusClosed": "closed",
   "ticketStatusNew": "new",
@@ -911,6 +1001,18 @@
   "ticketStatusPendingCustomer": "waiting for customer",
   "ticketStatusPendingInternal": "waiting for colleague",
   "ticketWaitingForYou": "Waiting for your reply",
+  "timeNote": "Note",
+  "timeTotal": "Total {total}, billable {billable}",
+  "@timeTotal": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      },
+      "billable": {
+        "type": "String"
+      }
+    }
+  },
   "timeTotals": "Work {work} · Travel {travel}",
   "@timeTotals": {
     "placeholders": {
@@ -922,6 +1024,7 @@
       }
     }
   },
+  "timeTracking": "Time tracking",
   "title": "Title",
   "titleCustomerValueRequired": "Title, customer and a valid value are required.",
   "titleMr": "Mr.",
@@ -958,6 +1061,7 @@
   "until": "Until",
   "updateToCurrentPrices": "Update to current prices",
   "updated": "Updated",
+  "uploadingFile": "Uploading…",
   "uploadingPhotos": "Uploading…",
   "useAnotherPriceListDate": "Use another price list date",
   "validFrom": "Valid from",

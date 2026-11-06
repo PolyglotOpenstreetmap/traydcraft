@@ -164,6 +164,7 @@ void main() {
             'article_count': 1,
             'created_at': '2026-11-06T10:00:00Z',
             'updated_at': '2026-11-06T10:00:00Z',
+            ...ticketExtras(),
           },
           'articles': <Object?>[],
         },

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,12 +7,18 @@ import 'package:intl/intl.dart';
 import '../../app/api.dart';
 import '../../l10n/l10n.dart';
 import '../../shared/actions.dart';
+import '../../shared/attachments.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
 import '../customers/customer_form.dart';
 import '../repairs/repairs_page.dart' show showNewRepairDialog;
 import 'call_dialogs.dart';
+import 'ticket_extras.dart';
 import 'tickets_page.dart';
+
+final teamsProvider = FutureProvider.autoDispose<List<Team>>(
+  (ref) => ref.watch(apiProvider).helpdesk.listTeams(),
+);
 
 final usersProvider = FutureProvider<List<CompanyUser>>(
   (ref) => ref.watch(apiProvider).core.listUsers(),
@@ -20,8 +27,9 @@ final usersProvider = FutureProvider<List<CompanyUser>>(
 /// One ticket: the conversation, a composer for replies and internal notes (with prepared answers
 /// in the ticket's language), the ticket's properties and links, and the actions on it.
 class TicketScreen extends ConsumerStatefulWidget {
-  const TicketScreen({super.key, required this.id});
+  const TicketScreen({super.key, required this.id, this.pickFiles});
   final String id;
+  final AttachmentPicker? pickFiles;
 
   @override
   ConsumerState<TicketScreen> createState() => _TicketScreenState();
@@ -41,6 +49,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   String _category = 'question';
   String _language = 'nl';
   String? _ownerId;
+  String? _teamId;
   String? _customerId;
   String? _contactId;
   String? _customerName;
@@ -64,6 +73,10 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   final _body = TextEditingController();
   String? _statusAfter;
   String? _answerInfo;
+  List<FileInfo> _attached = [];
+
+  /// How files are chosen; replaceable in tests.
+  AttachmentPicker get _picker => widget.pickFiles ?? pickAttachmentFiles;
 
   TraydcraftApi get _api => ref.read(apiProvider);
 
@@ -95,6 +108,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
       _category = t.category;
       _language = t.language;
       _ownerId = t.ownerUserId;
+      _teamId = t.teamId;
       _customerId = t.customerId;
       _contactId = t.contactId;
       _customerName = t.customerName;
@@ -190,12 +204,17 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                     ? null
                     : _replySubject.text.trim(),
                 body: _body.text,
+                attachmentIds: [for (final f in _attached) f.id],
                 status: _statusAfter,
               ),
             )
           : _api.helpdesk.addNote(
               id: widget.id,
-              body: NoteInput(body: _body.text, status: _statusAfter),
+              body: NoteInput(
+                body: _body.text,
+                attachmentIds: [for (final f in _attached) f.id],
+                status: _statusAfter,
+              ),
             ),
       success: _reply ? l.replyQueued : l.noteAdded,
     );
@@ -205,6 +224,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         _replySubject.clear();
         _statusAfter = null;
         _answerInfo = null;
+        _attached = [];
       });
     }
   }
@@ -238,6 +258,28 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(errorMessage(e))));
       }
+    }
+  }
+
+  /// Moves the ticket to a team (and keeps or changes its owner).
+  Future<void> _assign(String? teamId) => _run(
+    () => _api.helpdesk.assign(
+      id: widget.id,
+      body: AssignmentInput(teamId: teamId, ownerUserId: _ownerId),
+    ),
+    success: context.l10n.saved,
+  );
+
+  Future<void> _merge() async {
+    final l = context.l10n;
+    final target = await showMergeDialog(context, ticket: _d!.ticket);
+    if (target == null || !mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(l.ticketMerged)));
+    // The ticket is closed and its content now lives in the target.
+    _apply(target);
+    if (GoRouter.maybeOf(context) != null) {
+      context.pushReplacement('/helpdesk/${target.ticket.id}');
     }
   }
 
@@ -397,6 +439,10 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                   icon: const Icon(Icons.phone_in_talk_outlined),
                   label: Text(l.logCall),
                 ),
+              if (t.sla.state != 'none') ...[
+                Flexible(child: SlaBadge(sla: t.sla)),
+                const SizedBox(width: 8),
+              ],
               Chip(label: Text(l.ticketStatus(t.status))),
               const SizedBox(width: 8),
               Chip(
@@ -412,10 +458,29 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
             content: Text(l.internalQuestionHelp(languageName(t.language))),
             actions: const [SizedBox.shrink()],
           ),
+        if (t.mergedIntoId != null)
+          MaterialBanner(
+            leading: const Icon(Icons.merge_type),
+            content: Text(l.mergedInto(t.mergedIntoNumber ?? '')),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    context.pushReplacement('/helpdesk/${t.mergedIntoId}'),
+                child: Text(t.mergedIntoNumber ?? ''),
+              ),
+            ],
+          ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.all(16),
-            children: [for (final a in d.articles) _ArticleCard(article: a)],
+            children: [
+              for (final a in d.articles)
+                _ArticleCard(
+                  article: a,
+                  dio: ref.read(dioProvider),
+                  ticketId: t.id,
+                ),
+            ],
           ),
         ),
         if (canWrite) _composer(context, canReply),
@@ -520,6 +585,15 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
               ),
             ),
             const SizedBox(height: 8),
+            AttachmentComposer(
+              key: ValueKey('attachments-$_reply'),
+              dio: ref.read(dioProvider),
+              uploadPath: '/api/v1/tickets/${widget.id}/attachments',
+              files: _attached,
+              pick: _picker,
+              onChanged: (f) => setState(() => _attached = f),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 SizedBox(
@@ -567,6 +641,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     final theme = Theme.of(context);
     final canWrite = perms.contains('helpdesk.write');
     final users = ref.watch(usersProvider).value ?? const <CompanyUser>[];
+    final teams = ref.watch(teamsProvider).value ?? const <Team>[];
     const gap = SizedBox(height: 12);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -667,6 +742,34 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
             ),
           ],
         ),
+        gap,
+        DropdownButtonFormField<String?>(
+          isExpanded: true,
+          key: ValueKey('team-${teams.length}-$_teamId'),
+          initialValue: teams.any((x) => x.id == _teamId) ? _teamId : null,
+          decoration: InputDecoration(labelText: l.team),
+          items: [
+            DropdownMenuItem<String?>(value: null, child: Text(l.noTeam)),
+            for (final x in teams)
+              DropdownMenuItem<String?>(value: x.id, child: Text(x.name)),
+          ],
+          onChanged: canWrite && !_busy ? _assign : null,
+        ),
+        const Divider(height: 32),
+        if (t.sla.state != 'none') ...[
+          SlaSection(sla: t.sla),
+          const Divider(height: 32),
+        ],
+        TagsSection(
+          ticketId: t.id,
+          tags: t.tags,
+          canWrite: canWrite,
+          onChanged: _apply,
+        ),
+        const Divider(height: 32),
+        TimeSection(ticketId: t.id, canWrite: canWrite),
+        const Divider(height: 32),
+        CsatSection(ticket: t),
         const Divider(height: 32),
         Text(l.customer, style: theme.textTheme.titleSmall),
         const SizedBox(height: 8),
@@ -845,6 +948,16 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                         }
                       },
               ),
+            if (canWrite &&
+                t.customerId != null &&
+                t.mergedIntoId == null &&
+                t.status != 'closed')
+              OutlinedButton.icon(
+                key: const ValueKey('merge-ticket'),
+                icon: const Icon(Icons.merge_type),
+                label: Text(l.mergeTicket),
+                onPressed: _busy ? null : _merge,
+              ),
             for (final r in _repairs)
               ActionChip(
                 avatar: const Icon(Icons.build_circle_outlined, size: 18),
@@ -912,8 +1025,14 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
 }
 
 class _ArticleCard extends StatelessWidget {
-  const _ArticleCard({required this.article});
+  const _ArticleCard({
+    required this.article,
+    required this.dio,
+    required this.ticketId,
+  });
   final Article article;
+  final Dio dio;
+  final String ticketId;
 
   @override
   Widget build(BuildContext context) {
@@ -1031,6 +1150,11 @@ class _ArticleCard extends StatelessWidget {
                   ),
                 const SizedBox(height: 6),
                 SelectableText(a.body),
+                AttachmentChips(
+                  files: a.attachments,
+                  dio: dio,
+                  pathFor: (id) => '/api/v1/tickets/$ticketId/attachments/$id',
+                ),
                 if (a.deliveryError != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 6),

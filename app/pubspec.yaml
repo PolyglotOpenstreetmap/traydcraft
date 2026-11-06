@@ -9,6 +9,7 @@ environment:
 dependencies:
   decimal: ^3.2.6
   dio: ^5.11.1
+  file_selector: ^1.1.0
   flutter:
     sdk: flutter
   flutter_localizations:

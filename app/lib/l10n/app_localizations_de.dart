@@ -40,6 +40,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Komponente per Seriennummer hinzufügen (auf Lager)';
 
   @override
+  String get addMember => 'Mitglied hinzufügen';
+
+  @override
   String get addNote => 'Notiz hinzufügen';
 
   @override
@@ -56,6 +59,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get addRebate => 'Rabatt hinzufügen';
+
+  @override
+  String get addTag => 'Tag hinzufügen';
 
   @override
   String get addTask => 'Aufgabe hinzufügen';
@@ -85,6 +91,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get allStatuses => 'Alle Status';
+
+  @override
+  String get allTags => 'Alle Tags';
+
+  @override
+  String get allTeams => 'Alle Teams';
 
   @override
   String get always => 'immer';
@@ -118,6 +130,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get assignTo => 'Zuweisen an';
 
   @override
+  String get attachFile => 'Datei anhängen';
+
+  @override
+  String get attachments => 'Anhänge';
+
+  @override
+  String get attachmentsHelp => 'Bilder (JPEG, PNG, WebP) und PDF, bis 12 MB';
+
+  @override
   String get automatic => 'Automatisch';
 
   @override
@@ -128,6 +149,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get billOfMaterials => 'Stückliste';
+
+  @override
+  String get billable => 'Abrechenbar';
 
   @override
   String get bomActive => 'aktiv';
@@ -369,6 +393,39 @@ class AppLocalizationsDe extends AppLocalizations {
   String get createRepair => 'Reparatur anlegen';
 
   @override
+  String get csatAlready => 'Diese Umfrage wurde bereits beantwortet.';
+
+  @override
+  String get csatBad => 'Nicht zufrieden';
+
+  @override
+  String get csatComment => 'Kommentar (optional)';
+
+  @override
+  String get csatEnabled =>
+      'Zufriedenheitsumfrage beim Schließen eines Tickets senden';
+
+  @override
+  String get csatExpired => 'Dieser Link ist abgelaufen.';
+
+  @override
+  String get csatGood => 'Zufrieden';
+
+  @override
+  String get csatNone => 'Noch keine Bewertung';
+
+  @override
+  String csatQuestion(String number) {
+    return 'Wie zufrieden sind Sie mit der Bearbeitung von Ticket $number?';
+  }
+
+  @override
+  String get csatThanks => 'Vielen Dank für Ihr Feedback!';
+
+  @override
+  String get csatTitle => 'Kundenzufriedenheit';
+
+  @override
   String get current => 'Aktuell';
 
   @override
@@ -398,6 +455,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get date => 'Datum';
+
+  @override
+  String get defaultTeam => 'Standardteam für neue Tickets';
 
   @override
   String get deliveryFailed => 'nicht gesendet';
@@ -513,6 +573,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get firstName => 'Vorname';
 
   @override
+  String get firstResponseMinutes => 'Erstreaktion (Min.)';
+
+  @override
   String get from => 'Ab';
 
   @override
@@ -533,6 +596,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get helpdesk => 'Kundendienst';
+
+  @override
+  String get helpdeskSettings => 'Helpdesk-Einstellungen';
 
   @override
   String get history => 'Verlauf';
@@ -640,6 +706,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get logCall => 'Anruf erfassen';
 
   @override
+  String get logTime => 'Zeit erfassen';
+
+  @override
   String get logWork => 'Arbeit erfassen';
 
   @override
@@ -684,10 +753,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get materialRequirements => 'Materialbedarf (aktive Revision)';
 
   @override
+  String get mergeAction => 'Zusammenführen';
+
+  @override
+  String get mergeHelp =>
+      'Alle Nachrichten, Dateien, Tags und Zeiteinträge wandern in das gewählte Ticket desselben Kunden. Dieses Ticket wird geschlossen. Das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get mergeNoCandidates => 'Kein anderes offenes Ticket dieses Kunden.';
+
+  @override
+  String get mergeTicket => 'In anderes Ticket zusammenführen…';
+
+  @override
+  String mergedInto(String number) {
+    return 'Zusammengeführt mit $number';
+  }
+
+  @override
   String get message => 'Nachricht';
 
   @override
   String get messageSent => 'Nachricht gesendet';
+
+  @override
+  String get minutes => 'Minuten';
 
   @override
   String minutesShort(String minutes) {
@@ -774,6 +864,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get newTeam => 'Neues Team';
+
+  @override
   String get newTicket => 'Neues Ticket';
 
   @override
@@ -808,6 +901,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noOrdersYet => 'Sie haben noch keine Aufträge.';
 
   @override
+  String get noPermission =>
+      'Sie haben keine Berechtigung, diese Einstellungen zu ändern.';
+
+  @override
   String get noPhotos => 'Noch keine Fotos.';
 
   @override
@@ -835,10 +932,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noSerialComponents => 'Keine Komponenten mit Seriennummer.';
 
   @override
+  String get noTeam => 'Kein Team';
+
+  @override
   String get noTechnicians => 'Niemand zugewiesen';
 
   @override
   String get noTicketsYet => 'Sie haben noch keine Tickets.';
+
+  @override
+  String get noTimeEntries => 'Noch keine Zeit erfasst.';
 
   @override
   String get nobodyFound => 'Niemand mit dieser Nummer gefunden.';
@@ -1369,6 +1472,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get required => 'Pflichtfeld';
 
   @override
+  String get resolutionMinutes => 'Lösung (Min.)';
+
+  @override
   String get retry => 'Erneut versuchen';
 
   @override
@@ -1544,6 +1650,58 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get sla => 'SLA';
+
+  @override
+  String get slaAtRisk => 'Gefährdet';
+
+  @override
+  String get slaBreached => 'Überschritten';
+
+  @override
+  String slaDue(String date) {
+    return 'Fällig $date';
+  }
+
+  @override
+  String get slaFilterAny => 'Jeder SLA-Status';
+
+  @override
+  String get slaFirstResponse => 'Erstreaktion';
+
+  @override
+  String slaLeft(String time) {
+    return 'noch $time';
+  }
+
+  @override
+  String get slaMet => 'Eingehalten';
+
+  @override
+  String get slaNone => 'Kein SLA';
+
+  @override
+  String get slaOnTime => 'Im Plan';
+
+  @override
+  String slaOverdue(String time) {
+    return '$time überfällig';
+  }
+
+  @override
+  String get slaPaused => 'Uhr angehalten: wartet auf den Kunden';
+
+  @override
+  String get slaPolicies => 'Service-Level (SLA)';
+
+  @override
+  String get slaPoliciesHelp =>
+      'Reine verstrichene Zeit, Geschäftszeiten werden nicht berücksichtigt. Die Uhr steht, solange ein Ticket auf den Kunden wartet.';
+
+  @override
+  String get slaResolution => 'Lösung';
+
+  @override
   String get stage => 'Phase';
 
   @override
@@ -1617,6 +1775,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get tags => 'Tags';
+
+  @override
   String get takePhoto => 'Foto aufnehmen';
 
   @override
@@ -1626,6 +1787,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String tasksProgress(String done, String total) {
     return '$done von $total erledigt';
   }
+
+  @override
+  String get team => 'Team';
+
+  @override
+  String get teamLead => 'Teamleiter';
+
+  @override
+  String get teamMembers => 'Mitglieder';
+
+  @override
+  String get teamName => 'Teamname';
+
+  @override
+  String get teams => 'Teams';
 
   @override
   String get technicians => 'Techniker';
@@ -1641,6 +1817,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get ticketInProgress => 'In Bearbeitung';
+
+  @override
+  String get ticketMerged => 'Tickets zusammengeführt';
 
   @override
   String get ticketOpened => 'Ticket erstellt';
@@ -1664,9 +1843,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ticketWaitingForYou => 'Wartet auf Ihre Antwort';
 
   @override
+  String get timeNote => 'Notiz';
+
+  @override
+  String timeTotal(String total, String billable) {
+    return 'Gesamt $total, abrechenbar $billable';
+  }
+
+  @override
   String timeTotals(String work, String travel) {
     return 'Arbeit $work · Fahrt $travel';
   }
+
+  @override
+  String get timeTracking => 'Zeiterfassung';
 
   @override
   String get title => 'Titel';
@@ -1739,6 +1929,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get updated => 'Aktualisiert';
+
+  @override
+  String get uploadingFile => 'Wird hochgeladen…';
 
   @override
   String get uploadingPhotos => 'Hochladen…';

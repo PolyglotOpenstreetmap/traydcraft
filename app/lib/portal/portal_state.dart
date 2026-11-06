@@ -48,6 +48,31 @@ String? linkTokenFromUri(Uri uri) {
   return token != null && token.startsWith('tcl_') ? token : null;
 }
 
+/// The satisfaction survey link the portal was opened with: `/csat#token=tcq_...&rating=good`.
+class CsatLink {
+  const CsatLink(this.token, this.rating);
+  final String token;
+
+  /// good | bad, as clicked in the e-mail; null when the link did not say.
+  final String? rating;
+}
+
+CsatLink? csatLinkFromUri(Uri uri) {
+  try {
+    if (!uri.fragment.contains('=')) return null;
+    final q = Uri.splitQueryString(uri.fragment);
+    final token = q['token'];
+    if (token == null || !token.startsWith('tcq_')) return null;
+    final rating = q['rating'];
+    return CsatLink(token, rating == 'good' || rating == 'bad' ? rating : null);
+  } on FormatException {
+    return null;
+  }
+}
+
+/// Read in `main` before the router rewrites the address (the fragment would be lost).
+final initialCsatLinkProvider = Provider<CsatLink?>((ref) => null);
+
 /// The login-link token the app was opened with. It must be read in `main`, before the router
 /// starts: the router rewrites the address and drops the fragment.
 final initialPortalLinkTokenProvider = Provider<String?>((ref) => null);

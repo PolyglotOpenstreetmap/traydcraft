@@ -158,6 +158,12 @@ abstract class AppLocalizations {
   /// **'Add component by serial number (in stock)'**
   String get addComponentBySerial;
 
+  /// No description provided for @addMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Add member'**
+  String get addMember;
+
   /// No description provided for @addNote.
   ///
   /// In en, this message translates to:
@@ -193,6 +199,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add rebate'**
   String get addRebate;
+
+  /// No description provided for @addTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get addTag;
 
   /// No description provided for @addTask.
   ///
@@ -248,6 +260,18 @@ abstract class AppLocalizations {
   /// **'All statuses'**
   String get allStatuses;
 
+  /// No description provided for @allTags.
+  ///
+  /// In en, this message translates to:
+  /// **'All tags'**
+  String get allTags;
+
+  /// No description provided for @allTeams.
+  ///
+  /// In en, this message translates to:
+  /// **'All teams'**
+  String get allTeams;
+
   /// No description provided for @always.
   ///
   /// In en, this message translates to:
@@ -302,6 +326,24 @@ abstract class AppLocalizations {
   /// **'Assign to'**
   String get assignTo;
 
+  /// No description provided for @attachFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach file'**
+  String get attachFile;
+
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @attachmentsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Images (JPEG, PNG, WebP) and PDF, up to 12 MB'**
+  String get attachmentsHelp;
+
   /// No description provided for @automatic.
   ///
   /// In en, this message translates to:
@@ -325,6 +367,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bill of materials'**
   String get billOfMaterials;
+
+  /// No description provided for @billable.
+  ///
+  /// In en, this message translates to:
+  /// **'Billable'**
+  String get billable;
 
   /// No description provided for @bomActive.
   ///
@@ -764,6 +812,66 @@ abstract class AppLocalizations {
   /// **'Create repair'**
   String get createRepair;
 
+  /// No description provided for @csatAlready.
+  ///
+  /// In en, this message translates to:
+  /// **'This survey was already answered.'**
+  String get csatAlready;
+
+  /// No description provided for @csatBad.
+  ///
+  /// In en, this message translates to:
+  /// **'Not satisfied'**
+  String get csatBad;
+
+  /// No description provided for @csatComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment (optional)'**
+  String get csatComment;
+
+  /// No description provided for @csatEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a satisfaction survey when a ticket is closed'**
+  String get csatEnabled;
+
+  /// No description provided for @csatExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This survey link has expired.'**
+  String get csatExpired;
+
+  /// No description provided for @csatGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Satisfied'**
+  String get csatGood;
+
+  /// No description provided for @csatNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No rating yet'**
+  String get csatNone;
+
+  /// No description provided for @csatQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How satisfied are you with the handling of ticket {number}?'**
+  String csatQuestion(String number);
+
+  /// No description provided for @csatThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your feedback!'**
+  String get csatThanks;
+
+  /// No description provided for @csatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer satisfaction'**
+  String get csatTitle;
+
   /// No description provided for @current.
   ///
   /// In en, this message translates to:
@@ -817,6 +925,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Date'**
   String get date;
+
+  /// No description provided for @defaultTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Default team for new tickets'**
+  String get defaultTeam;
 
   /// No description provided for @deliveryFailed.
   ///
@@ -1028,6 +1142,12 @@ abstract class AppLocalizations {
   /// **'First name'**
   String get firstName;
 
+  /// No description provided for @firstResponseMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'First response (min)'**
+  String get firstResponseMinutes;
+
   /// No description provided for @from.
   ///
   /// In en, this message translates to:
@@ -1063,6 +1183,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Helpdesk'**
   String get helpdesk;
+
+  /// No description provided for @helpdeskSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Helpdesk settings'**
+  String get helpdeskSettings;
 
   /// No description provided for @history.
   ///
@@ -1256,6 +1382,12 @@ abstract class AppLocalizations {
   /// **'Log call'**
   String get logCall;
 
+  /// No description provided for @logTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Log time'**
+  String get logTime;
+
   /// No description provided for @logWork.
   ///
   /// In en, this message translates to:
@@ -1340,6 +1472,36 @@ abstract class AppLocalizations {
   /// **'Material requirements (active revision)'**
   String get materialRequirements;
 
+  /// No description provided for @mergeAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get mergeAction;
+
+  /// No description provided for @mergeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'All messages, files, tags and time entries move to the chosen ticket of the same customer. This ticket is closed. This cannot be undone.'**
+  String get mergeHelp;
+
+  /// No description provided for @mergeNoCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'No other open ticket of this customer.'**
+  String get mergeNoCandidates;
+
+  /// No description provided for @mergeTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge into another ticket…'**
+  String get mergeTicket;
+
+  /// No description provided for @mergedInto.
+  ///
+  /// In en, this message translates to:
+  /// **'Merged into {number}'**
+  String mergedInto(String number);
+
   /// No description provided for @message.
   ///
   /// In en, this message translates to:
@@ -1351,6 +1513,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message sent'**
   String get messageSent;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get minutes;
 
   /// No description provided for @minutesShort.
   ///
@@ -1508,6 +1676,12 @@ abstract class AppLocalizations {
   /// **'New revision of {number}'**
   String newRevisionOf(String number);
 
+  /// No description provided for @newTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'New team'**
+  String get newTeam;
+
   /// No description provided for @newTicket.
   ///
   /// In en, this message translates to:
@@ -1574,6 +1748,12 @@ abstract class AppLocalizations {
   /// **'You have no orders yet.'**
   String get noOrdersYet;
 
+  /// No description provided for @noPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission to change these settings.'**
+  String get noPermission;
+
   /// No description provided for @noPhotos.
   ///
   /// In en, this message translates to:
@@ -1628,6 +1808,12 @@ abstract class AppLocalizations {
   /// **'No serialised components.'**
   String get noSerialComponents;
 
+  /// No description provided for @noTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'No team'**
+  String get noTeam;
+
   /// No description provided for @noTechnicians.
   ///
   /// In en, this message translates to:
@@ -1639,6 +1825,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have no tickets yet.'**
   String get noTicketsYet;
+
+  /// No description provided for @noTimeEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'No time logged yet.'**
+  String get noTimeEntries;
 
   /// No description provided for @nobodyFound.
   ///
@@ -2594,6 +2786,12 @@ abstract class AppLocalizations {
   /// **'Required'**
   String get required;
 
+  /// No description provided for @resolutionMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution (min)'**
+  String get resolutionMinutes;
+
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:
@@ -2912,6 +3110,96 @@ abstract class AppLocalizations {
   /// **'{count} product/zone combinations have no price and are skipped'**
   String skippedWithoutPrice(int count);
 
+  /// No description provided for @sla.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA'**
+  String get sla;
+
+  /// No description provided for @slaAtRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'At risk'**
+  String get slaAtRisk;
+
+  /// No description provided for @slaBreached.
+  ///
+  /// In en, this message translates to:
+  /// **'Breached'**
+  String get slaBreached;
+
+  /// No description provided for @slaDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String slaDue(String date);
+
+  /// No description provided for @slaFilterAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any SLA state'**
+  String get slaFilterAny;
+
+  /// No description provided for @slaFirstResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'First response'**
+  String get slaFirstResponse;
+
+  /// No description provided for @slaLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} left'**
+  String slaLeft(String time);
+
+  /// No description provided for @slaMet.
+  ///
+  /// In en, this message translates to:
+  /// **'Met'**
+  String get slaMet;
+
+  /// No description provided for @slaNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No SLA'**
+  String get slaNone;
+
+  /// No description provided for @slaOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'On time'**
+  String get slaOnTime;
+
+  /// No description provided for @slaOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{time} overdue'**
+  String slaOverdue(String time);
+
+  /// No description provided for @slaPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Clock stopped: waiting for the customer'**
+  String get slaPaused;
+
+  /// No description provided for @slaPolicies.
+  ///
+  /// In en, this message translates to:
+  /// **'Service levels (SLA)'**
+  String get slaPolicies;
+
+  /// No description provided for @slaPoliciesHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain elapsed time, business hours are not taken into account. The clock stops while a ticket waits for the customer.'**
+  String get slaPoliciesHelp;
+
+  /// No description provided for @slaResolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution'**
+  String get slaResolution;
+
   /// No description provided for @stage.
   ///
   /// In en, this message translates to:
@@ -3050,6 +3338,12 @@ abstract class AppLocalizations {
   /// **'Suggested: {value}'**
   String suggested(String value);
 
+  /// No description provided for @tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tags;
+
   /// No description provided for @takePhoto.
   ///
   /// In en, this message translates to:
@@ -3067,6 +3361,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{done} of {total} done'**
   String tasksProgress(String done, String total);
+
+  /// No description provided for @team.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get team;
+
+  /// No description provided for @teamLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Lead'**
+  String get teamLead;
+
+  /// No description provided for @teamMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Members'**
+  String get teamMembers;
+
+  /// No description provided for @teamName.
+  ///
+  /// In en, this message translates to:
+  /// **'Team name'**
+  String get teamName;
+
+  /// No description provided for @teams.
+  ///
+  /// In en, this message translates to:
+  /// **'Teams'**
+  String get teams;
 
   /// No description provided for @technicians.
   ///
@@ -3097,6 +3421,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'In progress'**
   String get ticketInProgress;
+
+  /// No description provided for @ticketMerged.
+  ///
+  /// In en, this message translates to:
+  /// **'Tickets merged'**
+  String get ticketMerged;
 
   /// No description provided for @ticketOpened.
   ///
@@ -3140,11 +3470,29 @@ abstract class AppLocalizations {
   /// **'Waiting for your reply'**
   String get ticketWaitingForYou;
 
+  /// No description provided for @timeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get timeNote;
+
+  /// No description provided for @timeTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total {total}, billable {billable}'**
+  String timeTotal(String total, String billable);
+
   /// No description provided for @timeTotals.
   ///
   /// In en, this message translates to:
   /// **'Work {work} · Travel {travel}'**
   String timeTotals(String work, String travel);
+
+  /// No description provided for @timeTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Time tracking'**
+  String get timeTracking;
 
   /// No description provided for @title.
   ///
@@ -3283,6 +3631,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Updated'**
   String get updated;
+
+  /// No description provided for @uploadingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading…'**
+  String get uploadingFile;
 
   /// No description provided for @uploadingPhotos.
   ///
