@@ -7,6 +7,7 @@ import 'package:retrofit/retrofit.dart';
 
 import '../models/announce_repair.dart';
 import '../models/confirm_portal_order.dart';
+import '../models/file_info.dart';
 import '../models/login_link_input.dart';
 import '../models/message_input.dart';
 import '../models/new_priority_request.dart';
@@ -120,6 +121,27 @@ abstract class PortalClient {
   @GET('/api/v1/portal/tickets/{id}')
   Future<PortalTicketDetail> getPortalTicket({
     @Path('id') required String id,
+  });
+
+  /// Uploads a file to a ticket: the request body is the file (JPEG, PNG, WebP or PDF, at most.
+  /// 12 MB). Send its id in `attachment_ids` with the next message.
+  ///
+  /// [filename] - The original file name.
+  ///
+  /// [clientId] - A client-chosen id: uploading the same id again returns the first upload (safe retries).
+  @POST('/api/v1/portal/tickets/{id}/attachments')
+  Future<FileInfo> uploadPortalTicketAttachment({
+    @Path('id') required String id,
+    @Body() required String body,
+    @Query('filename') String? filename,
+    @Query('client_id') String? clientId,
+  });
+
+  /// A file of a message the customer can see, as a download.
+  @GET('/api/v1/portal/tickets/{id}/attachments/{file_id}')
+  Future<String> getPortalTicketAttachment({
+    @Path('id') required String id,
+    @Path('file_id') required String fileId,
   });
 
   /// Adds a message to a ticket. A closed ticket is reopened.

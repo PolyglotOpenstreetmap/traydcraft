@@ -10,6 +10,7 @@ part 'reply_input.g.dart';
 class ReplyInput {
   const ReplyInput({
     required this.body,
+    this.attachmentIds,
     this.cc,
     this.status,
     this.subject,
@@ -18,6 +19,9 @@ class ReplyInput {
   
   factory ReplyInput.fromJson(Map<String, Object?> json) => _$ReplyInputFromJson(json);
   
+  /// Files uploaded to the ticket (`POST /tickets/{id}/attachments`) to send with the e-mail.
+  @JsonKey(includeIfNull: false,name: 'attachment_ids')
+  final List<String>? attachmentIds;
   final String body;
   @JsonKey(includeIfNull: false)
   final List<String>? cc;

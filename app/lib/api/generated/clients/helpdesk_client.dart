@@ -5,10 +5,16 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/assignment_input.dart';
 import '../models/call_input.dart';
 import '../models/convert_ticket_input.dart';
+import '../models/csat_info.dart';
+import '../models/csat_input.dart';
+import '../models/file_info.dart';
+import '../models/helpdesk_settings.dart';
 import '../models/inbound_result.dart';
 import '../models/lead_input.dart';
+import '../models/merge_input.dart';
 import '../models/new_ticket_input.dart';
 import '../models/note_input.dart';
 import '../models/prepared_answer.dart';
@@ -16,15 +22,38 @@ import '../models/prepared_answer_input.dart';
 import '../models/production_question_input.dart';
 import '../models/rendered_answer.dart';
 import '../models/reply_input.dart';
+import '../models/settings_input.dart';
+import '../models/sla_policies_input.dart';
+import '../models/sla_policy.dart';
+import '../models/tag_count.dart';
+import '../models/tag_input.dart';
+import '../models/team.dart';
+import '../models/team_input.dart';
 import '../models/ticket_detail.dart';
 import '../models/ticket_input.dart';
 import '../models/ticket_page.dart';
+import '../models/time_entries.dart';
+import '../models/time_entry_input.dart';
 
 part 'helpdesk_client.g.dart';
 
 @RestApi()
 abstract class HelpdeskClient {
   factory HelpdeskClient(Dio dio, {String? baseUrl}) = _HelpdeskClient;
+
+  /// What the customer sees before rating. Reading changes nothing, so mail scanners that open.
+  /// links do not use up the token.
+  @GET('/api/v1/csat/{token}')
+  Future<CsatInfo> getCsat({
+    @Path('token') required String token,
+  });
+
+  /// Records the rating. The token works once and only until it expires.
+  @POST('/api/v1/csat/{token}')
+  Future<CsatInfo> rateCsat({
+    @Path('token') required String token,
+    @Body() required CsatInput body,
+  });
 
   /// Logs a phone call. The caller is looked up by phone number; the call is added to the given.
   /// ticket, or a new ticket is opened for it.
@@ -37,6 +66,41 @@ abstract class HelpdeskClient {
   @POST('/api/v1/helpdesk/inbound')
   Future<InboundResult> inbound({
     @Body() required String body,
+  });
+
+  @GET('/api/v1/helpdesk/settings')
+  Future<HelpdeskSettings> getSettings();
+
+  @PUT('/api/v1/helpdesk/settings')
+  Future<HelpdeskSettings> putSettings({
+    @Body() required SettingsInput body,
+  });
+
+  @GET('/api/v1/helpdesk/sla-policies')
+  Future<List<SlaPolicy>> getPolicies();
+
+  /// Replaces the windows for the given priorities. Open tickets get new due times.
+  @PUT('/api/v1/helpdesk/sla-policies')
+  Future<List<SlaPolicy>> putPolicies({
+    @Body() required SlaPoliciesInput body,
+  });
+
+  /// All tags in use at this company, for filters and suggestions.
+  @GET('/api/v1/helpdesk/tags')
+  Future<List<TagCount>> listTags();
+
+  @GET('/api/v1/helpdesk/teams')
+  Future<List<Team>> listTeams();
+
+  @POST('/api/v1/helpdesk/teams')
+  Future<Team> createTeam({
+    @Body() required TeamInput body,
+  });
+
+  @PUT('/api/v1/helpdesk/teams/{id}')
+  Future<Team> updateTeam({
+    @Path('id') required String id,
+    @Body() required TeamInput body,
   });
 
   /// [q] - Searches code, name and texts.
@@ -66,6 +130,16 @@ abstract class HelpdeskClient {
   /// [status] - A status, or `active` for everything not closed.
   ///
   /// [owner] - `me` for my tickets, `none` for unassigned, or a user id.
+  ///
+  /// [teamId] - Tickets in this team.
+  ///
+  /// [mine] - Tickets that are mine: I own them, or nobody owns them and they are in one of my teams.
+  ///
+  /// [unassigned] - Tickets with neither an owner nor a team.
+  ///
+  /// [sla] - `breached` or `at_risk` (under 25 % of a window left).
+  ///
+  /// [tag] - Tickets with this tag.
   @GET('/api/v1/tickets')
   Future<TicketPage> listTickets({
     @Query('q') String? q,
@@ -73,6 +147,11 @@ abstract class HelpdeskClient {
     @Query('owner') String? owner,
     @Query('customer_id') String? customerId,
     @Query('category') String? category,
+    @Query('team_id') String? teamId,
+    @Query('mine') bool? mine,
+    @Query('unassigned') bool? unassigned,
+    @Query('sla') String? sla,
+    @Query('tag') String? tag,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
   });
@@ -100,6 +179,34 @@ abstract class HelpdeskClient {
     @Body() required TicketInput body,
   });
 
+  /// Assigns a ticket to a team and/or an owner.
+  @PUT('/api/v1/tickets/{id}/assignment')
+  Future<TicketDetail> assign({
+    @Path('id') required String id,
+    @Body() required AssignmentInput body,
+  });
+
+  /// Uploads a file to the ticket: the request body is the file itself (JPEG, PNG, WebP or PDF,.
+  /// at most 12 MB). Attach it to a note or reply by passing its id in `attachment_ids`.
+  ///
+  /// [filename] - The original file name.
+  ///
+  /// [clientId] - A client-chosen id: uploading the same id again returns the first upload (safe retries).
+  @POST('/api/v1/tickets/{id}/attachments')
+  Future<FileInfo> uploadTicketAttachment({
+    @Path('id') required String id,
+    @Body() required String body,
+    @Query('filename') String? filename,
+    @Query('client_id') String? clientId,
+  });
+
+  /// The file itself, as a download.
+  @GET('/api/v1/tickets/{id}/attachments/{file_id}')
+  Future<String> getTicketAttachment({
+    @Path('id') required String id,
+    @Path('file_id') required String fileId,
+  });
+
   /// The customer confirmed the linked quotation: convert it into a sales order.
   /// If the customer asked for changes, revise the quotation first and link the new revision.
   @POST('/api/v1/tickets/{id}/convert')
@@ -113,6 +220,15 @@ abstract class HelpdeskClient {
   Future<TicketDetail> createLead({
     @Path('id') required String id,
     @Body() required LeadInput body,
+  });
+
+  /// Merges this ticket into another ticket of the same customer. Articles (with their.
+  /// attachments), tags and time entries move to the target; this ticket is closed with a note.
+  /// and points at the target. A merge cannot be undone. Returns the target.
+  @POST('/api/v1/tickets/{id}/merge')
+  Future<TicketDetail> merge({
+    @Path('id') required String id,
+    @Body() required MergeInput body,
   });
 
   /// Adds an internal note: never sent to the customer.
@@ -134,5 +250,35 @@ abstract class HelpdeskClient {
   Future<TicketDetail> reply({
     @Path('id') required String id,
     @Body() required ReplyInput body,
+  });
+
+  @POST('/api/v1/tickets/{id}/tags')
+  Future<TicketDetail> addTag({
+    @Path('id') required String id,
+    @Body() required TagInput body,
+  });
+
+  @DELETE('/api/v1/tickets/{id}/tags/{tag}')
+  Future<TicketDetail> removeTag({
+    @Path('id') required String id,
+    @Path('tag') required String tag,
+  });
+
+  @GET('/api/v1/tickets/{id}/time-entries')
+  Future<TimeEntries> listTime({
+    @Path('id') required String id,
+  });
+
+  @POST('/api/v1/tickets/{id}/time-entries')
+  Future<TimeEntries> addTime({
+    @Path('id') required String id,
+    @Body() required TimeEntryInput body,
+  });
+
+  /// Removes an entry: one's own, or any with the helpdesk admin permission.
+  @DELETE('/api/v1/tickets/{id}/time-entries/{entry_id}')
+  Future<TimeEntries> deleteTime({
+    @Path('id') required String id,
+    @Path('entry_id') required String entryId,
   });
 }

@@ -4,11 +4,14 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
+import 'file_info.dart';
+
 part 'article.g.dart';
 
 @JsonSerializable()
 class Article {
   const Article({
+    required this.attachments,
     required this.body,
     required this.ccAddresses,
     required this.createdAt,
@@ -32,6 +35,8 @@ class Article {
   
   factory Article.fromJson(Map<String, Object?> json) => _$ArticleFromJson(json);
   
+  /// Files sent or received with the message.
+  final List<FileInfo> attachments;
   @JsonKey(includeIfNull: false,name: 'author_name')
   final String? authorName;
   @JsonKey(includeIfNull: false,name: 'author_user_id')
