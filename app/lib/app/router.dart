@@ -12,6 +12,10 @@ import '../features/kb/kb_categories_page.dart';
 import '../features/kb/kb_entry_screen.dart';
 import '../features/kb/kb_page.dart';
 import '../features/field/jobs_page.dart';
+import '../features/inventory/counts_page.dart';
+import '../features/inventory/product_stock_screen.dart';
+import '../features/inventory/stock_page.dart';
+import '../features/inventory/warehouses_page.dart';
 import '../features/orders/order_screen.dart';
 import '../features/orders/orders_page.dart';
 import '../features/login/login_page.dart';
@@ -104,6 +108,20 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/orders/:id',
             builder: (_, s) => OrderScreen(id: s.pathParameters['id']!),
+          ),
+          GoRoute(path: '/stock', builder: (_, _) => const StockPage()),
+          GoRoute(
+            path: '/stock/warehouses',
+            builder: (_, _) => const WarehousesPage(),
+          ),
+          GoRoute(path: '/stock/counts', builder: (_, _) => const CountsPage()),
+          GoRoute(
+            path: '/stock/counts/:id',
+            builder: (_, s) => CountScreen(id: s.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/stock/products/:id',
+            builder: (_, s) => ProductStockScreen(id: s.pathParameters['id']!),
           ),
           GoRoute(path: '/customers', builder: (_, _) => const CustomersPage()),
           GoRoute(path: '/products', builder: (_, _) => const ProductsPage()),

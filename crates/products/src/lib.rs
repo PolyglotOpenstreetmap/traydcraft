@@ -19,7 +19,7 @@ use utoipa_axum::routes;
 use uuid::Uuid;
 
 const PRODUCT_TYPES: [&str; 4] = ["purchased", "manufactured", "configurable", "service"];
-const TRACKING: [&str; 2] = ["none", "serial"];
+const TRACKING: [&str; 3] = ["none", "serial", "lot"];
 const PRICING_TYPES: [&str; 3] = ["list", "net", "indicative"];
 
 pub mod bulk;
@@ -36,7 +36,8 @@ pub struct Product {
     pub product_type: String,
     #[schema(value_type = String, example = "21")]
     pub vat_rate: Decimal,
-    /// none | serial — serial-tracked products get an individual serial number per unit.
+    /// none | serial | lot — serial-tracked products get an individual serial number per unit,
+    /// lot-tracked products are stocked per lot or batch.
     pub tracking: String,
     pub family_id: Option<Uuid>,
     pub family_code: Option<String>,
@@ -44,6 +45,27 @@ pub struct Product {
     /// indicative (price must be confirmed on each quotation)
     pub pricing_type: String,
     pub active: bool,
+    /// Standard cost per stock unit. Only returned with the permission `inventory.cost`, else null.
+    #[schema(value_type = Option<String>, example = "42.5000")]
+    pub standard_cost: Option<Decimal>,
+    /// Reorder when the available stock falls below this quantity.
+    #[schema(value_type = Option<String>, example = "10")]
+    pub reorder_min: Option<Decimal>,
+    /// Order up to this quantity.
+    #[schema(value_type = Option<String>, example = "40")]
+    pub reorder_max: Option<Decimal>,
+    pub lead_time_days: Option<i32>,
+    pub barcode: Option<String>,
+}
+
+impl Product {
+    /// Removes what the user may not see (cost).
+    pub fn for_user(mut self, user: &CurrentUser) -> Self {
+        if !user.can(Permission::InventoryCost) {
+            self.standard_cost = None;
+        }
+        self
+    }
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -67,6 +89,23 @@ pub struct ProductInput {
     pub pricing_type: String,
     #[serde(default = "default_true")]
     pub active: bool,
+    /// Ignored (the stored cost is kept) without the permission `inventory.cost`.
+    #[schema(value_type = Option<String>, example = "42.5")]
+    pub standard_cost: Option<Decimal>,
+    #[schema(value_type = Option<String>, example = "10")]
+    pub reorder_min: Option<Decimal>,
+    #[schema(value_type = Option<String>, example = "40")]
+    pub reorder_max: Option<Decimal>,
+    pub lead_time_days: Option<i32>,
+    pub barcode: Option<String>,
+}
+
+fn barcode(input: &ProductInput) -> Option<&str> {
+    input
+        .barcode
+        .as_deref()
+        .map(str::trim)
+        .filter(|b| !b.is_empty())
 }
 
 fn default_pricing_type() -> String {
@@ -104,11 +143,6 @@ impl ProductInput {
                 TRACKING.join(", ")
             )));
         }
-        if self.tracking == "serial" && self.product_type == "service" {
-            return Err(AppError::Validation(
-                "services cannot be serial-tracked".into(),
-            ));
-        }
         if !PRICING_TYPES.contains(&self.pricing_type.as_str()) {
             return Err(AppError::Validation(format!(
                 "pricing_type must be one of {}",
@@ -117,6 +151,28 @@ impl ProductInput {
         }
         if self.vat_rate < Decimal::ZERO {
             return Err(AppError::Validation("vat_rate cannot be negative".into()));
+        }
+        if self.tracking != "none" && self.product_type == "service" {
+            return Err(AppError::Validation("services cannot be tracked".into()));
+        }
+        let negative = |v: Option<Decimal>| v.is_some_and(|v| v < Decimal::ZERO);
+        if negative(self.standard_cost) || negative(self.reorder_min) || negative(self.reorder_max)
+        {
+            return Err(AppError::Validation(
+                "cost and reorder quantities cannot be negative".into(),
+            ));
+        }
+        if let (Some(min), Some(max)) = (self.reorder_min, self.reorder_max) {
+            if max < min {
+                return Err(AppError::Validation(
+                    "reorder_max must be at least reorder_min".into(),
+                ));
+            }
+        }
+        if self.lead_time_days.is_some_and(|d| d < 0) {
+            return Err(AppError::Validation(
+                "lead_time_days cannot be negative".into(),
+            ));
         }
         Ok(())
     }
@@ -168,7 +224,8 @@ pub struct ZonePriceInput {
 /// Products with their family code; wrapped so callers can filter on plain column names.
 const SELECT_PRODUCT: &str = "SELECT * FROM (
         SELECT p.id, p.code, p.name, p.description, p.unit, p.product_type, p.vat_rate, p.tracking,
-               p.family_id, f.code AS family_code, p.pricing_type, p.active
+               p.family_id, f.code AS family_code, p.pricing_type, p.active, p.standard_cost, p.reorder_min,
+               p.reorder_max, p.lead_time_days, p.barcode
         FROM products.products p LEFT JOIN products.product_families f ON f.id = p.family_id
     ) p";
 
@@ -290,6 +347,10 @@ async fn list_products(
     .bind(p.family_id)
     .fetch_one(&state.db)
     .await?;
+    let items = items
+        .into_iter()
+        .map(|p: Product| p.for_user(&user))
+        .collect();
     Ok(Json(ProductPage { items, total }))
 }
 
@@ -301,7 +362,7 @@ async fn get_product_handler(
     Path(id): Path<Uuid>,
 ) -> AppResult<Json<Product>> {
     user.require(Permission::ProductsRead)?;
-    Ok(Json(get_product(&state.db, id).await?))
+    Ok(Json(get_product(&state.db, id).await?.for_user(&user)))
 }
 
 #[utoipa::path(post, path = "/products", tag = "products", request_body = ProductInput,
@@ -317,8 +378,9 @@ async fn create_product(
     let mut tx = state.db.begin().await?;
     sqlx::query(
         "INSERT INTO products.products (id, code, name, description, unit, product_type, vat_rate, active, tracking,
-                                        family_id, pricing_type)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+                                        family_id, pricing_type, standard_cost, reorder_min, reorder_max,
+                                        lead_time_days, barcode)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
     )
     .bind(id)
     .bind(input.code.trim())
@@ -331,6 +393,15 @@ async fn create_product(
     .bind(&input.tracking)
     .bind(input.family_id)
     .bind(&input.pricing_type)
+    .bind(
+        input
+            .standard_cost
+            .filter(|_| user.can(Permission::InventoryCost)),
+    )
+    .bind(input.reorder_min)
+    .bind(input.reorder_max)
+    .bind(input.lead_time_days)
+    .bind(barcode(&input))
     .execute(&mut *tx)
     .await?;
     audit::record(
@@ -343,7 +414,10 @@ async fn create_product(
     )
     .await?;
     tx.commit().await?;
-    Ok((StatusCode::CREATED, Json(get_product(&state.db, id).await?)))
+    Ok((
+        StatusCode::CREATED,
+        Json(get_product(&state.db, id).await?.for_user(&user)),
+    ))
 }
 
 #[utoipa::path(put, path = "/products/{id}", tag = "products", params(("id" = Uuid, Path)),
@@ -359,7 +433,9 @@ async fn update_product(
     let mut tx = state.db.begin().await?;
     let updated = sqlx::query(
         "UPDATE products.products SET code = $2, name = $3, description = $4, unit = $5, product_type = $6,
-                vat_rate = $7, active = $8, tracking = $9, family_id = $10, pricing_type = $11, updated_at = now()
+                vat_rate = $7, active = $8, tracking = $9, family_id = $10, pricing_type = $11,
+                standard_cost = CASE WHEN $12 THEN $13 ELSE standard_cost END,
+                reorder_min = $14, reorder_max = $15, lead_time_days = $16, barcode = $17, updated_at = now()
          WHERE id = $1",
     )
     .bind(id)
@@ -373,6 +449,12 @@ async fn update_product(
     .bind(&input.tracking)
     .bind(input.family_id)
     .bind(&input.pricing_type)
+    .bind(user.can(Permission::InventoryCost))
+    .bind(input.standard_cost)
+    .bind(input.reorder_min)
+    .bind(input.reorder_max)
+    .bind(input.lead_time_days)
+    .bind(barcode(&input))
     .execute(&mut *tx)
     .await?;
     if updated.rows_affected() == 0 {
@@ -388,7 +470,7 @@ async fn update_product(
     )
     .await?;
     tx.commit().await?;
-    Ok(Json(get_product(&state.db, id).await?))
+    Ok(Json(get_product(&state.db, id).await?.for_user(&user)))
 }
 
 #[utoipa::path(get, path = "/price-zones", tag = "products",

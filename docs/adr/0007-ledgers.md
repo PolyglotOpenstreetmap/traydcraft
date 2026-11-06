@@ -1,6 +1,7 @@
 # 0007 — Ledgers with projections for stock and money
 
-**Status:** Proposed (inventory and finance releases)
+**Status:** Accepted for stock, as detailed in [ADR 0019](0019-inventory-stock-ledger.md), which supersedes the stock part.
+The money and finance ledgers below remain Proposed (finance release).
 
 **Decision.**
 * Stock is an immutable movement ledger (receipt, consumption, production output, transfer,

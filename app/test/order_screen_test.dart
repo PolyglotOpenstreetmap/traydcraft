@@ -10,6 +10,7 @@ import 'package:traydcraft_app/l10n/app_localizations.dart';
 import 'fake_http.dart';
 
 Map<String, Object?> _line(String pos, {String pricing = 'list'}) => {
+  'id': 'line$pos',
   'position': int.parse(pos),
   'product_id': 'p$pos',
   'product_code': 'UNIT-$pos',
@@ -103,6 +104,7 @@ FakeHttp _http(
   bool net = false,
   int current = 1,
   List<Object?> requests = const [],
+  Map<String, Object? Function(Object?)> extra = const {},
 }) => FakeHttp({
   'GET /api/v1/me': (_) => meJson(perms),
   'GET /api/v1/orders/o1': (_) => _order(
@@ -135,6 +137,7 @@ FakeHttp _http(
   'PUT /api/v1/orders/o1/priority': (_) => _order(status, priority: 'expedite'),
   'POST /api/v1/orders/o1/priority-requests/r1/dismiss': (_) =>
       _request(status: 'dismissed'),
+  ...extra,
 });
 
 Future<void> _pump(WidgetTester tester, FakeHttp http, Widget home) async {
@@ -166,6 +169,7 @@ Future<FakeHttp> _screen(
   bool net = false,
   int current = 1,
   List<Object?> requests = const [],
+  Map<String, Object? Function(Object?)> extra = const {},
 }) async {
   final http = _http(
     status,
@@ -174,6 +178,7 @@ Future<FakeHttp> _screen(
     net: net,
     current: current,
     requests: requests,
+    extra: extra,
   );
   await _pump(tester, http, const OrderScreen(id: 'o1'));
   return http;
@@ -429,5 +434,155 @@ void main() {
     await tester.pumpAndSettle();
     expect(http.queries.first['status'], isNull);
     expect(http.queries.last['status'], 'confirmed');
+  });
+
+  Map<String, Object?> availability({bool reservable = true}) => {
+    'order_id': 'o1',
+    'order_number': 'SO2026-00001',
+    'order_status': reservable ? 'confirmed' : 'sent',
+    'reservable': reservable,
+    'lines': [
+      {
+        'order_line_id': 'line1',
+        'position': 1,
+        'product_id': 'p1',
+        'product_code': 'UNIT-1',
+        'description': 'Process unit 1',
+        'unit': 'pcs',
+        'ordered': '1.0000',
+        'reserved': '0.0000',
+        'on_hand': '3.0000',
+        'reserved_total': '1.0000',
+        'available': '2.0000',
+        'shortfall': '0.0000',
+        'state': 'available',
+      },
+      {
+        'order_line_id': 'line2',
+        'position': 2,
+        'product_id': 'p2',
+        'product_code': 'HOSE-25',
+        'description': 'Hose',
+        'unit': 'm',
+        'ordered': '10.0000',
+        'reserved': '4.0000',
+        'on_hand': '4.0000',
+        'reserved_total': '4.0000',
+        'available': '0.0000',
+        'shortfall': '6.0000',
+        'state': 'partial',
+      },
+      {
+        'order_line_id': 'line3',
+        'position': 3,
+        'product_id': null,
+        'product_code': 'INSTALL',
+        'description': 'Installation',
+        'unit': 'h',
+        'ordered': '2.0000',
+        'reserved': '0.0000',
+        'on_hand': '0.0000',
+        'reserved_total': '0.0000',
+        'available': '0.0000',
+        'shortfall': '0.0000',
+        'state': 'not_stocked',
+      },
+    ],
+  };
+
+  testWidgets('the order shows availability per line and reserves stock', (
+    tester,
+  ) async {
+    final http = await _screen(
+      tester,
+      'confirmed',
+      perms: const ['orders.read', 'inventory.read', 'inventory.write'],
+      extra: {
+        'GET /api/v1/inventory/orders/o1/availability': (_) => availability(),
+        'PUT /api/v1/inventory/order-lines/line1/reservation': (_) => {
+          'order_line_id': 'line1',
+          'product_id': 'p1',
+          'product_code': 'UNIT-1',
+          'ordered': '1',
+          'reserved': '1',
+          'allocations': [],
+        },
+        'PUT /api/v1/inventory/order-lines/line2/reservation': (_) => {
+          'order_line_id': 'line2',
+          'product_id': 'p2',
+          'product_code': 'HOSE-25',
+          'ordered': '10',
+          'reserved': '0',
+          'allocations': [],
+        },
+      },
+    );
+    expect(find.text('Stock availability'), findsOneWidget);
+    expect(find.text('In stock'), findsOneWidget);
+    expect(find.text('Partly in stock'), findsOneWidget);
+    // Services and lines without stock are not listed.
+    expect(find.textContaining('INSTALL ·'), findsNothing);
+    expect(find.textContaining('Short by 6'), findsOneWidget);
+    expect(find.text('Reserve'), findsNWidgets(2));
+    expect(find.text('Release'), findsOneWidget);
+
+    await tester.tap(find.text('Reserve').first);
+    await tester.pumpAndSettle();
+    expect(
+      (http.bodies['PUT /api/v1/inventory/order-lines/line1/reservation']
+          as Map)['quantity'],
+      '1',
+    );
+    await tester.tap(find.text('Release'));
+    await tester.pumpAndSettle();
+    expect(
+      (http.bodies['PUT /api/v1/inventory/order-lines/line2/reservation']
+          as Map)['quantity'],
+      '0',
+    );
+  });
+
+  testWidgets(
+    'before confirmation availability is shown but nothing can be reserved',
+    (tester) async {
+      await _screen(
+        tester,
+        'sent',
+        perms: const ['orders.read', 'inventory.read', 'inventory.write'],
+        extra: {
+          'GET /api/v1/inventory/orders/o1/availability': (_) =>
+              availability(reservable: false),
+        },
+      );
+      expect(find.text('Stock availability'), findsOneWidget);
+      expect(
+        find.textContaining('once the customer has confirmed'),
+        findsOneWidget,
+      );
+      expect(find.text('Reserve'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'people without inventory.read see no stock panel and trigger no request',
+    (tester) async {
+      final http = await _screen(tester, 'confirmed');
+      expect(find.text('Stock availability'), findsNothing);
+      expect(http.requests.where((r) => r.contains('/inventory/')), isEmpty);
+    },
+  );
+
+  testWidgets('reading inventory does not allow reserving', (tester) async {
+    await _screen(
+      tester,
+      'confirmed',
+      perms: const ['orders.read', 'inventory.read'],
+      extra: {
+        'GET /api/v1/inventory/orders/o1/availability': (_) => availability(),
+      },
+    );
+    expect(find.text('Stock availability'), findsOneWidget);
+    expect(find.text('Reserve'), findsNothing);
+    expect(find.text('Release'), findsNothing);
   });
 }

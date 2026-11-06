@@ -2268,6 +2268,1739 @@
         }
       }
     },
+    "/api/v1/inventory/adjustments": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Corrects the stock at a location to a counted quantity, or by a difference.",
+        "operationId": "adjust",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdjustmentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/balances/rebuild": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Recomputes balances and serial locations from the ledger.",
+        "operationId": "rebuild",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rebuilt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/counts": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "list_counts",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "counting | posted | cancelled",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "warehouse_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Count"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Starts a count of a warehouse (or a location, or a product in it) and snapshots what the system\nexpects. Serial-tracked products are not counted.",
+        "operationId": "create_count",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/counts/{id}": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "get_count",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/counts/{id}/cancel": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "cancel_count",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/counts/{id}/lines": {
+      "put": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Enters counted quantities, and adds lines for stock that was not expected.",
+        "operationId": "enter_counts",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CountEntries"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/counts/{id}/post": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Posts the count: one adjustment move for every counted line whose quantity differs from the\nstock at this moment. Lines without a counted quantity are left alone.",
+        "operationId": "post_count",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountDetail"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/integrity": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Compares the balances with the sum of the ledger.",
+        "operationId": "integrity",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Integrity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/issues": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Takes stock out of a location. The reason decides where it goes: a customer (`shipment`),\nproduction (`consumption`, `repair_use`) or scrap.",
+        "operationId": "issue",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/locations": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "create_location",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/locations/{id}": {
+      "put": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "update_location",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/lots": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "list_lots",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "in_stock",
+            "in": "query",
+            "description": "Only lots with stock.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Lot"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/lots/{id}": {
+      "put": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "update_lot",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lot"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/moves": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "list_moves",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "description": "Moves from or to this location.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "lot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "serial_unit_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "receipt | issue | transfer | adjustment",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "reference_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "reference_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovePage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/moves/{id}": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "get_move",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/moves/{id}/reverse": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Undoes a move with a new move in the opposite direction. The original stays in the ledger.",
+        "operationId": "reverse",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReverseInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/order-lines/{id}/reservation": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "get_reservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineReservation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Sets how much stock is reserved for an order line. Idempotent: the same call twice changes\nnothing the second time.",
+        "operationId": "set_reservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReserveInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineReservation"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/orders/{id}/availability": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Availability (ATP) of every line of the order: what is in the warehouses, what is reserved,\nand what this order's lines still lack. Van stock is not counted.",
+        "operationId": "order_availability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderAvailability"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/products/{id}/uoms": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "product_uoms",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductUom"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Replaces the product-specific units (for example a box of 12 pieces).",
+        "operationId": "set_product_uoms",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductUomsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductUom"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/receipts": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Receives stock at a location from outside (a manual receipt; purchasing posts its own).",
+        "operationId": "receive",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReceiptInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Retry of a move that was already posted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/reservations": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Active reservations, for example to see which orders hold a product.",
+        "operationId": "list_reservations",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "order_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReservationRow"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/stock": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "list_stock",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "warehouse_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "lot_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches product code, name, barcode and lot number.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "include_zero",
+            "in": "query",
+            "description": "Include rows with zero stock (default false).",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockRowPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/stock/products": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "list_product_stock",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "warehouse_id",
+            "in": "query",
+            "description": "Count only this warehouse (a van too).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Searches code, name and barcode.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "in_stock",
+            "in": "query",
+            "description": "Only products that have stock.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "below_reorder",
+            "in": "query",
+            "description": "Only products below their reorder minimum.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductStockPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/transfers": {
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Moves stock between two locations (also from a warehouse to a service van).",
+        "operationId": "transfer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMove"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/uoms": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "list_uoms",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Uom"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "create_uom",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UomInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Uom"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/warehouses": {
+      "get": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "list_warehouses",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Warehouse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "inventory"
+        ],
+        "summary": "Creates a warehouse or service van with one default location (`MAIN`, for a van `VAN`).",
+        "operationId": "create_warehouse",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/warehouses/{id}": {
+      "put": {
+        "tags": [
+          "inventory"
+        ],
+        "operationId": "update_warehouse",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarehouseInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Warehouse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/kb/categories": {
       "get": {
         "tags": [
@@ -9664,6 +11397,113 @@
   },
   "components": {
     "schemas": {
+      "AdjustmentInput": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "location_id",
+          "note"
+        ],
+        "properties": {
+          "delta": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "...or change it by this much (negative takes stock away).",
+            "example": "-1"
+          },
+          "expiry_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lot-tracked stock that was found: the lot number (created if new)."
+          },
+          "new_quantity": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Set the stock at the location to this quantity...",
+            "example": "12"
+          },
+          "note": {
+            "type": "string",
+            "description": "Why; required."
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "Allocation": {
+        "type": "object",
+        "required": [
+          "id",
+          "location_id",
+          "location",
+          "quantity",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "location": {
+            "type": "string"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "quantity": {
+            "type": "string"
+          }
+        }
+      },
       "AnnounceRepair": {
         "type": "object",
         "required": [
@@ -9859,6 +11699,40 @@
         ],
         "properties": {
           "child_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "BalanceDifference": {
+        "type": "object",
+        "required": [
+          "product_id",
+          "location_id",
+          "ledger_quantity",
+          "balance_quantity"
+        ],
+        "properties": {
+          "balance_quantity": {
+            "type": "string",
+            "description": "What the balance table holds."
+          },
+          "ledger_quantity": {
+            "type": "string",
+            "description": "Sum of the moves."
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "product_id": {
             "type": "string",
             "format": "uuid"
           }
@@ -10794,6 +12668,276 @@
             "description": "The customer's purchase order number or reference."
           },
           "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "Count": {
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "warehouse_id",
+          "warehouse_code",
+          "status",
+          "note",
+          "created_by_name",
+          "created_at",
+          "line_count",
+          "counted_count"
+        ],
+        "properties": {
+          "closed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "counted_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Lines with a counted quantity."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "line_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "location_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "location_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "description": "counting | posted | cancelled"
+          },
+          "warehouse_code": {
+            "type": "string"
+          },
+          "warehouse_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CountDetail": {
+        "type": "object",
+        "required": [
+          "count",
+          "lines"
+        ],
+        "properties": {
+          "count": {
+            "$ref": "#/components/schemas/Count"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountLine"
+            }
+          }
+        }
+      },
+      "CountEntries": {
+        "type": "object",
+        "required": [
+          "entries"
+        ],
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountEntry"
+            }
+          }
+        }
+      },
+      "CountEntry": {
+        "type": "object",
+        "properties": {
+          "counted_quantity": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The counted quantity; null clears it (the line is left alone when posting).",
+            "example": "12"
+          },
+          "expiry_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "line_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "An existing line..."
+          },
+          "location_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "...or stock that was not expected: product, location and lot."
+          }
+        }
+      },
+      "CountInput": {
+        "type": "object",
+        "required": [
+          "warehouse_id"
+        ],
+        "properties": {
+          "location_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Count only this location."
+          },
+          "note": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Count only this product."
+          },
+          "warehouse_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CountLine": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "product_code",
+          "product_name",
+          "unit",
+          "location_id",
+          "location",
+          "expected_quantity"
+        ],
+        "properties": {
+          "adjustment_move_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The adjustment posted for this line."
+          },
+          "counted_quantity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expected_quantity": {
+            "type": "string",
+            "description": "What the system expected when the count was created."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "location": {
+            "type": "string"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "unit": {
             "type": "string"
           }
         }
@@ -11768,6 +13912,90 @@
           }
         }
       },
+      "Integrity": {
+        "type": "object",
+        "required": [
+          "ok",
+          "differences"
+        ],
+        "properties": {
+          "differences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BalanceDifference"
+            }
+          },
+          "ok": {
+            "type": "boolean",
+            "description": "The balance table equals the sum of the ledger."
+          }
+        }
+      },
+      "IssueInput": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "location_id",
+          "quantity"
+        ],
+        "properties": {
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Serial units shipped: the customer (unless the unit has one)."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "string",
+            "example": "2"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "consumption (default) | shipment | scrap | repair_use"
+          },
+          "serial_unit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "uom": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "Job": {
         "type": "object",
         "required": [
@@ -12157,6 +14385,171 @@
           }
         }
       },
+      "LineAvailability": {
+        "type": "object",
+        "required": [
+          "order_line_id",
+          "position",
+          "product_code",
+          "description",
+          "unit",
+          "ordered",
+          "reserved",
+          "on_hand",
+          "reserved_total",
+          "available",
+          "shortfall",
+          "state"
+        ],
+        "properties": {
+          "available": {
+            "type": "string",
+            "description": "Available to promise: on hand minus everything reserved."
+          },
+          "description": {
+            "type": "string"
+          },
+          "on_hand": {
+            "type": "string",
+            "description": "In the warehouses."
+          },
+          "order_line_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ordered": {
+            "type": "string",
+            "description": "Ordered quantity, in the unit of the line."
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "reserved": {
+            "type": "string",
+            "description": "Reserved for this line, in the stock unit."
+          },
+          "reserved_total": {
+            "type": "string",
+            "description": "Reserved for all orders."
+          },
+          "shortfall": {
+            "type": "string",
+            "description": "What neither the reservation nor free stock covers."
+          },
+          "state": {
+            "type": "string",
+            "description": "reserved | available | partial | short | not_stocked"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "LineReservation": {
+        "type": "object",
+        "required": [
+          "order_line_id",
+          "product_id",
+          "product_code",
+          "ordered",
+          "reserved",
+          "allocations"
+        ],
+        "properties": {
+          "allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allocation"
+            }
+          },
+          "order_line_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ordered": {
+            "type": "string",
+            "description": "Ordered quantity in the stock unit of the product."
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reserved": {
+            "type": "string"
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "required": [
+          "id",
+          "warehouse_id",
+          "code",
+          "name",
+          "active"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "warehouse_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "LocationInput": {
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "active": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "warehouse_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Required when creating."
+          }
+        }
+      },
       "LoginLinkInput": {
         "type": "object",
         "required": [
@@ -12193,6 +14586,61 @@
               "$ref": "#/components/schemas/CustomerMatch"
             },
             "description": "Customers whose main phone number or e-mail address matches. Useful when the caller is\nnot (yet) a known contact, or calls from the customer's switchboard."
+          }
+        }
+      },
+      "Lot": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "product_code",
+          "lot_number",
+          "notes",
+          "on_hand"
+        ],
+        "properties": {
+          "expiry_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "on_hand": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "LotInput": {
+        "type": "object",
+        "properties": {
+          "expiry_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": "string"
           }
         }
       },
@@ -12329,6 +14777,25 @@
           },
           "body": {
             "type": "string"
+          }
+        }
+      },
+      "MovePage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockMove"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -12765,6 +15232,38 @@
           }
         }
       },
+      "OrderAvailability": {
+        "type": "object",
+        "required": [
+          "order_id",
+          "order_number",
+          "order_status",
+          "reservable",
+          "lines"
+        ],
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LineAvailability"
+            }
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_number": {
+            "type": "string"
+          },
+          "order_status": {
+            "type": "string"
+          },
+          "reservable": {
+            "type": "boolean",
+            "description": "Stock can be reserved: the customer has confirmed and the order is not cancelled."
+          }
+        }
+      },
       "OrderEditInput": {
         "type": "object",
         "description": "Changes to a draft revision. Lines that are left out are removed; prices and rebates stay as\nagreed on the quotation, the totals are recomputed by the server.",
@@ -12792,6 +15291,7 @@
       "OrderLine": {
         "type": "object",
         "required": [
+          "id",
           "position",
           "product_code",
           "description",
@@ -12808,6 +15308,11 @@
         "properties": {
           "description": {
             "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identifies the line of this revision (inventory reserves stock against it)."
           },
           "line_discount_percent": {
             "type": "string"
@@ -13883,6 +16388,12 @@
           "active": {
             "type": "boolean"
           },
+          "barcode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "code": {
             "type": "string"
           },
@@ -13906,6 +16417,13 @@
             "type": "string",
             "format": "uuid"
           },
+          "lead_time_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
           "name": {
             "type": "string"
           },
@@ -13917,9 +16435,33 @@
             "type": "string",
             "description": "purchased | manufactured | configurable | service"
           },
+          "reorder_max": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Order up to this quantity.",
+            "example": "40"
+          },
+          "reorder_min": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Reorder when the available stock falls below this quantity.",
+            "example": "10"
+          },
+          "standard_cost": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Standard cost per stock unit. Only returned with the permission `inventory.cost`, else null.",
+            "example": "42.5000"
+          },
           "tracking": {
             "type": "string",
-            "description": "none | serial — serial-tracked products get an individual serial number per unit."
+            "description": "none | serial | lot — serial-tracked products get an individual serial number per unit,\nlot-tracked products are stocked per lot or batch."
           },
           "unit": {
             "type": "string"
@@ -13988,6 +16530,12 @@
           "active": {
             "type": "boolean"
           },
+          "barcode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "code": {
             "type": "string"
           },
@@ -14001,6 +16549,13 @@
             ],
             "format": "uuid"
           },
+          "lead_time_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
           "name": {
             "type": "string"
           },
@@ -14010,6 +16565,28 @@
           },
           "product_type": {
             "type": "string"
+          },
+          "reorder_max": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "40"
+          },
+          "reorder_min": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "example": "10"
+          },
+          "standard_cost": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Ignored (the stored cost is kept) without the permission `inventory.cost`.",
+            "example": "42.5"
           },
           "tracking": {
             "type": "string",
@@ -14040,6 +16617,133 @@
           "total": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "ProductStock": {
+        "type": "object",
+        "description": "Stock of one product over all locations.",
+        "required": [
+          "product_id",
+          "code",
+          "name",
+          "unit",
+          "tracking",
+          "on_hand",
+          "in_vans",
+          "reserved",
+          "available",
+          "below_reorder"
+        ],
+        "properties": {
+          "available": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "below_reorder": {
+            "type": "boolean",
+            "description": "Available is below the reorder minimum."
+          },
+          "code": {
+            "type": "string"
+          },
+          "in_vans": {
+            "type": "string",
+            "description": "In service vans; not part of the other numbers unless a van is chosen."
+          },
+          "lead_time_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "on_hand": {
+            "type": "string",
+            "description": "In the warehouses (or in the chosen warehouse)."
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reorder_max": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reorder_min": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reserved": {
+            "type": "string"
+          },
+          "tracking": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductStockPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductStock"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ProductUom": {
+        "type": "object",
+        "required": [
+          "uom_code",
+          "factor"
+        ],
+        "properties": {
+          "factor": {
+            "type": "string",
+            "description": "Stock units in one of this unit (a box of 12 pieces: 12).",
+            "example": "12"
+          },
+          "uom_code": {
+            "type": "string"
+          }
+        }
+      },
+      "ProductUomsInput": {
+        "type": "object",
+        "required": [
+          "uoms"
+        ],
+        "properties": {
+          "uoms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductUom"
+            }
           }
         }
       },
@@ -14779,6 +17483,92 @@
           }
         }
       },
+      "Rebuilt": {
+        "type": "object",
+        "required": [
+          "balance_rows"
+        ],
+        "properties": {
+          "balance_rows": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ReceiptInput": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "location_id",
+          "quantity"
+        ],
+        "properties": {
+          "expiry_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Chosen by the client; a retry with the same id changes nothing."
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Lot-tracked products: the lot (created if new)."
+          },
+          "note": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "string",
+            "example": "10"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "manual_receipt (default) | return"
+          },
+          "serial_number": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "...or a new serial number, which registers the unit."
+          },
+          "serial_unit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Serial-tracked products: an existing unit that is in stock without a location..."
+          },
+          "uom": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Unit the quantity is entered in; default the stock unit of the product."
+          }
+        }
+      },
       "RelatedEntry": {
         "type": "object",
         "required": [
@@ -15359,6 +18149,122 @@
           }
         }
       },
+      "ReservationRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "order_id",
+          "order_number",
+          "customer_name",
+          "order_line_id",
+          "position",
+          "product_id",
+          "product_code",
+          "location",
+          "quantity",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customer_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "location": {
+            "type": "string"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "order_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_line_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "order_number": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "string"
+          }
+        }
+      },
+      "ReserveInput": {
+        "type": "object",
+        "required": [
+          "quantity"
+        ],
+        "properties": {
+          "location_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "...or this location..."
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "...or this lot."
+          },
+          "quantity": {
+            "type": "string",
+            "description": "The quantity that should be reserved for the line in total, in the stock unit of the\nproduct. More reserves additional stock, less releases the newest allocations, 0 releases all.",
+            "example": "5"
+          },
+          "warehouse_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Take additional stock only from this warehouse..."
+          }
+        }
+      },
+      "ReverseInput": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Chosen by the client for the reversal move."
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
       "ReviseInput": {
         "type": "object",
         "required": [
@@ -15744,6 +18650,268 @@
           },
           "status": {
             "type": "string"
+          }
+        }
+      },
+      "StockMove": {
+        "type": "object",
+        "description": "One row of the ledger, as shown to staff.",
+        "required": [
+          "id",
+          "seq",
+          "product_id",
+          "product_code",
+          "product_name",
+          "unit",
+          "quantity",
+          "from_location_id",
+          "from_location",
+          "to_location_id",
+          "to_location",
+          "kind",
+          "reason",
+          "note",
+          "occurred_at",
+          "created_by_name",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by_name": {
+            "type": "string"
+          },
+          "entered_quantity": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What the user typed, when it was in another unit than the stock unit."
+          },
+          "entered_uom": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "from_location": {
+            "type": "string"
+          },
+          "from_location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "receipt | issue | transfer | adjustment"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "note": {
+            "type": "string"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string",
+            "example": "5.0000"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "reference_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "reference_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reversed_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The move that reversed this one."
+          },
+          "reversed_of": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The move this one reverses."
+          },
+          "seq": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Position in the ledger; moves are shown newest first by this number."
+          },
+          "serial_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serial_unit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "to_location": {
+            "type": "string"
+          },
+          "to_location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "unit": {
+            "type": "string",
+            "description": "The stock unit the quantity is in."
+          },
+          "unit_cost": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Standard cost per stock unit at the time of the move. Only with `inventory.cost`."
+          }
+        }
+      },
+      "StockRow": {
+        "type": "object",
+        "description": "Stock of one product at one location and lot.",
+        "required": [
+          "product_id",
+          "product_code",
+          "product_name",
+          "unit",
+          "tracking",
+          "warehouse_id",
+          "warehouse_kind",
+          "location_id",
+          "location",
+          "on_hand",
+          "reserved",
+          "available"
+        ],
+        "properties": {
+          "available": {
+            "type": "string",
+            "description": "On hand minus reserved; negative when stock was adjusted away from reservations."
+          },
+          "expiry_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "location": {
+            "type": "string",
+            "description": "`WAREHOUSE/LOCATION`"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "lot_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "on_hand": {
+            "type": "string"
+          },
+          "product_code": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "reserved": {
+            "type": "string"
+          },
+          "tracking": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "warehouse_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "warehouse_kind": {
+            "type": "string"
+          }
+        }
+      },
+      "StockRowPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockRow"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -16416,6 +19584,122 @@
           }
         }
       },
+      "TransferInput": {
+        "type": "object",
+        "required": [
+          "id",
+          "product_id",
+          "from_location_id",
+          "to_location_id",
+          "quantity"
+        ],
+        "properties": {
+          "from_location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "note": {
+            "type": "string"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "string",
+            "example": "2"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "transfer (default) | van_replenishment"
+          },
+          "serial_unit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "to_location_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uom": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Uom": {
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "category",
+          "factor",
+          "active"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "category": {
+            "type": "string",
+            "description": "unit | weight | length | area | volume | time"
+          },
+          "code": {
+            "type": "string"
+          },
+          "factor": {
+            "type": "string",
+            "description": "Size in the base unit of the category (kg = 1, g = 0.001).",
+            "example": "0.001"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "UomInput": {
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "category",
+          "factor"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "factor": {
+            "type": "string",
+            "example": "0.001"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "VatGroup": {
         "type": "object",
         "required": [
@@ -16431,6 +19715,91 @@
             "type": "string"
           },
           "vat_rate": {
+            "type": "string"
+          }
+        }
+      },
+      "Warehouse": {
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "kind",
+          "active",
+          "locations"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "assigned_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The technician a service van belongs to."
+          },
+          "assigned_user_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "warehouse | van"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Location"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "WarehouseInput": {
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "active": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "assigned_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "warehouse | van. Cannot be changed afterwards."
+          },
+          "name": {
             "type": "string"
           }
         }
@@ -16615,6 +19984,10 @@
     {
       "name": "field",
       "description": "Field jobs for technicians: tasks, work logs and photos"
+    },
+    {
+      "name": "inventory",
+      "description": "Warehouses, stock moves, lots, reservations and counts"
     },
     {
       "name": "portal",

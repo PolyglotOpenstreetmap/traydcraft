@@ -9,6 +9,7 @@ publish.workspace = true
 traydcraft-core.workspace = true
 traydcraft-crm.workspace = true
 traydcraft-documents.workspace = true
+traydcraft-inventory.workspace = true
 traydcraft-pricing.workspace = true
 traydcraft-products.workspace = true
 axum.workspace = true

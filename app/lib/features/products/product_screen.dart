@@ -26,6 +26,9 @@ class ProductScreen extends ConsumerWidget {
     final canWrite =
         ref.watch(meProvider).value?.permissions.contains('products.write') ??
         false;
+    final canSeeStock =
+        ref.watch(meProvider).value?.permissions.contains('inventory.read') ??
+        false;
     return Scaffold(
       body: product.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -61,6 +64,13 @@ class ProductScreen extends ConsumerWidget {
                         '${p.code} · ${p.name}',
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
+                      if (canSeeStock)
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.warehouse_outlined),
+                          label: Text(context.l10n.stockTitle),
+                          onPressed: () =>
+                              context.push('/stock/products/${p.id}'),
+                        ),
                       if (canWrite)
                         OutlinedButton.icon(
                           icon: const Icon(Icons.edit),
@@ -87,7 +97,7 @@ class ProductScreen extends ConsumerWidget {
                       InfoItem(context.l10n.vat, '${number(p.vatRate)} %'),
                       InfoItem(
                         context.l10n.tracking,
-                        serial ? 'serial numbers' : 'none',
+                        context.l10n.trackingLabel(p.tracking),
                       ),
                       InfoItem(context.l10n.family, p.familyCode ?? ''),
                       InfoItem(

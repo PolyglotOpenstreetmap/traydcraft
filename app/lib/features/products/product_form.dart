@@ -31,7 +31,14 @@ class _ProductFormState extends ConsumerState<ProductForm> {
   late final _unit = TextEditingController(text: p?.unit ?? 'pcs');
   late final _vat = TextEditingController(text: number(p?.vatRate ?? '21'));
   late String _type = p?.productType ?? 'purchased';
-  late bool _serial = p?.tracking == 'serial';
+  late String _tracking = p?.tracking ?? 'none';
+  late final _cost = TextEditingController(text: number(p?.standardCost));
+  late final _reorderMin = TextEditingController(text: number(p?.reorderMin));
+  late final _reorderMax = TextEditingController(text: number(p?.reorderMax));
+  late final _leadTime = TextEditingController(
+    text: p?.leadTimeDays?.toString() ?? '',
+  );
+  late final _barcode = TextEditingController(text: p?.barcode);
   late String? _familyId = p?.familyId;
   late String _pricing = p?.pricingType ?? 'list';
   late bool _active = p?.active ?? true;
@@ -43,6 +50,25 @@ class _ProductFormState extends ConsumerState<ProductForm> {
       setState(() => _error = context.l10n.codeNameVatRequired);
       return;
     }
+    final cost = _cost.text.trim().isEmpty
+        ? null
+        : parseDecimalInput(_cost.text);
+    final min = _reorderMin.text.trim().isEmpty
+        ? null
+        : parseDecimalInput(_reorderMin.text);
+    final max = _reorderMax.text.trim().isEmpty
+        ? null
+        : parseDecimalInput(_reorderMax.text);
+    final lead = _leadTime.text.trim().isEmpty
+        ? null
+        : int.tryParse(_leadTime.text.trim());
+    if ((_cost.text.trim().isNotEmpty && cost == null) ||
+        (_reorderMin.text.trim().isNotEmpty && min == null) ||
+        (_reorderMax.text.trim().isNotEmpty && max == null) ||
+        (_leadTime.text.trim().isNotEmpty && lead == null)) {
+      setState(() => _error = context.l10n.stockInvalidNumbers);
+      return;
+    }
     final body = ProductInput(
       code: _code.text.trim(),
       name: _name.text.trim(),
@@ -50,10 +76,15 @@ class _ProductFormState extends ConsumerState<ProductForm> {
       unit: _unit.text.trim(),
       productType: _type,
       vatRate: vat,
-      tracking: _serial ? 'serial' : 'none',
+      tracking: _type == 'service' ? 'none' : _tracking,
       familyId: _familyId,
       pricingType: _pricing,
       active: _active,
+      standardCost: cost,
+      reorderMin: min,
+      reorderMax: max,
+      leadTimeDays: lead,
+      barcode: _barcode.text.trim().isEmpty ? null : _barcode.text.trim(),
     );
     try {
       final api = ref.read(apiProvider).products;
@@ -105,6 +136,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _type,
+                    isExpanded: true,
                     decoration: InputDecoration(labelText: context.l10n.type),
                     items: [
                       for (final t in productTypes)
@@ -163,6 +195,7 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _pricing,
+                    isExpanded: true,
                     decoration: InputDecoration(
                       labelText: context.l10n.pricing,
                     ),
@@ -185,14 +218,85 @@ class _ProductFormState extends ConsumerState<ProductForm> {
                 ),
               ],
             ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(context.l10n.serialNumbers),
-              subtitle: Text(context.l10n.serialNumbersHelp),
-              value: _serial,
+            DropdownButtonFormField<String>(
+              initialValue: _tracking,
+              isExpanded: true,
+              decoration: InputDecoration(labelText: context.l10n.tracking),
+              items: [
+                DropdownMenuItem(value: 'none', child: Text(context.l10n.none)),
+                DropdownMenuItem(
+                  value: 'serial',
+                  child: Text(context.l10n.serialNumbers),
+                ),
+                DropdownMenuItem(
+                  value: 'lot',
+                  child: Text(context.l10n.stockLotTrackingHelp),
+                ),
+              ],
               onChanged: _type == 'service'
                   ? null
-                  : (v) => setState(() => _serial = v),
+                  : (v) => setState(() => _tracking = v!),
+            ),
+            gap,
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _reorderMin,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.stockReorderMin,
+                    ),
+                  ),
+                ),
+                gap,
+                Expanded(
+                  child: TextField(
+                    controller: _reorderMax,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.stockReorderMax,
+                    ),
+                  ),
+                ),
+                gap,
+                Expanded(
+                  child: TextField(
+                    controller: _leadTime,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.stockLeadTime,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            gap,
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _barcode,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.stockBarcode,
+                    ),
+                  ),
+                ),
+                // Cost is only offered to people who may see it (the server also enforces it).
+                if (ref
+                        .watch(meProvider)
+                        .value
+                        ?.permissions
+                        .contains('inventory.cost') ??
+                    false) ...[
+                  gap,
+                  Expanded(
+                    child: TextField(
+                      controller: _cost,
+                      decoration: InputDecoration(
+                        labelText: context.l10n.stockStandardCost,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,

@@ -10,6 +10,7 @@ part 'order_line.g.dart';
 class OrderLine {
   const OrderLine({
     required this.description,
+    required this.id,
     required this.lineDiscountPercent,
     required this.lineTotal,
     required this.listUnitPrice,
@@ -27,6 +28,9 @@ class OrderLine {
   factory OrderLine.fromJson(Map<String, Object?> json) => _$OrderLineFromJson(json);
   
   final String description;
+
+  /// Identifies the line of this revision (inventory reserves stock against it).
+  final String id;
   @JsonKey(name: 'line_discount_percent')
   final String lineDiscountPercent;
   @JsonKey(name: 'line_total')

@@ -292,6 +292,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get code => 'Code';
 
   @override
+  String get codeNameRequired => 'Le code et le nom sont obligatoires.';
+
+  @override
   String get codeNameVatRequired =>
       'Le code, le nom et le taux de TVA sont obligatoires.';
 
@@ -375,9 +378,62 @@ class AppLocalizationsFr extends AppLocalizations {
   String get convertToOrder => 'Convertir en commande';
 
   @override
+  String get countAddLine => 'Ajouter du stock non listé';
+
+  @override
+  String get countCancel => 'Annuler l\'inventaire';
+
+  @override
+  String get countCounted => 'Compté';
+
+  @override
+  String get countDifference => 'Écart';
+
+  @override
+  String get countExpected => 'Attendu';
+
+  @override
+  String get countInvalidQuantity =>
+      'Une quantité comptée n\'est pas un nombre.';
+
+  @override
+  String get countNew => 'Nouvel inventaire';
+
+  @override
   String countOf(int count, int total) {
     return '$count sur $total';
   }
+
+  @override
+  String get countOneProduct => 'Un seul produit (facultatif)';
+
+  @override
+  String get countPost => 'Comptabiliser l\'inventaire';
+
+  @override
+  String get countPostConfirm =>
+      'Les écarts sont comptabilisés comme corrections de stock. Les lignes sans quantité comptée restent inchangées.';
+
+  @override
+  String get countProgress => 'Compté';
+
+  @override
+  String get countStart => 'Démarrer l\'inventaire';
+
+  @override
+  String get countStatusCounting => 'En cours';
+
+  @override
+  String get countStatusPosted => 'Comptabilisé';
+
+  @override
+  String get countWarehouseRequired => 'Choisissez un entrepôt.';
+
+  @override
+  String get countWholeWarehouse => 'Tout l\'entrepôt';
+
+  @override
+  String get countedBy => 'Démarré par';
 
   @override
   String get country => 'Pays';
@@ -1059,6 +1115,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get orderStatusReadyForShipping => 'prête à l\'expédition';
+
+  @override
+  String get orderStockRelease => 'Libérer';
+
+  @override
+  String get orderStockReserve => 'Réserver';
+
+  @override
+  String get orderStockReserveHint =>
+      'Le stock peut être réservé une fois la commande confirmée par le client.';
+
+  @override
+  String orderStockThisLine(String quantity) {
+    return '$quantity réservé pour cette ligne';
+  }
+
+  @override
+  String get orderStockTitle => 'Disponibilité du stock';
 
   @override
   String get orders => 'Commandes';
@@ -1747,6 +1821,219 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get statusSuperseded => 'remplacée';
+
+  @override
+  String get stockAdjust => 'Corriger';
+
+  @override
+  String get stockAdjustReason => 'Pourquoi corriger le stock ?';
+
+  @override
+  String get stockAdjustRequired =>
+      'Choisissez un emplacement, saisissez une quantité et un motif.';
+
+  @override
+  String get stockAllWarehouses => 'Tous les entrepôts';
+
+  @override
+  String get stockAssignedTo => 'Attribué à';
+
+  @override
+  String get stockAvailable => 'Disponible';
+
+  @override
+  String get stockBarcode => 'Code-barres';
+
+  @override
+  String get stockBelowReorder => 'Sous le seuil de réappro.';
+
+  @override
+  String get stockChangeBy => 'Modifier de (+/−)';
+
+  @override
+  String get stockCounts => 'Inventaires';
+
+  @override
+  String get stockExpiry => 'Date de péremption';
+
+  @override
+  String get stockFrom => 'De';
+
+  @override
+  String get stockInVans => 'Dans les camionnettes';
+
+  @override
+  String get stockInvalidNumbers =>
+      'Le coût, les seuils et le délai doivent être des nombres.';
+
+  @override
+  String get stockIssue => 'Sortir';
+
+  @override
+  String get stockKindVan => 'Camionnette de service';
+
+  @override
+  String get stockKindWarehouse => 'Entrepôt';
+
+  @override
+  String get stockLeadTime => 'Délai (jours)';
+
+  @override
+  String get stockLocation => 'Emplacement';
+
+  @override
+  String get stockLocations => 'Stock par emplacement';
+
+  @override
+  String get stockLot => 'Lot';
+
+  @override
+  String get stockLotNumber => 'Numéro de lot';
+
+  @override
+  String get stockLotTrackingHelp => 'Lots / batchs';
+
+  @override
+  String get stockMoves => 'Mouvements';
+
+  @override
+  String get stockNewLocation => 'Nouvel emplacement';
+
+  @override
+  String get stockNewLot => 'Nouveau lot';
+
+  @override
+  String get stockNewQuantity => 'Nouvelle quantité';
+
+  @override
+  String get stockNewVan => 'Nouvelle camionnette de service';
+
+  @override
+  String get stockNewWarehouse => 'Nouvel entrepôt';
+
+  @override
+  String get stockNoMoves => 'Aucun mouvement';
+
+  @override
+  String get stockNoWarehouses =>
+      'Aucun entrepôt. Un administrateur les crée ici.';
+
+  @override
+  String get stockNote => 'Remarque';
+
+  @override
+  String get stockNothingInStock => 'Rien en stock';
+
+  @override
+  String get stockOnHand => 'En stock';
+
+  @override
+  String get stockOnlyInStock => 'Seulement en stock';
+
+  @override
+  String get stockProductQuantityRequired =>
+      'Choisissez un produit et saisissez une quantité.';
+
+  @override
+  String get stockReasonConsumption => 'Consommation';
+
+  @override
+  String get stockReasonCorrection => 'Correction';
+
+  @override
+  String get stockReasonCount => 'Inventaire';
+
+  @override
+  String get stockReasonManualReceipt => 'Réception manuelle';
+
+  @override
+  String get stockReasonProductionOutput => 'Production terminée';
+
+  @override
+  String get stockReasonPurchaseReceipt => 'Réception d\'achat';
+
+  @override
+  String get stockReasonRepairUse => 'Utilisé en réparation';
+
+  @override
+  String get stockReasonReturn => 'Retour client';
+
+  @override
+  String get stockReasonReversal => 'Annulation';
+
+  @override
+  String get stockReasonScrap => 'Rebut';
+
+  @override
+  String get stockReasonShipment => 'Expédition';
+
+  @override
+  String get stockReasonVanReplenishment => 'Réapprovisionnement camionnette';
+
+  @override
+  String get stockReceive => 'Réceptionner';
+
+  @override
+  String get stockReorderMax => 'Stock maximum';
+
+  @override
+  String get stockReorderMin => 'Stock minimum';
+
+  @override
+  String get stockReservations => 'Réservé pour des commandes';
+
+  @override
+  String get stockReserved => 'Réservé';
+
+  @override
+  String get stockReverse => 'Annuler';
+
+  @override
+  String get stockReverseTitle => 'Annuler ce mouvement';
+
+  @override
+  String get stockReversed => 'annulé';
+
+  @override
+  String stockShortBy(String quantity) {
+    return 'Manque $quantity';
+  }
+
+  @override
+  String get stockStandardCost => 'Coût standard';
+
+  @override
+  String get stockStateAvailable => 'En stock';
+
+  @override
+  String get stockStateNotStocked => 'Non stocké';
+
+  @override
+  String get stockStatePartial => 'En stock partiellement';
+
+  @override
+  String get stockStateReserved => 'Réservé';
+
+  @override
+  String get stockStateShort => 'Pas en stock';
+
+  @override
+  String get stockTitle => 'Stock';
+
+  @override
+  String get stockTo => 'Vers';
+
+  @override
+  String get stockTrackingLot => 'lot';
+
+  @override
+  String get stockTransfer => 'Transférer';
+
+  @override
+  String get stockWarehouse => 'Entrepôt';
+
+  @override
+  String get stockWarehouses => 'Entrepôts';
 
   @override
   String get street => 'Rue';

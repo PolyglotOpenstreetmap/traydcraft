@@ -10,6 +10,7 @@ import '../../l10n/l10n.dart';
 import '../../shared/actions.dart';
 import '../../shared/format.dart';
 import '../../shared/order_widgets.dart';
+import '../inventory/order_stock_panel.dart';
 
 final _historyProvider = FutureProvider.autoDispose
     .family<List<PriorityChange>, String>(
@@ -823,6 +824,15 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
             Text(d.notes),
           gap,
           _lines(d),
+          if (perms.contains('inventory.read') &&
+              o.status != 'cancelled' &&
+              d.revision == o.currentRevision) ...[
+            gap,
+            OrderStockPanel(
+              orderId: o.id,
+              revision: '${o.status}-${d.revision}',
+            ),
+          ],
           gap,
           const Divider(),
           _priority(d, canWrite),

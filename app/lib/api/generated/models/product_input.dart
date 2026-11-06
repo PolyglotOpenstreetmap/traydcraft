@@ -13,10 +13,15 @@ class ProductInput {
     required this.name,
     required this.vatRate,
     this.active,
+    this.barcode,
     this.description,
     this.familyId,
+    this.leadTimeDays,
     this.pricingType,
     this.productType,
+    this.reorderMax,
+    this.reorderMin,
+    this.standardCost,
     this.tracking,
     this.unit,
   });
@@ -25,11 +30,15 @@ class ProductInput {
   
   @JsonKey(includeIfNull: false)
   final bool? active;
+  @JsonKey(includeIfNull: false)
+  final String? barcode;
   final String code;
   @JsonKey(includeIfNull: false)
   final String? description;
   @JsonKey(includeIfNull: false,name: 'family_id')
   final String? familyId;
+  @JsonKey(includeIfNull: false,name: 'lead_time_days')
+  final int? leadTimeDays;
   final String name;
 
   /// list | net | indicative
@@ -37,6 +46,14 @@ class ProductInput {
   final String? pricingType;
   @JsonKey(includeIfNull: false,name: 'product_type')
   final String? productType;
+  @JsonKey(includeIfNull: false,name: 'reorder_max')
+  final String? reorderMax;
+  @JsonKey(includeIfNull: false,name: 'reorder_min')
+  final String? reorderMin;
+
+  /// Ignored (the stored cost is kept) without the permission `inventory.cost`.
+  @JsonKey(includeIfNull: false,name: 'standard_cost')
+  final String? standardCost;
 
   /// none | serial
   @JsonKey(includeIfNull: false)
