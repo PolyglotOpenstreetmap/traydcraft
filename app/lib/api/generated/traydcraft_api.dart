@@ -9,6 +9,7 @@ import 'clients/crm_client.dart';
 import 'clients/helpdesk_client.dart';
 import 'clients/repairs_client.dart';
 import 'clients/field_client.dart';
+import 'clients/kb_client.dart';
 import 'clients/core_client.dart';
 import 'clients/sales_client.dart';
 import 'clients/portal_client.dart';
@@ -34,6 +35,7 @@ class TraydcraftApi {
   HelpdeskClient? _helpdesk;
   RepairsClient? _repairs;
   FieldClient? _field;
+  KbClient? _kb;
   CoreClient? _core;
   SalesClient? _sales;
   PortalClient? _portal;
@@ -48,6 +50,8 @@ class TraydcraftApi {
   RepairsClient get repairs => _repairs ??= RepairsClient(_dio, baseUrl: _baseUrl);
 
   FieldClient get field => _field ??= FieldClient(_dio, baseUrl: _baseUrl);
+
+  KbClient get kb => _kb ??= KbClient(_dio, baseUrl: _baseUrl);
 
   CoreClient get core => _core ??= CoreClient(_dio, baseUrl: _baseUrl);
 

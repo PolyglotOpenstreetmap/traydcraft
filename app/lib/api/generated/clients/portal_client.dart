@@ -8,6 +8,7 @@ import 'package:retrofit/retrofit.dart';
 import '../models/announce_repair.dart';
 import '../models/confirm_portal_order.dart';
 import '../models/file_info.dart';
+import '../models/kb_vote.dart';
 import '../models/login_link_input.dart';
 import '../models/message_input.dart';
 import '../models/new_priority_request.dart';
@@ -22,6 +23,9 @@ import '../models/portal_ticket.dart';
 import '../models/portal_ticket_detail.dart';
 import '../models/priority_request.dart';
 import '../models/profile_input.dart';
+import '../models/reader_category.dart';
+import '../models/reader_entry.dart';
+import '../models/reader_summary.dart';
 import '../models/session_input.dart';
 
 part 'portal_client.g.dart';
@@ -29,6 +33,60 @@ part 'portal_client.g.dart';
 @RestApi()
 abstract class PortalClient {
   factory PortalClient(Dio dio, {String? baseUrl}) = _PortalClient;
+
+  /// [language] - nl | fr | en | de | es (default: the company's language)
+  @GET('/api/v1/portal/kb/categories')
+  Future<List<ReaderCategory>> listPortalKbCategories({
+    @Query('language') String? language,
+  });
+
+  /// Browse or search the help articles.
+  ///
+  /// [q] - Search words.
+  ///
+  /// [categoryId] - Includes the sub-categories of this category.
+  ///
+  /// [language] - nl | fr | en | de | es (default: the company's language).
+  @GET('/api/v1/portal/kb/entries')
+  Future<List<ReaderSummary>> listPortalKbEntries({
+    @Query('q') String? q,
+    @Query('category_id') String? categoryId,
+    @Query('tag') String? tag,
+    @Query('language') String? language,
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+  });
+
+  /// One article. Counts one view. Internal, draft and archived entries are "not found".
+  ///
+  /// [language] - nl | fr | en | de | es (default: the company's language).
+  @GET('/api/v1/portal/kb/entries/{id}')
+  Future<ReaderEntry> getPortalKbEntry({
+    @Path('id') required String id,
+    @Query('language') String? language,
+  });
+
+  @GET('/api/v1/portal/kb/entries/{id}/images/{file_id}')
+  Future<String> getPortalKbImage({
+    @Path('id') required String id,
+    @Path('file_id') required String fileId,
+  });
+
+  /// Says whether the article helped. One vote per contact and article; sending it again changes it.
+  @PUT('/api/v1/portal/kb/entries/{id}/vote')
+  Future<void> votePortalKbEntry({
+    @Path('id') required String id,
+    @Body() required KbVote body,
+  });
+
+  /// Up to three articles that fit what the contact types, for the "new ticket" form.
+  ///
+  /// [q] - What the customer typed so far, e.g. the subject of a new ticket.
+  @GET('/api/v1/portal/kb/suggestions')
+  Future<List<ReaderSummary>> suggestPortalKbEntries({
+    @Query('q') String? q,
+    @Query('language') String? language,
+  });
 
   /// Always answers 202, whether or not the address belongs to a portal user, so the endpoint.
   /// cannot be used to find out who is a customer.
