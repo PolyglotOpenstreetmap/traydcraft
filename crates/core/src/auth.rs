@@ -53,6 +53,8 @@ pub enum Permission {
     HelpdeskWrite,
     /// Send e-mails to customers.
     HelpdeskReply,
+    /// Manage SLA policies, teams and helpdesk settings.
+    HelpdeskAdmin,
     /// Manage prepared answers.
     AnswersWrite,
     OrdersRead,
@@ -76,7 +78,7 @@ pub enum Permission {
 }
 
 impl Permission {
-    pub const ALL: [Permission; 29] = [
+    pub const ALL: [Permission; 30] = [
         Permission::CustomersRead,
         Permission::CustomersWrite,
         Permission::ProductsRead,
@@ -95,6 +97,7 @@ impl Permission {
         Permission::HelpdeskRead,
         Permission::HelpdeskWrite,
         Permission::HelpdeskReply,
+        Permission::HelpdeskAdmin,
         Permission::AnswersWrite,
         Permission::OrdersRead,
         Permission::OrdersWrite,
@@ -128,6 +131,7 @@ impl Permission {
             Permission::HelpdeskRead => "helpdesk.read",
             Permission::HelpdeskWrite => "helpdesk.write",
             Permission::HelpdeskReply => "helpdesk.reply",
+            Permission::HelpdeskAdmin => "helpdesk.admin",
             Permission::AnswersWrite => "answers.write",
             Permission::OrdersRead => "orders.read",
             Permission::OrdersWrite => "orders.write",
@@ -519,6 +523,14 @@ mod tests {
         assert!(role_grants("production", Permission::HelpdeskWrite));
         assert!(!role_grants("production", Permission::HelpdeskReply));
         assert!(role_grants("sales", Permission::HelpdeskReply));
+    }
+
+    #[test]
+    fn only_admins_manage_sla_policies_and_teams() {
+        assert!(role_grants("admin", Permission::HelpdeskAdmin));
+        for r in ["sales", "sales_manager", "support", "production", "viewer"] {
+            assert!(!role_grants(r, Permission::HelpdeskAdmin), "{r}");
+        }
     }
 
     #[test]

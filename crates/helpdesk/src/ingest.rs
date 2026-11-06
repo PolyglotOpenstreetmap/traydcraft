@@ -107,8 +107,11 @@ async fn find_ticket(
         }
     }
     if let Some(number) = find_ticket_number(&mail.subject) {
+        // A merged ticket's number leads to the ticket it was merged into.
         return Ok(sqlx::query_as(
-            "SELECT id, number FROM helpdesk.tickets WHERE company_id = $1 AND number = $2",
+            "SELECT t2.id, t2.number FROM helpdesk.tickets t
+             JOIN helpdesk.tickets t2 ON t2.id = coalesce(t.merged_into_id, t.id)
+             WHERE t.company_id = $1 AND t.number = $2",
         )
         .bind(company_id)
         .bind(number)
@@ -223,6 +226,7 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             .bind(contact.as_ref().map(|c| c.id))
             .execute(&mut *tx)
             .await?;
+            crate::sla::sync(&mut tx, t.id).await?;
             (t.id, t.number)
         }
         None => {
@@ -267,6 +271,8 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             .bind(contact.as_ref().map(|c| c.id))
             .execute(&mut *tx)
             .await?;
+            crate::teams::assign_default_team(&mut tx, company_id, id).await?;
+            crate::sla::sync(&mut tx, id).await?;
             (id, number)
         }
     };
@@ -292,6 +298,7 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
     .bind(contact.as_ref().map(|c| c.id))
     .execute(&mut *tx)
     .await?;
+    store_attachments(&mut tx, company_id, ticket_id, article_id, &mail).await?;
     tx.commit().await?;
     Ok(IngestResult {
         ticket_id,
@@ -300,4 +307,54 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
         new_ticket,
         duplicate: false,
     })
+}
+
+/// Stores the files of an incoming mail on the ticket, linked to its article. Files that are not
+/// JPEG, PNG, WebP or PDF, empty or too large are left out (the original mail is kept in full in
+/// `raw_message`); the same rules as for uploads apply.
+async fn store_attachments(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    ticket_id: Uuid,
+    article_id: Uuid,
+    mail: &InboundEmail,
+) -> anyhow::Result<()> {
+    let sender = if mail.from_name.is_empty() {
+        mail.from_address.as_str()
+    } else {
+        mail.from_name.as_str()
+    };
+    for a in mail
+        .attachments
+        .iter()
+        .take(crate::attachments::MAX_PER_ARTICLE)
+    {
+        match traydcraft_core::files::store_document(
+            conn,
+            company_id,
+            None,
+            &a.filename,
+            &a.data,
+            None,
+            sender,
+        )
+        .await
+        {
+            Ok(file) => {
+                sqlx::query(
+                    "INSERT INTO helpdesk.ticket_attachments (file_id, ticket_id, article_id) VALUES ($1, $2, $3)",
+                )
+                .bind(file.id)
+                .bind(ticket_id)
+                .bind(article_id)
+                .execute(&mut *conn)
+                .await?;
+            }
+            Err(traydcraft_core::AppError::Validation(reason)) => {
+                tracing::info!(file = %a.filename, %reason, "attachment of an incoming e-mail skipped");
+            }
+            Err(e) => anyhow::bail!("storing an attachment failed: {e}"),
+        }
+    }
+    Ok(())
 }

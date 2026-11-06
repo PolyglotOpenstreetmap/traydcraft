@@ -18,6 +18,7 @@ use axum::Json;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use session::{new_token, PortalUser, LINK_PREFIX, SESSION_PREFIX};
+use traydcraft_core::files::FileInfo;
 use traydcraft_core::{audit, is_language, new_id, AppError, AppResult, AppState, LANGUAGES};
 use traydcraft_crm::contacts::{self, Contact, ADDRESS_FORMS, TITLES};
 use traydcraft_helpdesk::portal::{self, PortalTicket, PortalTicketDetail};
@@ -393,6 +394,9 @@ async fn get_ticket(
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct MessageInput {
     pub body: String,
+    /// Files uploaded to the ticket (`POST /portal/tickets/{id}/attachments`) to send along.
+    #[serde(default)]
+    pub attachment_ids: Vec<Uuid>,
 }
 
 /// Adds a message to a ticket. A closed ticket is reopened.
@@ -406,9 +410,54 @@ async fn add_message(
     Json(input): Json<MessageInput>,
 ) -> AppResult<(StatusCode, Json<PortalTicketDetail>)> {
     let mut tx = state.db.begin().await?;
-    let d = portal::add_message(&mut tx, &user.viewer(), id, &input.body).await?;
+    let d = portal::add_message(
+        &mut tx,
+        &user.viewer(),
+        id,
+        &input.body,
+        &input.attachment_ids,
+    )
+    .await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(d)))
+}
+
+/// Uploads a file to a ticket: the request body is the file (JPEG, PNG, WebP or PDF, at most
+/// 12 MB). Send its id in `attachment_ids` with the next message.
+#[utoipa::path(post, path = "/portal/tickets/{id}/attachments", tag = "portal", operation_id = "upload_portal_ticket_attachment",
+    params(("id" = Uuid, Path), traydcraft_helpdesk::attachments::UploadParams),
+    request_body(content = String, content_type = "application/octet-stream"),
+    responses((status = 201, body = FileInfo), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody), (status = 422, body = ErrorBody)))]
+async fn upload_ticket_attachment(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path(id): Path<Uuid>,
+    Query(p): Query<traydcraft_helpdesk::attachments::UploadParams>,
+    body: Bytes,
+) -> AppResult<(StatusCode, Json<FileInfo>)> {
+    let mut tx = state.db.begin().await?;
+    let f = portal::upload_attachment(&mut tx, &user.viewer(), id, &p, &body).await?;
+    tx.commit().await?;
+    Ok((StatusCode::CREATED, Json(f)))
+}
+
+/// A file of a message the customer can see, as a download.
+#[utoipa::path(get, path = "/portal/tickets/{id}/attachments/{file_id}", tag = "portal", operation_id = "get_portal_ticket_attachment",
+    params(("id" = Uuid, Path), ("file_id" = Uuid, Path)),
+    responses((status = 200, content_type = "application/octet-stream", body = String), (status = 401, body = ErrorBody), (status = 404, body = ErrorBody)))]
+async fn get_ticket_attachment(
+    State(state): State<AppState>,
+    user: PortalUser,
+    Path((id, file_id)): Path<(Uuid, Uuid)>,
+) -> AppResult<Response> {
+    let mut conn = state.db.acquire().await?;
+    let (filename, content_type, data) =
+        portal::attachment_data(&mut conn, &user.viewer(), id, file_id).await?;
+    Ok(traydcraft_core::files::attachment_response(
+        &content_type,
+        &filename,
+        data,
+    ))
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -637,6 +686,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list_repairs, announce_repair))
         .routes(routes!(get_repair))
         .routes(routes!(get_repair_photo))
+        .routes(routes!(get_ticket_attachment))
         .routes(routes!(list_orders))
         .routes(routes!(get_order))
         .routes(routes!(confirm_order))
@@ -645,6 +695,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(
             OpenApiRouter::new()
                 .routes(routes!(upload_repair_photo))
+                .routes(routes!(upload_ticket_attachment))
                 .layer(DefaultBodyLimit::max(
                     traydcraft_core::files::MAX_FILE_BYTES + 64 * 1024,
                 )),
