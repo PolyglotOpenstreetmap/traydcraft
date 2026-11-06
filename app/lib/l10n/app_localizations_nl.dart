@@ -2031,4 +2031,200 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get zonesNoneAll => 'Zones (geen selectie = alle)';
+
+  @override
+  String get kbTitle => 'Kennisbank';
+
+  @override
+  String get kbNewArticle => 'Nieuw artikel';
+
+  @override
+  String get kbSearchHint => 'Artikels zoeken';
+
+  @override
+  String get kbAllCategories => 'Alle categorieën';
+
+  @override
+  String get kbAllStatuses => 'Alle statussen';
+
+  @override
+  String get kbAllAudiences => 'Alle doelgroepen';
+
+  @override
+  String get kbManageCategories => 'Categorieën';
+
+  @override
+  String get kbStatusPublished => 'Gepubliceerd';
+
+  @override
+  String get kbStatusArchived => 'Gearchiveerd';
+
+  @override
+  String get kbAudience => 'Doelgroep';
+
+  @override
+  String get kbAudienceInternal => 'Intern (alleen personeel)';
+
+  @override
+  String get kbAudiencePortal => 'Klantenportaal';
+
+  @override
+  String get kbAudiencePublic => 'Publiek';
+
+  @override
+  String get kbArticleTitle => 'Titel';
+
+  @override
+  String get kbSummary => 'Samenvatting';
+
+  @override
+  String get kbBody => 'Tekst (Markdown)';
+
+  @override
+  String get kbPreview => 'Voorbeeld';
+
+  @override
+  String get kbWriteTab => 'Schrijven';
+
+  @override
+  String get kbMarkdownHelp =>
+      'Gebruik # voor titels, **vet**, *cursief*, - voor lijsten, [tekst](https://…) voor links en ![omschrijving](image:ID) voor afbeeldingen.';
+
+  @override
+  String get kbTagsLabel => 'Labels (gescheiden door komma)';
+
+  @override
+  String get kbRelated => 'Gerelateerde artikels';
+
+  @override
+  String get kbAddRelated => 'Gerelateerd artikel toevoegen';
+
+  @override
+  String get kbImages => 'Afbeeldingen';
+
+  @override
+  String get kbUploadImage => 'Afbeelding uploaden';
+
+  @override
+  String get kbInsertImage => 'In tekst invoegen';
+
+  @override
+  String get kbPublish => 'Publiceren';
+
+  @override
+  String get kbUnpublish => 'Depubliceren';
+
+  @override
+  String get kbArchive => 'Archiveren';
+
+  @override
+  String get kbHistory => 'Versiegeschiedenis';
+
+  @override
+  String kbVersionLine(int version, String name, String date) {
+    return 'Versie $version · $name · $date';
+  }
+
+  @override
+  String get kbRestore => 'Deze versie herstellen';
+
+  @override
+  String kbRestoredFrom(int version) {
+    return 'hersteld van versie $version';
+  }
+
+  @override
+  String kbFeedback(int yes, int no) {
+    return '$yes vonden dit nuttig, $no niet';
+  }
+
+  @override
+  String kbViews(int count) {
+    return '$count weergaven';
+  }
+
+  @override
+  String get kbNoArticles => 'Geen artikels gevonden.';
+
+  @override
+  String get kbNoCategory => 'Geen categorie';
+
+  @override
+  String get kbMainCategory => 'Hoofdcategorie';
+
+  @override
+  String get kbSortOrder => 'Volgorde';
+
+  @override
+  String get kbNewCategory => 'Nieuwe categorie';
+
+  @override
+  String get kbCategoryNames => 'Naam per taal';
+
+  @override
+  String get kbDelete => 'Verwijderen';
+
+  @override
+  String get kbSuggestedArticles => 'Voorgestelde artikels';
+
+  @override
+  String get kbNoSuggestions => 'Geen passende artikels.';
+
+  @override
+  String get kbInsertText => 'Tekst invoegen';
+
+  @override
+  String get kbInsertLink => 'Link invoegen';
+
+  @override
+  String get kbInsertArticle => 'Artikel invoegen';
+
+  @override
+  String get kbNoPortalLink =>
+      'Dit artikel is intern: enkel de tekst kan worden ingevoegd.';
+
+  @override
+  String get kbHelp => 'Hulp';
+
+  @override
+  String get kbHelpHeading => 'Hoe kunnen we helpen?';
+
+  @override
+  String get kbHelpSearch => 'Zoek in de hulpartikels';
+
+  @override
+  String get kbHelpEmpty =>
+      'Geen artikels gevonden. U kunt in plaats daarvan een ticket openen.';
+
+  @override
+  String get kbWasHelpful => 'Was dit artikel nuttig?';
+
+  @override
+  String get kbYes => 'Ja';
+
+  @override
+  String get kbNo => 'Nee';
+
+  @override
+  String get kbThanks => 'Bedankt voor uw feedback.';
+
+  @override
+  String get kbStillNeedHelp => 'Nog hulp nodig? Open een ticket.';
+
+  @override
+  String get kbRelatedReading => 'Gerelateerde artikels';
+
+  @override
+  String get kbDeflectionTitle =>
+      'Deze artikels beantwoorden uw vraag misschien al';
+
+  @override
+  String kbShownIn(String language) {
+    return 'Niet beschikbaar in uw taal; getoond in $language.';
+  }
+
+  @override
+  String kbUpdatedOn(String date) {
+    return 'Bijgewerkt op $date';
+  }
 }

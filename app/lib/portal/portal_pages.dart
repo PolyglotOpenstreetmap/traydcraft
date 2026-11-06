@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../api/generated/export.dart';
 import '../l10n/l10n.dart';
 import '../shared/attachments.dart';
+import 'portal_help.dart' show PortalKbSuggestions;
 import 'portal_state.dart';
 
 final _when = DateFormat('dd/MM/yyyy HH:mm');
@@ -528,6 +529,7 @@ class _PortalNewTicketPageState extends ConsumerState<PortalNewTicketPage> {
           controller: _subject,
           decoration: InputDecoration(labelText: l.subject),
         ),
+        PortalKbSuggestions(controller: _subject),
         gap,
         DropdownButtonFormField<String>(
           initialValue: _category,

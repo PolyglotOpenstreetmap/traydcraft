@@ -3817,6 +3817,366 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Zones (none selected = all)'**
   String get zonesNoneAll;
+
+  /// No description provided for @kbTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Knowledge base'**
+  String get kbTitle;
+
+  /// No description provided for @kbNewArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'New article'**
+  String get kbNewArticle;
+
+  /// No description provided for @kbSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search articles'**
+  String get kbSearchHint;
+
+  /// No description provided for @kbAllCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All categories'**
+  String get kbAllCategories;
+
+  /// No description provided for @kbAllStatuses.
+  ///
+  /// In en, this message translates to:
+  /// **'All statuses'**
+  String get kbAllStatuses;
+
+  /// No description provided for @kbAllAudiences.
+  ///
+  /// In en, this message translates to:
+  /// **'All audiences'**
+  String get kbAllAudiences;
+
+  /// No description provided for @kbManageCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get kbManageCategories;
+
+  /// No description provided for @kbStatusPublished.
+  ///
+  /// In en, this message translates to:
+  /// **'Published'**
+  String get kbStatusPublished;
+
+  /// No description provided for @kbStatusArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get kbStatusArchived;
+
+  /// No description provided for @kbAudience.
+  ///
+  /// In en, this message translates to:
+  /// **'Audience'**
+  String get kbAudience;
+
+  /// No description provided for @kbAudienceInternal.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal (staff only)'**
+  String get kbAudienceInternal;
+
+  /// No description provided for @kbAudiencePortal.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer portal'**
+  String get kbAudiencePortal;
+
+  /// No description provided for @kbAudiencePublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get kbAudiencePublic;
+
+  /// No description provided for @kbArticleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get kbArticleTitle;
+
+  /// No description provided for @kbSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get kbSummary;
+
+  /// No description provided for @kbBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Text (Markdown)'**
+  String get kbBody;
+
+  /// No description provided for @kbPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get kbPreview;
+
+  /// No description provided for @kbWriteTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Write'**
+  String get kbWriteTab;
+
+  /// No description provided for @kbMarkdownHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use # for headings, **bold**, *italic*, - for lists, [text](https://…) for links and ![description](image:ID) for pictures.'**
+  String get kbMarkdownHelp;
+
+  /// No description provided for @kbTagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags (comma separated)'**
+  String get kbTagsLabel;
+
+  /// No description provided for @kbRelated.
+  ///
+  /// In en, this message translates to:
+  /// **'Related articles'**
+  String get kbRelated;
+
+  /// No description provided for @kbAddRelated.
+  ///
+  /// In en, this message translates to:
+  /// **'Add related article'**
+  String get kbAddRelated;
+
+  /// No description provided for @kbImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get kbImages;
+
+  /// No description provided for @kbUploadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload image'**
+  String get kbUploadImage;
+
+  /// No description provided for @kbInsertImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert in text'**
+  String get kbInsertImage;
+
+  /// No description provided for @kbPublish.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish'**
+  String get kbPublish;
+
+  /// No description provided for @kbUnpublish.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpublish'**
+  String get kbUnpublish;
+
+  /// No description provided for @kbArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get kbArchive;
+
+  /// No description provided for @kbHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Version history'**
+  String get kbHistory;
+
+  /// No description provided for @kbVersionLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} · {name} · {date}'**
+  String kbVersionLine(int version, String name, String date);
+
+  /// No description provided for @kbRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore this version'**
+  String get kbRestore;
+
+  /// No description provided for @kbRestoredFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'restored from version {version}'**
+  String kbRestoredFrom(int version);
+
+  /// No description provided for @kbFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'{yes} found this helpful, {no} did not'**
+  String kbFeedback(int yes, int no);
+
+  /// No description provided for @kbViews.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} views'**
+  String kbViews(int count);
+
+  /// No description provided for @kbNoArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'No articles found.'**
+  String get kbNoArticles;
+
+  /// No description provided for @kbNoCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No category'**
+  String get kbNoCategory;
+
+  /// No description provided for @kbMainCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Main category'**
+  String get kbMainCategory;
+
+  /// No description provided for @kbSortOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort order'**
+  String get kbSortOrder;
+
+  /// No description provided for @kbNewCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'New category'**
+  String get kbNewCategory;
+
+  /// No description provided for @kbCategoryNames.
+  ///
+  /// In en, this message translates to:
+  /// **'Name per language'**
+  String get kbCategoryNames;
+
+  /// No description provided for @kbDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get kbDelete;
+
+  /// No description provided for @kbSuggestedArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested articles'**
+  String get kbSuggestedArticles;
+
+  /// No description provided for @kbNoSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching articles.'**
+  String get kbNoSuggestions;
+
+  /// No description provided for @kbInsertText.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert text'**
+  String get kbInsertText;
+
+  /// No description provided for @kbInsertLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert link'**
+  String get kbInsertLink;
+
+  /// No description provided for @kbInsertArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert article'**
+  String get kbInsertArticle;
+
+  /// No description provided for @kbNoPortalLink.
+  ///
+  /// In en, this message translates to:
+  /// **'This article is internal: only its text can be inserted.'**
+  String get kbNoPortalLink;
+
+  /// No description provided for @kbHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get kbHelp;
+
+  /// No description provided for @kbHelpHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we help?'**
+  String get kbHelpHeading;
+
+  /// No description provided for @kbHelpSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search the help articles'**
+  String get kbHelpSearch;
+
+  /// No description provided for @kbHelpEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No articles found. You can open a ticket instead.'**
+  String get kbHelpEmpty;
+
+  /// No description provided for @kbWasHelpful.
+  ///
+  /// In en, this message translates to:
+  /// **'Was this article helpful?'**
+  String get kbWasHelpful;
+
+  /// No description provided for @kbYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get kbYes;
+
+  /// No description provided for @kbNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get kbNo;
+
+  /// No description provided for @kbThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your feedback.'**
+  String get kbThanks;
+
+  /// No description provided for @kbStillNeedHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Still need help? Open a ticket.'**
+  String get kbStillNeedHelp;
+
+  /// No description provided for @kbRelatedReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Related articles'**
+  String get kbRelatedReading;
+
+  /// No description provided for @kbDeflectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'These articles may already answer your question'**
+  String get kbDeflectionTitle;
+
+  /// No description provided for @kbShownIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available in your language; shown in {language}.'**
+  String kbShownIn(String language);
+
+  /// No description provided for @kbUpdatedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {date}'**
+  String kbUpdatedOn(String date);
 }
 
 class _AppLocalizationsDelegate

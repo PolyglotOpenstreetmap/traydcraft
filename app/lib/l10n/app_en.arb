@@ -1139,5 +1139,116 @@
       }
     }
   },
-  "zonesNoneAll": "Zones (none selected = all)"
+  "zonesNoneAll": "Zones (none selected = all)",
+  "kbTitle": "Knowledge base",
+  "kbNewArticle": "New article",
+  "kbSearchHint": "Search articles",
+  "kbAllCategories": "All categories",
+  "kbAllStatuses": "All statuses",
+  "kbAllAudiences": "All audiences",
+  "kbManageCategories": "Categories",
+  "kbStatusPublished": "Published",
+  "kbStatusArchived": "Archived",
+  "kbAudience": "Audience",
+  "kbAudienceInternal": "Internal (staff only)",
+  "kbAudiencePortal": "Customer portal",
+  "kbAudiencePublic": "Public",
+  "kbArticleTitle": "Title",
+  "kbSummary": "Summary",
+  "kbBody": "Text (Markdown)",
+  "kbPreview": "Preview",
+  "kbWriteTab": "Write",
+  "kbMarkdownHelp": "Use # for headings, **bold**, *italic*, - for lists, [text](https://…) for links and ![description](image:ID) for pictures.",
+  "kbTagsLabel": "Tags (comma separated)",
+  "kbRelated": "Related articles",
+  "kbAddRelated": "Add related article",
+  "kbImages": "Images",
+  "kbUploadImage": "Upload image",
+  "kbInsertImage": "Insert in text",
+  "kbPublish": "Publish",
+  "kbUnpublish": "Unpublish",
+  "kbArchive": "Archive",
+  "kbHistory": "Version history",
+  "kbVersionLine": "Version {version} · {name} · {date}",
+  "@kbVersionLine": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "kbRestore": "Restore this version",
+  "kbRestoredFrom": "restored from version {version}",
+  "@kbRestoredFrom": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "kbFeedback": "{yes} found this helpful, {no} did not",
+  "@kbFeedback": {
+    "placeholders": {
+      "yes": {
+        "type": "int"
+      },
+      "no": {
+        "type": "int"
+      }
+    }
+  },
+  "kbViews": "{count} views",
+  "@kbViews": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "kbNoArticles": "No articles found.",
+  "kbNoCategory": "No category",
+  "kbMainCategory": "Main category",
+  "kbSortOrder": "Sort order",
+  "kbNewCategory": "New category",
+  "kbCategoryNames": "Name per language",
+  "kbDelete": "Delete",
+  "kbSuggestedArticles": "Suggested articles",
+  "kbNoSuggestions": "No matching articles.",
+  "kbInsertText": "Insert text",
+  "kbInsertLink": "Insert link",
+  "kbInsertArticle": "Insert article",
+  "kbNoPortalLink": "This article is internal: only its text can be inserted.",
+  "kbHelp": "Help",
+  "kbHelpHeading": "How can we help?",
+  "kbHelpSearch": "Search the help articles",
+  "kbHelpEmpty": "No articles found. You can open a ticket instead.",
+  "kbWasHelpful": "Was this article helpful?",
+  "kbYes": "Yes",
+  "kbNo": "No",
+  "kbThanks": "Thank you for your feedback.",
+  "kbStillNeedHelp": "Still need help? Open a ticket.",
+  "kbRelatedReading": "Related articles",
+  "kbDeflectionTitle": "These articles may already answer your question",
+  "kbShownIn": "Not available in your language; shown in {language}.",
+  "@kbShownIn": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "kbUpdatedOn": "Updated {date}",
+  "@kbUpdatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -11,6 +11,8 @@ import '../../shared/attachments.dart';
 import '../../shared/format.dart';
 import '../../shared/search_picker.dart';
 import '../customers/customer_form.dart';
+import '../kb/kb_entry_screen.dart' show KbArticlePicker;
+import '../kb/kb_suggestions.dart';
 import '../repairs/repairs_page.dart' show showNewRepairDialog;
 import 'call_dialogs.dart';
 import 'ticket_extras.dart';
@@ -226,6 +228,30 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         _answerInfo = null;
         _attached = [];
       });
+    }
+  }
+
+  void _appendToReply(String text) => setState(() {
+    _body.text = _body.text.trim().isEmpty
+        ? text
+        : '${_body.text.trimRight()}\n\n$text';
+  });
+
+  Future<void> _insertArticle() async {
+    final picked = await showDialog<EntrySummary>(
+      context: context,
+      builder: (_) =>
+          KbArticlePicker(publishedOnly: true, language: _d?.ticket.language),
+    );
+    if (picked == null || !mounted) return;
+    try {
+      final r = await _api.kb.renderKbEntry(id: widget.id, entryId: picked.id);
+      _appendToReply(kbInsertionText(r));
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(errorMessage(e))));
+      }
     }
   }
 
@@ -490,6 +516,8 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
 
   Widget _composer(BuildContext context, bool canReply) {
     final l = context.l10n;
+    final canKb =
+        ref.watch(meProvider).value?.permissions.contains('kb.read') ?? false;
     final theme = Theme.of(context);
     return Material(
       color: theme.colorScheme.surfaceContainerLow,
@@ -528,6 +556,13 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                     icon: const Icon(Icons.text_snippet_outlined),
                     label: Text(l.insertPreparedAnswer),
                   ),
+                if (_reply && canKb)
+                  OutlinedButton.icon(
+                    key: const ValueKey('insert-article'),
+                    onPressed: _insertArticle,
+                    icon: const Icon(Icons.menu_book_outlined),
+                    label: Text(l.kbInsertArticle),
+                  ),
                 if (_reply)
                   Text(
                     l.writeIn(languageName(_d!.ticket.language)),
@@ -535,6 +570,8 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                   ),
               ],
             ),
+            if (_reply && canKb)
+              KbSuggestionsPanel(ticketId: widget.id, onInsert: _appendToReply),
             if (_answerInfo != null)
               Padding(
                 padding: const EdgeInsets.only(top: 6),

@@ -8,6 +8,9 @@ import '../features/helpdesk/helpdesk_settings_page.dart';
 import '../features/helpdesk/ticket_screen.dart';
 import '../features/helpdesk/tickets_page.dart';
 import '../features/field/job_screen.dart';
+import '../features/kb/kb_categories_page.dart';
+import '../features/kb/kb_entry_screen.dart';
+import '../features/kb/kb_page.dart';
 import '../features/field/jobs_page.dart';
 import '../features/orders/order_screen.dart';
 import '../features/orders/orders_page.dart';
@@ -70,6 +73,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/helpdesk/:id',
             builder: (_, s) => TicketScreen(id: s.pathParameters['id']!),
+          ),
+          GoRoute(path: '/kb', builder: (_, _) => const KbPage()),
+          GoRoute(
+            path: '/kb/categories',
+            builder: (_, _) => const KbCategoriesPage(),
+          ),
+          GoRoute(
+            path: '/kb/:id',
+            builder: (_, s) => KbEntryScreen(
+              key: ValueKey(s.pathParameters['id']),
+              id: s.pathParameters['id']!,
+            ),
           ),
           GoRoute(path: '/repairs', builder: (_, _) => const RepairsPage()),
           GoRoute(

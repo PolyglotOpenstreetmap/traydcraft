@@ -2033,4 +2033,200 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get zonesNoneAll => 'Zonas (sin selección = todas)';
+
+  @override
+  String get kbTitle => 'Base de conocimiento';
+
+  @override
+  String get kbNewArticle => 'Nuevo artículo';
+
+  @override
+  String get kbSearchHint => 'Buscar artículos';
+
+  @override
+  String get kbAllCategories => 'Todas las categorías';
+
+  @override
+  String get kbAllStatuses => 'Todos los estados';
+
+  @override
+  String get kbAllAudiences => 'Todos los públicos';
+
+  @override
+  String get kbManageCategories => 'Categorías';
+
+  @override
+  String get kbStatusPublished => 'Publicado';
+
+  @override
+  String get kbStatusArchived => 'Archivado';
+
+  @override
+  String get kbAudience => 'Público';
+
+  @override
+  String get kbAudienceInternal => 'Interno (solo personal)';
+
+  @override
+  String get kbAudiencePortal => 'Portal de clientes';
+
+  @override
+  String get kbAudiencePublic => 'Público';
+
+  @override
+  String get kbArticleTitle => 'Título';
+
+  @override
+  String get kbSummary => 'Resumen';
+
+  @override
+  String get kbBody => 'Texto (Markdown)';
+
+  @override
+  String get kbPreview => 'Vista previa';
+
+  @override
+  String get kbWriteTab => 'Escribir';
+
+  @override
+  String get kbMarkdownHelp =>
+      'Use # para títulos, **negrita**, *cursiva*, - para listas, [texto](https://…) para enlaces y ![descripción](image:ID) para imágenes.';
+
+  @override
+  String get kbTagsLabel => 'Etiquetas (separadas por comas)';
+
+  @override
+  String get kbRelated => 'Artículos relacionados';
+
+  @override
+  String get kbAddRelated => 'Añadir artículo relacionado';
+
+  @override
+  String get kbImages => 'Imágenes';
+
+  @override
+  String get kbUploadImage => 'Subir imagen';
+
+  @override
+  String get kbInsertImage => 'Insertar en el texto';
+
+  @override
+  String get kbPublish => 'Publicar';
+
+  @override
+  String get kbUnpublish => 'Despublicar';
+
+  @override
+  String get kbArchive => 'Archivar';
+
+  @override
+  String get kbHistory => 'Historial de versiones';
+
+  @override
+  String kbVersionLine(int version, String name, String date) {
+    return 'Versión $version · $name · $date';
+  }
+
+  @override
+  String get kbRestore => 'Restaurar esta versión';
+
+  @override
+  String kbRestoredFrom(int version) {
+    return 'restaurada desde la versión $version';
+  }
+
+  @override
+  String kbFeedback(int yes, int no) {
+    return '$yes lo encontraron útil, $no no';
+  }
+
+  @override
+  String kbViews(int count) {
+    return '$count vistas';
+  }
+
+  @override
+  String get kbNoArticles => 'No se encontraron artículos.';
+
+  @override
+  String get kbNoCategory => 'Sin categoría';
+
+  @override
+  String get kbMainCategory => 'Categoría principal';
+
+  @override
+  String get kbSortOrder => 'Orden';
+
+  @override
+  String get kbNewCategory => 'Nueva categoría';
+
+  @override
+  String get kbCategoryNames => 'Nombre por idioma';
+
+  @override
+  String get kbDelete => 'Eliminar';
+
+  @override
+  String get kbSuggestedArticles => 'Artículos sugeridos';
+
+  @override
+  String get kbNoSuggestions => 'No hay artículos que coincidan.';
+
+  @override
+  String get kbInsertText => 'Insertar texto';
+
+  @override
+  String get kbInsertLink => 'Insertar enlace';
+
+  @override
+  String get kbInsertArticle => 'Insertar artículo';
+
+  @override
+  String get kbNoPortalLink =>
+      'Este artículo es interno: solo se puede insertar su texto.';
+
+  @override
+  String get kbHelp => 'Ayuda';
+
+  @override
+  String get kbHelpHeading => '¿Cómo podemos ayudarle?';
+
+  @override
+  String get kbHelpSearch => 'Buscar en los artículos de ayuda';
+
+  @override
+  String get kbHelpEmpty =>
+      'No se encontraron artículos. Puede abrir un ticket.';
+
+  @override
+  String get kbWasHelpful => '¿Le ha resultado útil este artículo?';
+
+  @override
+  String get kbYes => 'Sí';
+
+  @override
+  String get kbNo => 'No';
+
+  @override
+  String get kbThanks => 'Gracias por sus comentarios.';
+
+  @override
+  String get kbStillNeedHelp => '¿Necesita más ayuda? Abra un ticket.';
+
+  @override
+  String get kbRelatedReading => 'Artículos relacionados';
+
+  @override
+  String get kbDeflectionTitle =>
+      'Estos artículos quizá ya respondan a su pregunta';
+
+  @override
+  String kbShownIn(String language) {
+    return 'No disponible en su idioma; se muestra en $language.';
+  }
+
+  @override
+  String kbUpdatedOn(String date) {
+    return 'Actualizado el $date';
+  }
 }
