@@ -53,7 +53,7 @@ PostgreSQL — one database, one schema per module
 | production | planned | production orders, work orders, consumption, MTS/MTO planning |
 | quality | planned | inspections, non-conformances, traceability |
 | service | planned | installed assets (builds on serial units), warranties |
-| helpdesk | slice | e-mail-to-ticket (IMAP) with threading and matching, replies via outbox (SMTP), prepared answers in 5 languages, leads / orders / production questions from tickets ([ADR 0013](adr/0013-helpdesk-email-and-languages.md)), phone calls logged on tickets; SLA planned |
+| helpdesk | slice | e-mail-to-ticket (IMAP) with threading and matching, replies via outbox (SMTP), prepared answers in 5 languages, leads / orders / production questions from tickets ([ADR 0013](adr/0013-helpdesk-email-and-languages.md)), phone calls logged on tickets; SLA with escalation, teams, attachments, tags, merge, time entries and satisfaction surveys ([ADR 0017](adr/0017-helpdesk-sla-teams-attachments.md)); automation rules, split, reporting and business hours planned |
 | repairs | slice | repairs customers send in (announced → received → routed → worked → shipped), workshop departments made by the admin, photos ([ADR 0015](adr/0015-repairs-field-service-and-photos.md)) |
 | field service | slice | jobs at customer sites: address and navigation, instructions, task checklist, work logs, photos; technicians see only their own jobs ([ADR 0015](adr/0015-repairs-field-service-and-photos.md)); offline queue and planning board planned |
 | portal | slice | customer portal: passwordless login for contacts, their tickets and profile; Flutter web entry point ([ADR 0014](adr/0014-contacts-calls-and-customer-portal.md)) |
@@ -75,7 +75,7 @@ PostgreSQL — one database, one schema per module
 2. **Engineering & inventory** — BOM revisions and serial numbers (done); next: routings, configurator, warehouses, stock ledger, purchasing.
 3. **Manufacturing** — MRP for MTS and MTO, production orders, labour, quality.
 4. **Service** — installed assets, repairs, field service planning, mobile app with offline sync.
-5. **Helpdesk & portal** — tickets from e-mail, prepared answers, orders, contacts, phone calls and a ticket portal (done); next: SLA, attachments, orders and quotations in the portal.
+5. **Helpdesk & portal** — tickets from e-mail, prepared answers, orders, contacts, phone calls and a ticket portal (done); SLA, teams, attachments, tags, merge, time entries and satisfaction surveys (done, ADR 0017); next: automation rules, ticket split, reporting, business hours in the SLA, quotations in the portal.
 6. **Finance** — invoicing, Peppol, payments, Exact integration.
 
 Each release runs alongside Salesforce/Exact, with one system clearly owning each kind of record
