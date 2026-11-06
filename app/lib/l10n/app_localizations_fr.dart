@@ -124,6 +124,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get backIntoWork => 'Remettre en cours';
 
   @override
+  String get backToCurrentRevision => 'Retour à la révision actuelle';
+
+  @override
   String get billOfMaterials => 'Nomenclature';
 
   @override
@@ -181,10 +184,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get cancelJob => 'Annuler';
 
   @override
+  String get cancelOrder => 'Annuler la commande';
+
+  @override
+  String get cancelReasonLabel => 'Motif de l\'annulation';
+
+  @override
   String get cancelRepair => 'Annuler la réparation';
 
   @override
   String get cancelled => 'annulée';
+
+  @override
+  String cancelledReason(String reason) {
+    return 'Annulée : $reason';
+  }
+
+  @override
+  String get cannotConfirmNewer =>
+      'Une révision plus récente de cette commande est en préparation. Vous pourrez la confirmer dès qu\'elle vous aura été envoyée.';
+
+  @override
+  String get cannotConfirmOther => 'Cette commande ne peut pas être confirmée.';
 
   @override
   String get category => 'Catégorie';
@@ -218,6 +239,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get change => 'Modification';
+
+  @override
+  String get changePriority => 'Modifier la priorité';
 
   @override
   String get chooseCustomerAndLine =>
@@ -270,7 +294,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String get confirm => 'confirmer';
 
   @override
+  String get confirmOnBehalf => 'Confirmer au nom du client';
+
+  @override
+  String get confirmOnBehalfHelp =>
+      'Enregistrez que le client a confirmé cette révision, par exemple par téléphone ou par e-mail.';
+
+  @override
+  String get confirmOrder => 'Confirmer la commande';
+
+  @override
+  String get confirmOrderHelp =>
+      'En confirmant, vous acceptez cette commande telle qu\'affichée.';
+
+  @override
+  String get confirmation => 'Confirmation';
+
+  @override
+  String get confirmationDate => 'Confirmée le';
+
+  @override
   String get confirmed => 'confirmée';
+
+  @override
+  String get confirmedRevision => 'Révision confirmée';
+
+  @override
+  String get confirmedVia => 'Confirmée via';
+
+  @override
+  String get confirmedViaPortal => 'portail client';
+
+  @override
+  String get confirmedViaStaff => 'collaborateur, au nom du client';
 
   @override
   String conflictsOnDate(int count) {
@@ -380,6 +436,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get difference => 'Différence';
+
+  @override
+  String get dismiss => 'Rejeter';
+
+  @override
+  String get dismissRequest => 'Rejeter la demande';
 
   @override
   String get draftSaved => 'Brouillon enregistré';
@@ -634,6 +696,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myJobs => 'Mes interventions';
 
   @override
+  String get myOrders => 'Mes commandes';
+
+  @override
   String get myProfile => 'Mes données';
 
   @override
@@ -687,6 +752,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get newPriority => 'Nouvelle priorité';
+
+  @override
   String get newProduct => 'Nouveau produit';
 
   @override
@@ -735,10 +803,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noLines => 'Pas encore de lignes.';
 
   @override
+  String get noOrdersYet => 'Vous n\'avez pas encore de commandes.';
+
+  @override
   String get noPhotos => 'Pas encore de photos.';
 
   @override
   String get noPrices => 'Pas encore de prix.';
+
+  @override
+  String get noPriorityChanges => 'Aucun changement de priorité.';
+
+  @override
+  String get noPriorityRequests => 'Aucune demande.';
 
   @override
   String get noQuotations => 'Pas encore d\'offres.';
@@ -780,6 +857,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noteAdded => 'Note ajoutée';
 
   @override
+  String get noteOptional => 'Remarque (facultatif)';
+
+  @override
   String get notes => 'Remarques';
 
   @override
@@ -813,6 +893,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get openOpportunity => 'Ouvrir l\'opportunité';
 
   @override
+  String openPriorityRequests(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count demandes de priorité en cours',
+      one: '1 demande de priorité en cours',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String openRepairsCount(String count) {
     return '$count ouvertes';
   }
@@ -830,7 +921,40 @@ class AppLocalizationsFr extends AppLocalizations {
   String get order => 'Commande';
 
   @override
+  String orderAlreadyConfirmed(String date) {
+    return 'Cette commande a été confirmée le $date.';
+  }
+
+  @override
+  String get orderAwaitingConfirmation => 'en attente de votre confirmation';
+
+  @override
+  String get orderConfirmationQueued =>
+      'La confirmation de commande est en attente d\'envoi.';
+
+  @override
+  String get orderConfirmedSnack => 'Commande confirmée.';
+
+  @override
+  String get orderConfirmedThanks => 'Merci, votre commande est confirmée.';
+
+  @override
   String get orderCreated => 'Commande créée';
+
+  @override
+  String get orderSaved => 'Commande enregistrée.';
+
+  @override
+  String get orderStatusInPlanning => 'en planification';
+
+  @override
+  String get orderStatusInProduction => 'en production';
+
+  @override
+  String get orderStatusPlanned => 'planifiée';
+
+  @override
+  String get orderStatusReadyForShipping => 'prête à l\'expédition';
 
   @override
   String get orders => 'Commandes';
@@ -975,13 +1099,42 @@ class AppLocalizationsFr extends AppLocalizations {
   String get priority => 'Priorité';
 
   @override
+  String priorityChangeLine(String date, String from, String to, String name) {
+    return '$date : $from → $to par $name';
+  }
+
+  @override
+  String get priorityChangedSnack => 'Priorité modifiée.';
+
+  @override
+  String get priorityExpedite => 'urgente';
+
+  @override
   String get priorityHigh => 'haute';
+
+  @override
+  String get priorityHistory => 'Historique de la priorité';
 
   @override
   String get priorityLow => 'basse';
 
   @override
   String get priorityNormal => 'normale';
+
+  @override
+  String get priorityRequestHelp =>
+      'Notre équipe décide si et comment la priorité est modifiée.';
+
+  @override
+  String priorityRequestLine(String name, String priority) {
+    return '$name demande la priorité : $priority';
+  }
+
+  @override
+  String get priorityRequestSent => 'Votre demande a été envoyée.';
+
+  @override
+  String get priorityRequests => 'Demandes de priorité du client';
 
   @override
   String get priorityUrgent => 'urgente';
@@ -1063,6 +1216,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reason => 'Motif';
 
   @override
+  String get reasonRequired => 'Un motif est obligatoire.';
+
+  @override
   String get rebate => 'Remise';
 
   @override
@@ -1109,6 +1265,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get removeBackToStock => 'Retirer, retour en stock';
+
+  @override
+  String get removeLine => 'Supprimer la ligne';
 
   @override
   String removedBy(String date, String name) {
@@ -1184,6 +1343,27 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get requestDismissedSnack => 'Demande rejetée.';
+
+  @override
+  String get requestLessUrgent => 'Moins urgent';
+
+  @override
+  String get requestMoreUrgent => 'Plus urgent (urgente)';
+
+  @override
+  String get requestPriorityChange => 'Demander un changement de priorité';
+
+  @override
+  String get requestStatusApplied => 'appliquée';
+
+  @override
+  String get requestStatusDismissed => 'rejetée';
+
+  @override
+  String get requestStatusOpen => 'ouverte';
+
+  @override
   String get required => 'Obligatoire';
 
   @override
@@ -1201,9 +1381,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get revisionNotes => 'Notes de révision';
 
   @override
+  String revisionNumber(int revision) {
+    return 'Révision $revision';
+  }
+
+  @override
   String revisionPriceLists(String agreed, String current) {
     return 'Prix convenus : tarif du $agreed. Prix actuels : tarif du $current.';
   }
+
+  @override
+  String revisionViewNotice(int revision, int current) {
+    return 'Vous consultez la révision $revision (lecture seule). La révision actuelle est la $current.';
+  }
+
+  @override
+  String get revisions => 'Révisions';
 
   @override
   String get roleInvoicing => 'Facturation';
@@ -1278,6 +1471,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sendLoginLink => 'Envoyer le lien de connexion';
+
+  @override
+  String get sendOrderConfirmation => 'Envoyer la confirmation de commande';
+
+  @override
+  String get sendOrderConfirmationHelp =>
+      'La confirmation de commande est envoyée au client par e-mail en PDF. La révision ne pourra plus être modifiée ensuite.';
 
   @override
   String get serial => 'n° de série';

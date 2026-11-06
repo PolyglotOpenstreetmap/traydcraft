@@ -314,6 +314,12 @@ abstract class AppLocalizations {
   /// **'Back into work'**
   String get backIntoWork;
 
+  /// No description provided for @backToCurrentRevision.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to current revision'**
+  String get backToCurrentRevision;
+
   /// No description provided for @billOfMaterials.
   ///
   /// In en, this message translates to:
@@ -422,6 +428,18 @@ abstract class AppLocalizations {
   /// **'Cancel job'**
   String get cancelJob;
 
+  /// No description provided for @cancelOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel order'**
+  String get cancelOrder;
+
+  /// No description provided for @cancelReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for cancelling'**
+  String get cancelReasonLabel;
+
   /// No description provided for @cancelRepair.
   ///
   /// In en, this message translates to:
@@ -433,6 +451,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'cancelled'**
   String get cancelled;
+
+  /// No description provided for @cancelledReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled: {reason}'**
+  String cancelledReason(String reason);
+
+  /// No description provided for @cannotConfirmNewer.
+  ///
+  /// In en, this message translates to:
+  /// **'A newer revision of this order is being prepared. You can confirm it once it has been sent to you.'**
+  String get cannotConfirmNewer;
+
+  /// No description provided for @cannotConfirmOther.
+  ///
+  /// In en, this message translates to:
+  /// **'This order cannot be confirmed.'**
+  String get cannotConfirmOther;
 
   /// No description provided for @category.
   ///
@@ -499,6 +535,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change'**
   String get change;
+
+  /// No description provided for @changePriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Change priority'**
+  String get changePriority;
 
   /// No description provided for @chooseCustomerAndLine.
   ///
@@ -590,11 +632,71 @@ abstract class AppLocalizations {
   /// **'confirm'**
   String get confirm;
 
+  /// No description provided for @confirmOnBehalf.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm on behalf of customer'**
+  String get confirmOnBehalf;
+
+  /// No description provided for @confirmOnBehalfHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Record that the customer has confirmed this revision, for example by phone or e-mail.'**
+  String get confirmOnBehalfHelp;
+
+  /// No description provided for @confirmOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm order'**
+  String get confirmOrder;
+
+  /// No description provided for @confirmOrderHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'By confirming you accept this order as shown.'**
+  String get confirmOrderHelp;
+
+  /// No description provided for @confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmation'**
+  String get confirmation;
+
+  /// No description provided for @confirmationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed on'**
+  String get confirmationDate;
+
   /// No description provided for @confirmed.
   ///
   /// In en, this message translates to:
   /// **'confirmed'**
   String get confirmed;
+
+  /// No description provided for @confirmedRevision.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed revision'**
+  String get confirmedRevision;
+
+  /// No description provided for @confirmedVia.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed via'**
+  String get confirmedVia;
+
+  /// No description provided for @confirmedViaPortal.
+  ///
+  /// In en, this message translates to:
+  /// **'customer portal'**
+  String get confirmedViaPortal;
+
+  /// No description provided for @confirmedViaStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'staff, on behalf of the customer'**
+  String get confirmedViaStaff;
 
   /// No description provided for @conflictsOnDate.
   ///
@@ -793,6 +895,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Difference'**
   String get difference;
+
+  /// No description provided for @dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
+
+  /// No description provided for @dismissRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss request'**
+  String get dismissRequest;
 
   /// No description provided for @draftSaved.
   ///
@@ -1250,6 +1364,12 @@ abstract class AppLocalizations {
   /// **'My jobs'**
   String get myJobs;
 
+  /// No description provided for @myOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'My orders'**
+  String get myOrders;
+
   /// No description provided for @myProfile.
   ///
   /// In en, this message translates to:
@@ -1352,6 +1472,12 @@ abstract class AppLocalizations {
   /// **'New prices valid from {date}'**
   String newPricesValidFrom(String date);
 
+  /// No description provided for @newPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'New priority'**
+  String get newPriority;
+
   /// No description provided for @newProduct.
   ///
   /// In en, this message translates to:
@@ -1442,6 +1568,12 @@ abstract class AppLocalizations {
   /// **'No lines yet.'**
   String get noLines;
 
+  /// No description provided for @noOrdersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no orders yet.'**
+  String get noOrdersYet;
+
   /// No description provided for @noPhotos.
   ///
   /// In en, this message translates to:
@@ -1453,6 +1585,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No prices yet.'**
   String get noPrices;
+
+  /// No description provided for @noPriorityChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No priority changes yet.'**
+  String get noPriorityChanges;
+
+  /// No description provided for @noPriorityRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No requests.'**
+  String get noPriorityRequests;
 
   /// No description provided for @noQuotations.
   ///
@@ -1532,6 +1676,12 @@ abstract class AppLocalizations {
   /// **'Note added'**
   String get noteAdded;
 
+  /// No description provided for @noteOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (optional)'**
+  String get noteOptional;
+
   /// No description provided for @notes.
   ///
   /// In en, this message translates to:
@@ -1598,6 +1748,12 @@ abstract class AppLocalizations {
   /// **'Open opportunity'**
   String get openOpportunity;
 
+  /// No description provided for @openPriorityRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 open priority request} other{{count} open priority requests}}'**
+  String openPriorityRequests(int count);
+
   /// No description provided for @openRepairsCount.
   ///
   /// In en, this message translates to:
@@ -1628,11 +1784,71 @@ abstract class AppLocalizations {
   /// **'Order'**
   String get order;
 
+  /// No description provided for @orderAlreadyConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'This order was confirmed on {date}.'**
+  String orderAlreadyConfirmed(String date);
+
+  /// No description provided for @orderAwaitingConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'awaiting your confirmation'**
+  String get orderAwaitingConfirmation;
+
+  /// No description provided for @orderConfirmationQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'Order confirmation queued for sending.'**
+  String get orderConfirmationQueued;
+
+  /// No description provided for @orderConfirmedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Order confirmed.'**
+  String get orderConfirmedSnack;
+
+  /// No description provided for @orderConfirmedThanks.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you, your order is confirmed.'**
+  String get orderConfirmedThanks;
+
   /// No description provided for @orderCreated.
   ///
   /// In en, this message translates to:
   /// **'Order created'**
   String get orderCreated;
+
+  /// No description provided for @orderSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Order saved.'**
+  String get orderSaved;
+
+  /// No description provided for @orderStatusInPlanning.
+  ///
+  /// In en, this message translates to:
+  /// **'in planning'**
+  String get orderStatusInPlanning;
+
+  /// No description provided for @orderStatusInProduction.
+  ///
+  /// In en, this message translates to:
+  /// **'in production'**
+  String get orderStatusInProduction;
+
+  /// No description provided for @orderStatusPlanned.
+  ///
+  /// In en, this message translates to:
+  /// **'planned'**
+  String get orderStatusPlanned;
+
+  /// No description provided for @orderStatusReadyForShipping.
+  ///
+  /// In en, this message translates to:
+  /// **'ready for shipping'**
+  String get orderStatusReadyForShipping;
 
   /// No description provided for @orders.
   ///
@@ -1892,11 +2108,35 @@ abstract class AppLocalizations {
   /// **'Priority'**
   String get priority;
 
+  /// No description provided for @priorityChangeLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}: {from} → {to} by {name}'**
+  String priorityChangeLine(String date, String from, String to, String name);
+
+  /// No description provided for @priorityChangedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority changed.'**
+  String get priorityChangedSnack;
+
+  /// No description provided for @priorityExpedite.
+  ///
+  /// In en, this message translates to:
+  /// **'expedite'**
+  String get priorityExpedite;
+
   /// No description provided for @priorityHigh.
   ///
   /// In en, this message translates to:
   /// **'high'**
   String get priorityHigh;
+
+  /// No description provided for @priorityHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority history'**
+  String get priorityHistory;
 
   /// No description provided for @priorityLow.
   ///
@@ -1909,6 +2149,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'normal'**
   String get priorityNormal;
+
+  /// No description provided for @priorityRequestHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Our team decides whether and how the priority is changed.'**
+  String get priorityRequestHelp;
+
+  /// No description provided for @priorityRequestLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} asks for priority: {priority}'**
+  String priorityRequestLine(String name, String priority);
+
+  /// No description provided for @priorityRequestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request has been sent.'**
+  String get priorityRequestSent;
+
+  /// No description provided for @priorityRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer priority requests'**
+  String get priorityRequests;
 
   /// No description provided for @priorityUrgent.
   ///
@@ -2054,6 +2318,12 @@ abstract class AppLocalizations {
   /// **'Reason'**
   String get reason;
 
+  /// No description provided for @reasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A reason is required.'**
+  String get reasonRequired;
+
   /// No description provided for @rebate.
   ///
   /// In en, this message translates to:
@@ -2137,6 +2407,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove, back to stock'**
   String get removeBackToStock;
+
+  /// No description provided for @removeLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove line'**
+  String get removeLine;
 
   /// No description provided for @removedBy.
   ///
@@ -2270,6 +2546,48 @@ abstract class AppLocalizations {
   /// **'Today\'s prices could not be calculated: {error}'**
   String repricingFailed(String error);
 
+  /// No description provided for @requestDismissedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Request dismissed.'**
+  String get requestDismissedSnack;
+
+  /// No description provided for @requestLessUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Less urgent'**
+  String get requestLessUrgent;
+
+  /// No description provided for @requestMoreUrgent.
+  ///
+  /// In en, this message translates to:
+  /// **'More urgent (expedite)'**
+  String get requestMoreUrgent;
+
+  /// No description provided for @requestPriorityChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Request priority change'**
+  String get requestPriorityChange;
+
+  /// No description provided for @requestStatusApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'applied'**
+  String get requestStatusApplied;
+
+  /// No description provided for @requestStatusDismissed.
+  ///
+  /// In en, this message translates to:
+  /// **'dismissed'**
+  String get requestStatusDismissed;
+
+  /// No description provided for @requestStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'open'**
+  String get requestStatusOpen;
+
   /// No description provided for @required.
   ///
   /// In en, this message translates to:
@@ -2300,11 +2618,29 @@ abstract class AppLocalizations {
   /// **'Revision notes'**
   String get revisionNotes;
 
+  /// No description provided for @revisionNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Revision {revision}'**
+  String revisionNumber(int revision);
+
   /// No description provided for @revisionPriceLists.
   ///
   /// In en, this message translates to:
   /// **'Agreed prices: price list of {agreed}. Current prices: price list of {current}.'**
   String revisionPriceLists(String agreed, String current);
+
+  /// No description provided for @revisionViewNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You are viewing revision {revision} (read-only). The current revision is {current}.'**
+  String revisionViewNotice(int revision, int current);
+
+  /// No description provided for @revisions.
+  ///
+  /// In en, this message translates to:
+  /// **'Revisions'**
+  String get revisions;
 
   /// No description provided for @roleInvoicing.
   ///
@@ -2449,6 +2785,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Send login link'**
   String get sendLoginLink;
+
+  /// No description provided for @sendOrderConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Send order confirmation'**
+  String get sendOrderConfirmation;
+
+  /// No description provided for @sendOrderConfirmationHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The order confirmation is e-mailed to the customer as a PDF. The revision can no longer be edited afterwards.'**
+  String get sendOrderConfirmationHelp;
 
   /// No description provided for @serial.
   ///

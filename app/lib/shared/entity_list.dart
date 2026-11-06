@@ -12,9 +12,13 @@ class EntityColumn<T> {
     this.value, {
     this.numeric = false,
     this.flex = 1,
+    this.cell,
   });
   final String label;
   final String Function(T item) value;
+
+  /// Optional widget for the wide table (e.g. a chip); [value] is still used on narrow screens.
+  final Widget Function(BuildContext context, T item)? cell;
   final bool numeric;
   final int flex;
 }
@@ -212,7 +216,11 @@ class EntityListState<T> extends State<EntityList<T>> {
       child: Row(
         children: [
           for (final c in widget.columns)
-            _cell(c, Text(c.value(item), overflow: TextOverflow.ellipsis)),
+            _cell(
+              c,
+              c.cell?.call(context, item) ??
+                  Text(c.value(item), overflow: TextOverflow.ellipsis),
+            ),
         ],
       ),
     ),

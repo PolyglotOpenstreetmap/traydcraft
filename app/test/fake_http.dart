@@ -12,6 +12,9 @@ class FakeHttp implements HttpClientAdapter {
   final requests = <String>[];
   final bodies = <String, Object?>{};
 
+  /// Query parameters of each request, in the order of [requests].
+  final queries = <Map<String, dynamic>>[];
+
   @override
   Future<ResponseBody> fetch(
     RequestOptions o,
@@ -20,6 +23,7 @@ class FakeHttp implements HttpClientAdapter {
   ) async {
     final key = '${o.method} ${o.path}';
     requests.add(key);
+    queries.add(o.queryParameters);
     Object? sent;
     if ((o.contentType ?? '').contains('json')) {
       if (body != null) {

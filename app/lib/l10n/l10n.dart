@@ -32,6 +32,37 @@ extension CodeLabels on AppLocalizations {
     _ => s,
   };
 
+  String orderStatus(String s) => switch (s) {
+    'draft' => statusDraft,
+    'sent' => statusSent,
+    'confirmed' => confirmed,
+    'cancelled' => cancelled,
+    'superseded' => statusSuperseded,
+    'in_planning' => orderStatusInPlanning,
+    'planned' => orderStatusPlanned,
+    'in_production' => orderStatusInProduction,
+    'ready_for_shipping' => orderStatusReadyForShipping,
+    _ => s,
+  };
+
+  /// What the customer sees of an order's state: a sent revision waits for their confirmation.
+  String portalOrderStatus(String s) =>
+      s == 'sent' ? orderAwaitingConfirmation : orderStatus(s);
+
+  String orderPriority(String s) => switch (s) {
+    'low' => priorityLow,
+    'normal' => priorityNormal,
+    'expedite' => priorityExpedite,
+    _ => s,
+  };
+
+  String priorityRequestStatus(String s) => switch (s) {
+    'open' => requestStatusOpen,
+    'applied' => requestStatusApplied,
+    'dismissed' => requestStatusDismissed,
+    _ => s,
+  };
+
   String opportunityStage(String s) => switch (s) {
     'lead' => stageLead,
     'qualified' => stageQualified,

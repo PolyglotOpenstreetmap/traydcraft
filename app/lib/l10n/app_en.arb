@@ -69,6 +69,7 @@
   "assignTo": "Assign to",
   "automatic": "Automatic",
   "backIntoWork": "Back into work",
+  "backToCurrentRevision": "Back to current revision",
   "billOfMaterials": "Bill of materials",
   "bomActive": "active",
   "bomObsolete": "obsolete",
@@ -94,8 +95,20 @@
   "canStillKeep": "You can still keep the agreed prices.",
   "cancel": "Cancel",
   "cancelJob": "Cancel job",
+  "cancelOrder": "Cancel order",
+  "cancelReasonLabel": "Reason for cancelling",
   "cancelRepair": "Cancel repair",
   "cancelled": "cancelled",
+  "cancelledReason": "Cancelled: {reason}",
+  "@cancelledReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "cannotConfirmNewer": "A newer revision of this order is being prepared. You can confirm it once it has been sent to you.",
+  "cannotConfirmOther": "This order cannot be confirmed.",
   "category": "Category",
   "categoryComplaint": "complaint",
   "categoryLead": "lead (new business)",
@@ -107,6 +120,7 @@
   "categoryService": "service / repair",
   "cc": "Cc",
   "change": "Change",
+  "changePriority": "Change priority",
   "chooseCustomerAndLine": "Choose a customer and add at least one valid line.",
   "choosePhoto": "Choose from gallery",
   "chooseRebateTarget": "Choose a product or family and enter a percentage.",
@@ -132,7 +146,17 @@
   },
   "componentsAsBuilt": "Components (as built)",
   "confirm": "confirm",
+  "confirmOnBehalf": "Confirm on behalf of customer",
+  "confirmOnBehalfHelp": "Record that the customer has confirmed this revision, for example by phone or e-mail.",
+  "confirmOrder": "Confirm order",
+  "confirmOrderHelp": "By confirming you accept this order as shown.",
+  "confirmation": "Confirmation",
+  "confirmationDate": "Confirmed on",
   "confirmed": "confirmed",
+  "confirmedRevision": "Confirmed revision",
+  "confirmedVia": "Confirmed via",
+  "confirmedViaPortal": "customer portal",
+  "confirmedViaStaff": "staff, on behalf of the customer",
   "conflictsOnDate": "{count} already have a price on this date",
   "@conflictsOnDate": {
     "placeholders": {
@@ -197,6 +221,8 @@
   "developmentUser": "Development user",
   "deviceLanguage": "Device language",
   "difference": "Difference",
+  "dismiss": "Dismiss",
+  "dismissRequest": "Dismiss request",
   "draftSaved": "Draft saved",
   "edit": "Edit",
   "editContact": "Edit contact",
@@ -343,6 +369,7 @@
     }
   },
   "myJobs": "My jobs",
+  "myOrders": "My orders",
   "myProfile": "My details",
   "myRepairs": "My repairs",
   "myTickets": "My tickets",
@@ -367,6 +394,7 @@
       }
     }
   },
+  "newPriority": "New priority",
   "newProduct": "New product",
   "newQuotation": "New quotation",
   "newRepair": "New repair",
@@ -389,8 +417,11 @@
   "noExpectedClose": "No expected close date",
   "noJobsAssigned": "No jobs assigned to you.",
   "noLines": "No lines yet.",
+  "noOrdersYet": "You have no orders yet.",
   "noPhotos": "No photos yet.",
   "noPrices": "No prices yet.",
+  "noPriorityChanges": "No priority changes yet.",
+  "noPriorityRequests": "No requests.",
   "noQuotations": "No quotations yet.",
   "noRebates": "No product or family rebates.",
   "noRepairs": "No repairs.",
@@ -404,6 +435,7 @@
   "notRouted": "Not routed yet",
   "notScheduled": "Not scheduled",
   "noteAdded": "Note added",
+  "noteOptional": "Note (optional)",
   "notes": "Notes",
   "number": "Number",
   "numberRequired": "Number",
@@ -415,6 +447,14 @@
   "openJobsOnly": "Active only",
   "openOnly": "Open only",
   "openOpportunity": "Open opportunity",
+  "openPriorityRequests": "{count, plural, =1{1 open priority request} other{{count} open priority requests}}",
+  "@openPriorityRequests": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "openRepairsCount": "{count} open",
   "@openRepairsCount": {
     "placeholders": {
@@ -427,7 +467,24 @@
   "opportunity": "Opportunity",
   "opportunityOptional": "Opportunity (optional)",
   "order": "Order",
+  "orderAlreadyConfirmed": "This order was confirmed on {date}.",
+  "@orderAlreadyConfirmed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "orderAwaitingConfirmation": "awaiting your confirmation",
+  "orderConfirmationQueued": "Order confirmation queued for sending.",
+  "orderConfirmedSnack": "Order confirmed.",
+  "orderConfirmedThanks": "Thank you, your order is confirmed.",
   "orderCreated": "Order created",
+  "orderSaved": "Order saved.",
+  "orderStatusInPlanning": "in planning",
+  "orderStatusInProduction": "in production",
+  "orderStatusPlanned": "planned",
+  "orderStatusReadyForShipping": "ready for shipping",
   "orders": "Orders",
   "owner": "Owner",
   "paymentDays": "Payment days",
@@ -509,9 +566,43 @@
   "pricingNet": "net",
   "pricingNetHelp": "Net price (never discounted)",
   "priority": "Priority",
+  "priorityChangeLine": "{date}: {from} → {to} by {name}",
+  "@priorityChangeLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "priorityChangedSnack": "Priority changed.",
+  "priorityExpedite": "expedite",
   "priorityHigh": "high",
+  "priorityHistory": "Priority history",
   "priorityLow": "low",
   "priorityNormal": "normal",
+  "priorityRequestHelp": "Our team decides whether and how the priority is changed.",
+  "priorityRequestLine": "{name} asks for priority: {priority}",
+  "@priorityRequestLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "priority": {
+        "type": "String"
+      }
+    }
+  },
+  "priorityRequestSent": "Your request has been sent.",
+  "priorityRequests": "Customer priority requests",
   "priorityUrgent": "urgent",
   "probability": "Probability",
   "probabilityPercent": "Probability %",
@@ -557,6 +648,7 @@
     }
   },
   "reason": "Reason",
+  "reasonRequired": "A reason is required.",
   "rebate": "Rebate",
   "rebateFor": "{target}: {percent} %",
   "@rebateFor": {
@@ -595,6 +687,7 @@
   "remove": "Remove",
   "removeAndScrap": "Remove and scrap",
   "removeBackToStock": "Remove, back to stock",
+  "removeLine": "Remove line",
   "removedBy": "removed {date} by {name}",
   "@removedBy": {
     "placeholders": {
@@ -634,6 +727,13 @@
       }
     }
   },
+  "requestDismissedSnack": "Request dismissed.",
+  "requestLessUrgent": "Less urgent",
+  "requestMoreUrgent": "More urgent (expedite)",
+  "requestPriorityChange": "Request priority change",
+  "requestStatusApplied": "applied",
+  "requestStatusDismissed": "dismissed",
+  "requestStatusOpen": "open",
   "required": "Required",
   "retry": "Retry",
   "revisionActivated": "Revision activated",
@@ -652,6 +752,14 @@
     }
   },
   "revisionNotes": "Revision notes",
+  "revisionNumber": "Revision {revision}",
+  "@revisionNumber": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      }
+    }
+  },
   "revisionPriceLists": "Agreed prices: price list of {agreed}. Current prices: price list of {current}.",
   "@revisionPriceLists": {
     "placeholders": {
@@ -663,6 +771,18 @@
       }
     }
   },
+  "revisionViewNotice": "You are viewing revision {revision} (read-only). The current revision is {current}.",
+  "@revisionViewNotice": {
+    "placeholders": {
+      "revision": {
+        "type": "int"
+      },
+      "current": {
+        "type": "int"
+      }
+    }
+  },
+  "revisions": "Revisions",
   "roleInvoicing": "Invoicing",
   "roleManagement": "Management",
   "roleOther": "Other",
@@ -694,6 +814,8 @@
   "send": "Send",
   "sendBackToTriage": "Send back to triage",
   "sendLoginLink": "Send login link",
+  "sendOrderConfirmation": "Send order confirmation",
+  "sendOrderConfirmationHelp": "The order confirmation is e-mailed to the customer as a PDF. The revision can no longer be edited afterwards.",
   "serial": "serial",
   "serialBuiltIn": "built in",
   "serialDelivered": "delivered",
