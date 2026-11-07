@@ -431,6 +431,9 @@ async fn move_cost(
     m: &NewMove,
     product: &Product,
 ) -> AppResult<Option<(Decimal, String)>> {
+    if m.currency.is_some() && m.unit_cost.is_none() && !m.inherit_cost {
+        return Err(AppError::Validation("a currency needs a unit cost".into()));
+    }
     let explicit = if m.inherit_cost || m.unit_cost.is_some() {
         m.unit_cost
     } else {

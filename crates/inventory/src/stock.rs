@@ -103,9 +103,7 @@ async fn list_stock(
     Query(p): Query<StockParams>,
 ) -> AppResult<Json<StockRowPage>> {
     user.require(Permission::InventoryRead)?;
-    let pattern =
-        p.q.as_deref()
-            .map(|q| format!("%{}%", q.trim().to_lowercase()));
+    let pattern = p.q.as_deref().map(like_pattern);
     let items = sqlx::query_as(&format!(
         "SELECT *, on_hand - reserved AS available FROM ({STOCK_ROWS}) x
          ORDER BY product_code, location, lot_number NULLS FIRST LIMIT $8 OFFSET $9"
@@ -223,9 +221,7 @@ async fn list_product_stock(
     Query(p): Query<ProductStockParams>,
 ) -> AppResult<Json<ProductStockPage>> {
     user.require(Permission::InventoryRead)?;
-    let pattern =
-        p.q.as_deref()
-            .map(|q| format!("%{}%", q.trim().to_lowercase()));
+    let pattern = p.q.as_deref().map(like_pattern);
     let items = sqlx::query_as(&format!("{PRODUCT_STOCK} ORDER BY code LIMIT $7 OFFSET $8"))
         .bind(user.company_id)
         .bind(p.product_id)
