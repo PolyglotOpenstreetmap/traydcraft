@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../app/api.dart';
 import '../../l10n/l10n.dart';
 import '../../shared/photos.dart' show newClientId;
+import 'offline/offline_queue.dart';
+import 'offline/offline_ui.dart' show showQueuedSnack;
 
 final _stamp = DateFormat('dd/MM/yyyy HH:mm');
 
@@ -26,16 +28,21 @@ Future<DateTime?> pickDateTime(BuildContext context, DateTime initial) async {
 }
 
 /// Logs work or travel on a job. The entry gets its id when the dialog opens, so pressing Save
-/// again after a failed attempt cannot register the time twice.
-Future<JobDetail?> showWorkLogDialog(BuildContext context, String jobId) =>
-    showDialog<JobDetail>(
-      context: context,
-      builder: (_) => WorkLogDialog(jobId: jobId),
-    );
+/// again after a failed attempt cannot register the time twice. Without a connection the entry is
+/// queued (ADR 0022); the dialog then closes with null and the job screen shows it as pending.
+Future<JobDetail?> showWorkLogDialog(
+  BuildContext context,
+  String jobId, {
+  String jobLabel = '',
+}) => showDialog<JobDetail>(
+  context: context,
+  builder: (_) => WorkLogDialog(jobId: jobId, jobLabel: jobLabel),
+);
 
 class WorkLogDialog extends ConsumerStatefulWidget {
-  const WorkLogDialog({super.key, required this.jobId});
+  const WorkLogDialog({super.key, required this.jobId, this.jobLabel = ''});
   final String jobId;
+  final String jobLabel;
 
   @override
   ConsumerState<WorkLogDialog> createState() => _WorkLogDialogState();
@@ -62,20 +69,38 @@ class _WorkLogDialogState extends ConsumerState<WorkLogDialog> {
       _error = null;
     });
     try {
-      final d = await ref
-          .read(apiProvider)
-          .field
-          .addWorkLog(
-            id: widget.jobId,
-            body: WorkLogInput(
-              id: _entryId,
-              kind: _kind,
-              startedAt: _from.toUtc(),
-              endedAt: _until.toUtc(),
-              notes: _notes.text.trim(),
+      final notes = _notes.text.trim();
+      final d = await submitWrite(
+        ref.read(offlineQueueProvider),
+        type: OpType.workLog,
+        jobId: widget.jobId,
+        jobLabel: widget.jobLabel,
+        id: _entryId,
+        payload: {
+          'kind': _kind,
+          'started_at': _from.toUtc().toIso8601String(),
+          'ended_at': _until.toUtc().toIso8601String(),
+          'notes': notes,
+        },
+        online: () => ref
+            .read(apiProvider)
+            .field
+            .addWorkLog(
+              id: widget.jobId,
+              body: WorkLogInput(
+                id: _entryId,
+                kind: _kind,
+                startedAt: _from.toUtc(),
+                endedAt: _until.toUtc(),
+                notes: notes,
+              ),
             ),
-          );
-      if (mounted) Navigator.pop(context, d);
+      );
+      if (!mounted) return;
+      if (d == null) showQueuedSnack(context);
+      Navigator.pop(context, d);
+    } on QueueFullException {
+      if (mounted) setState(() => _error = context.l10n.offlineTooLarge);
     } catch (e) {
       if (mounted) setState(() => _error = errorMessage(e));
     } finally {

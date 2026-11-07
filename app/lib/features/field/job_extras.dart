@@ -11,6 +11,8 @@ import '../../shared/auth_image.dart';
 import '../../shared/format.dart';
 import '../../shared/photos.dart' show newClientId;
 import '../../shared/search_picker.dart';
+import 'offline/offline_queue.dart';
+import 'offline/offline_ui.dart' show showQueuedSnack;
 import 'signature_dialog.dart';
 
 /// A chip saying whether a unit is in warranty.
@@ -48,11 +50,15 @@ class JobExtras extends ConsumerWidget {
     required this.canWork,
     required this.planner,
     required this.onChanged,
+    this.pending = const {},
   });
 
   final JobDetail detail;
   final bool canWork;
   final bool planner;
+
+  /// Ids of records whose change is still waiting in the offline queue.
+  final Set<String> pending;
   final ValueChanged<JobDetail> onChanged;
 
   @override
@@ -91,7 +97,10 @@ class JobExtras extends ConsumerWidget {
                 onPressed: () async {
                   final d = await showDialog<JobDetail>(
                     context: context,
-                    builder: (_) => PartDialog(jobId: j.id),
+                    builder: (_) => PartDialog(
+                      jobId: j.id,
+                      jobLabel: '${j.number} ${j.title}',
+                    ),
                   );
                   if (d != null) onChanged(d);
                 },
@@ -114,7 +123,12 @@ class JobExtras extends ConsumerWidget {
                 if (p.addedByName != null) p.addedByName!,
               ].join(' · '),
             ),
-            trailing: canEdit
+            trailing: pending.contains(p.id)
+                ? Tooltip(
+                    message: l.offlinePendingSync,
+                    child: const Icon(Icons.cloud_upload_outlined, size: 18),
+                  )
+                : canEdit
                 ? IconButton(
                     tooltip: l.remove,
                     icon: const Icon(Icons.delete_outline),
@@ -266,8 +280,9 @@ class JobExtras extends ConsumerWidget {
 /// Adds a part: a product from the catalogue or free text. The entry gets its id when the dialog
 /// opens, so pressing Save again after a failed attempt cannot record it twice.
 class PartDialog extends ConsumerStatefulWidget {
-  const PartDialog({super.key, required this.jobId});
+  const PartDialog({super.key, required this.jobId, this.jobLabel = ''});
   final String jobId;
+  final String jobLabel;
 
   @override
   ConsumerState<PartDialog> createState() => _PartDialogState();
@@ -302,21 +317,39 @@ class _PartDialogState extends ConsumerState<PartDialog> {
       _error = null;
     });
     try {
-      final d = await ref
-          .read(apiProvider)
-          .field
-          .addJobPart(
-            id: widget.jobId,
-            body: PartInput(
-              id: _id,
-              productId: _product?.id,
-              description: _description.text.trim(),
-              quantity: quantity,
-              unit: _unit.text.trim(),
-              billable: _billable,
+      final description = _description.text.trim();
+      final unit = _unit.text.trim();
+      final d = await submitWrite(
+        ref.read(offlineQueueProvider),
+        type: OpType.partAdd,
+        jobId: widget.jobId,
+        jobLabel: widget.jobLabel,
+        id: _id,
+        payload: {
+          'product_id': _product?.id,
+          'description': description,
+          'quantity': quantity,
+          'unit': unit,
+          'billable': _billable,
+        },
+        online: () => ref
+            .read(apiProvider)
+            .field
+            .addJobPart(
+              id: widget.jobId,
+              body: PartInput(
+                id: _id,
+                productId: _product?.id,
+                description: description,
+                quantity: quantity,
+                unit: unit,
+                billable: _billable,
+              ),
             ),
-          );
-      if (mounted) Navigator.pop(context, d);
+      );
+      if (!mounted) return;
+      if (d == null) showQueuedSnack(context);
+      Navigator.pop(context, d);
     } catch (e) {
       if (mounted) setState(() => _error = errorMessage(e));
     } finally {

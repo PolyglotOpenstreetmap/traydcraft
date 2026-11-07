@@ -1380,5 +1380,74 @@
         "type": "String"
       }
     }
-  }
+  },
+  "offlineWaiting": "{count, plural, =1{1 change waiting to sync} other{{count} changes waiting to sync}}",
+  "@offlineWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineFailedCount": "{count, plural, =1{1 needs your attention} other{{count} need your attention}}",
+  "@offlineFailedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineQueueTitle": "Changes waiting to sync",
+  "offlineSyncNow": "Sync now",
+  "offlineRetry": "Try again",
+  "offlineDiscard": "Discard",
+  "offlineDiscardQuestion": "Discard this change? It will not be sent to the server.",
+  "offlineAllSynced": "Everything is synced.",
+  "offlineAttempts": "Attempts: {count}",
+  "@offlineAttempts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineLastError": "Last error: {message}",
+  "@offlineLastError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineRejected": "The server refused this change. The job may have been reassigned, cancelled or changed in the meantime.",
+  "offlineDataFrom": "Offline: data from {time}",
+  "@offlineDataFrom": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "offlinePendingSync": "Waiting to sync",
+  "offlineQueuedMessage": "No connection: saved on this device, it will be sent when you are back online.",
+  "offlinePhotosWaiting": "{count, plural, =1{1 photo waiting to upload} other{{count} photos waiting to upload}}",
+  "@offlinePhotosWaiting": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineTooLarge": "Too large to keep offline. Connect to send it.",
+  "offlineReload": "Reload",
+  "offlineOpStart": "Start job",
+  "offlineOpTaskDone": "Task ticked",
+  "offlineOpTaskUndone": "Task unticked",
+  "offlineOpTaskAdd": "New task",
+  "offlineOpWorkLog": "Time entry",
+  "offlineOpPart": "Part used",
+  "offlineOpComplete": "Complete job",
+  "offlineOpDecline": "Customer declined to sign",
+  "offlineOpSignature": "Customer signature",
+  "offlineOpPhoto": "Photo"
 }

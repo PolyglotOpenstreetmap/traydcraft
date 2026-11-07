@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +15,10 @@ import '../../shared/photos.dart';
 import 'job_extras.dart';
 import 'job_form.dart';
 import 'jobs_page.dart' show whenText;
+import 'offline/job_cache.dart';
+import 'offline/offline_queue.dart';
+import 'offline/offline_ui.dart';
+import 'offline/pending_overlay.dart';
 import 'work_log_dialog.dart';
 
 final _stamp = DateFormat('dd/MM HH:mm');
@@ -27,31 +34,131 @@ class JobScreen extends ConsumerStatefulWidget {
 }
 
 class _JobScreenState extends ConsumerState<JobScreen> {
+  /// The job as the server last told us (or the local copy); queued changes are laid over it
+  /// when it is shown.
   JobDetail? _d;
   String? _error;
   bool _busy = false;
+
+  /// Set while what is shown comes from the local copy because the server cannot be reached.
+  DateTime? _offlineAt;
+  StreamSubscription<AppliedOp>? _applied;
   final _newTask = TextEditingController();
 
   FieldClient get _field => ref.read(apiProvider).field;
+  OfflineQueue get _queue => ref.read(offlineQueueProvider);
+  String get _label => _d == null ? '' : '${_d!.job.number} ${_d!.job.title}';
 
   @override
   void initState() {
     super.initState();
+    _applied = _queue.applied.listen(_onApplied);
     _load();
   }
 
   @override
   void dispose() {
+    _applied?.cancel();
     _newTask.dispose();
     super.dispose();
   }
 
+  void _setDetail(JobDetail d) {
+    if (!mounted) return;
+    setState(() {
+      _d = d;
+      _offlineAt = null;
+      _error = null;
+    });
+    unawaited(ref.read(jobCacheProvider).saveDetail(d).catchError((_) {}));
+  }
+
+  /// A queued change reached the server: show the job as it answered.
+  void _onApplied(AppliedOp a) {
+    if (a.op.jobId != widget.id || !mounted) return;
+    final m = a.detail;
+    if (m != null) {
+      try {
+        _setDetail(JobDetail.fromJson(m));
+        return;
+      } catch (_) {}
+    }
+    _load();
+  }
+
   Future<void> _load() async {
     try {
-      final d = await _field.getJob(id: widget.id);
-      if (mounted) setState(() => _d = d);
+      _setDetail(await _field.getJob(id: widget.id));
     } catch (e) {
-      if (mounted) setState(() => _error = errorMessage(e));
+      if (!mounted) return;
+      if (isNetworkError(e)) {
+        if (_d != null) {
+          setState(() => _offlineAt ??= DateTime.now());
+          return;
+        }
+        final cached = await ref.read(jobCacheProvider).loadDetail(widget.id);
+        if (cached != null && mounted) {
+          setState(() {
+            _d = cached.detail;
+            _offlineAt = cached.savedAt;
+          });
+          return;
+        }
+      }
+      if (mounted && _d == null) setState(() => _error = errorMessage(e));
+    }
+  }
+
+  /// Sends a technician write; with no connection it goes into the offline queue instead.
+  /// Returns true when it was sent now, false when it was queued, null when it failed (the
+  /// server's message is shown).
+  Future<bool?> _write(
+    OpType type, {
+    required Future<JobDetail> Function() online,
+    Map<String, Object?> payload = const {},
+    String? id,
+    String? entityId,
+    Uint8List? data,
+  }) async {
+    final l = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _busy = true);
+    try {
+      final d = await submitWrite(
+        _queue,
+        type: type,
+        jobId: widget.id,
+        jobLabel: _label,
+        online: online,
+        payload: payload,
+        id: id,
+        entityId: entityId,
+        data: data,
+      );
+      if (d != null) {
+        _setDetail(d);
+        return true;
+      }
+      messenger.showSnackBar(SnackBar(content: Text(l.offlineQueuedMessage)));
+      return false;
+    } on QueueFullException {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l.offlineTooLarge),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return null;
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(errorMessage(e)),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return null;
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 
@@ -60,28 +167,38 @@ class _JobScreenState extends ConsumerState<JobScreen> {
     JobDetail? d;
     final ok = await runAction(context, () async => d = await action());
     if (mounted) setState(() => _busy = false);
-    if (ok && d != null && mounted) setState(() => _d = d);
+    if (ok && d != null && mounted) _setDetail(d!);
   }
 
   Future<void> _complete() async {
     final l = context.l10n;
+    final view = _view(_d!);
     final notes = await showDialog<String>(
       context: context,
       builder: (_) =>
-          _CompleteDialog(done: _d!.job.tasksDone, total: _d!.job.tasksTotal),
+          _CompleteDialog(done: view.job.tasksDone, total: view.job.tasksTotal),
     );
     if (notes == null || notes.isEmpty || !mounted) return;
-    await _run(
-      () => _field.completeJob(
+    final sent = await _write(
+      OpType.complete,
+      payload: {'notes': notes},
+      online: () => _field.completeJob(
         id: widget.id,
         body: CompleteInput(notes: notes),
       ),
     );
-    if (mounted) {
+    if (sent == true && mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(l.saved)));
     }
   }
+
+  /// The server's job with the waiting changes applied, so the work shows at once.
+  JobDetail _view(JobDetail d) => applyPending(
+    d,
+    _queue.forJob(widget.id),
+    userName: ref.read(meProvider).value?.displayName ?? '',
+  );
 
   Future<void> _open(String url) async {
     final uri = Uri.tryParse(url);
@@ -97,17 +214,31 @@ class _JobScreenState extends ConsumerState<JobScreen> {
   Future<void> _addPhotos(List<PickedPhoto> photos) async {
     final dio = ref.read(dioProvider);
     for (final p in photos) {
-      await uploadPhoto(dio, '/api/v1/field/jobs/${widget.id}/photos', p);
+      final id = newClientId();
+      final ok = await _write(
+        OpType.photo,
+        id: id,
+        payload: {'filename': p.filename, 'caption': ''},
+        data: p.bytes,
+        online: () async {
+          final res = await uploadPhoto(
+            dio,
+            '/api/v1/field/jobs/${widget.id}/photos',
+            p,
+            clientId: id,
+          );
+          return JobDetail.fromJson(
+            Map<String, dynamic>.from(res.data! as Map),
+          );
+        },
+      );
+      if (ok == null) break;
     }
-    await _load();
   }
 
   @override
   Widget build(BuildContext context) {
-    final l = context.l10n;
-    final theme = Theme.of(context);
-    final d = _d;
-    if (d == null) {
+    if (_d == null) {
       return Scaffold(
         body: Center(
           child: _error != null
@@ -116,6 +247,24 @@ class _JobScreenState extends ConsumerState<JobScreen> {
         ),
       );
     }
+    final queue = ref.watch(offlineQueueProvider);
+    // Rebuild whenever something is queued, sent or fails.
+    return ListenableBuilder(
+      listenable: queue,
+      builder: (context, _) => _body(context, _view(_d!)),
+    );
+  }
+
+  Widget _body(BuildContext context, JobDetail d) {
+    final l = context.l10n;
+    final theme = Theme.of(context);
+    final queued = _queue.forJob(widget.id);
+    final pending = pendingIds(queued);
+    final addedOffline = {
+      for (final o in queued)
+        if (o.type == OpType.taskAdd) o.id,
+    };
+    final photosWaiting = queued.where((o) => o.type == OpType.photo).length;
     final j = d.job;
     final perms = ref.watch(meProvider).value?.permissions ?? const [];
     final planner = perms.contains('field.plan');
@@ -139,9 +288,19 @@ class _JobScreenState extends ConsumerState<JobScreen> {
                   style: theme.textTheme.titleLarge,
                 ),
               ),
+              IconButton(
+                tooltip: l.offlineReload,
+                onPressed: _load,
+                icon: const Icon(Icons.refresh),
+              ),
               Chip(label: Text(l.jobStatus(j.status))),
             ],
           ),
+          if (_offlineAt != null) ...[
+            OfflineNote(savedAt: _offlineAt!),
+            const SizedBox(height: 8),
+          ],
+          PendingSyncBanner(jobId: widget.id),
           Text(
             '${j.customerName} · ${l.jobKind(j.kind)} · ${whenText(j, l)}',
             style: theme.textTheme.bodyMedium,
@@ -205,7 +364,10 @@ class _JobScreenState extends ConsumerState<JobScreen> {
                   label: Text(l.startJob),
                   onPressed: _busy
                       ? null
-                      : () => _run(() => _field.startJob(id: widget.id)),
+                      : () => _write(
+                          OpType.start,
+                          online: () => _field.startJob(id: widget.id),
+                        ),
                 ),
               if (canWork && open)
                 OutlinedButton.icon(
@@ -214,8 +376,12 @@ class _JobScreenState extends ConsumerState<JobScreen> {
                   onPressed: _busy
                       ? null
                       : () async {
-                          final r = await showWorkLogDialog(context, widget.id);
-                          if (r != null && mounted) setState(() => _d = r);
+                          final r = await showWorkLogDialog(
+                            context,
+                            widget.id,
+                            jobLabel: _label,
+                          );
+                          if (r != null) _setDetail(r);
                         },
                 ),
               if (canWork && open)
@@ -230,7 +396,7 @@ class _JobScreenState extends ConsumerState<JobScreen> {
                   label: Text(l.editJob),
                   onPressed: () async {
                     final r = await showJobForm(context, detail: d);
-                    if (r != null && mounted) setState(() => _d = r);
+                    if (r != null) _setDetail(r);
                   },
                 ),
               if (planner && open)
@@ -293,9 +459,23 @@ class _JobScreenState extends ConsumerState<JobScreen> {
               subtitle: t.done && t.doneByName != null
                   ? Text(t.doneByName!)
                   : null,
-              onChanged: canWork && open && !_busy
-                  ? (v) => _run(
-                      () => _field.setJobTaskDone(
+              secondary: pending.contains(t.id)
+                  ? Tooltip(
+                      message: l.offlinePendingSync,
+                      child: const Icon(Icons.cloud_upload_outlined, size: 18),
+                    )
+                  : null,
+              // A task added offline has no id on the server yet: tick it after it is synced.
+              onChanged:
+                  canWork && open && !_busy && !addedOffline.contains(t.id)
+                  ? (v) => _write(
+                      OpType.taskDone,
+                      entityId: t.id,
+                      payload: {
+                        'done': v ?? false,
+                        'description': t.description,
+                      },
+                      online: () => _field.setJobTaskDone(
                         id: widget.id,
                         taskId: t.id,
                         body: DoneInput(done: v ?? false),
@@ -341,6 +521,12 @@ class _JobScreenState extends ConsumerState<JobScreen> {
                     : Icons.build_outlined,
                 size: 20,
               ),
+              trailing: pending.contains(w.id)
+                  ? Tooltip(
+                      message: l.offlinePendingSync,
+                      child: const Icon(Icons.cloud_upload_outlined, size: 18),
+                    )
+                  : null,
               title: Text(
                 '${minutesText(w.minutes)}${w.notes.isEmpty ? '' : ' — ${w.notes}'}',
               ),
@@ -353,7 +539,8 @@ class _JobScreenState extends ConsumerState<JobScreen> {
             detail: d,
             canWork: canWork,
             planner: planner,
-            onChanged: (x) => setState(() => _d = x),
+            pending: pending,
+            onChanged: _setDetail,
           ),
           const Divider(height: 32),
           PhotoGallery(
@@ -365,6 +552,17 @@ class _JobScreenState extends ConsumerState<JobScreen> {
             pathFor: (id) => '/api/v1/field/jobs/${widget.id}/photos/$id',
             onAdd: canWork && j.status != 'cancelled' ? _addPhotos : null,
           ),
+          if (photosWaiting > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.cloud_upload_outlined, size: 18),
+                  const SizedBox(width: 6),
+                  Text(l.offlinePhotosWaiting(photosWaiting)),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -374,10 +572,14 @@ class _JobScreenState extends ConsumerState<JobScreen> {
     final text = _newTask.text.trim();
     if (text.isEmpty) return;
     _newTask.clear();
-    _run(
-      () => _field.addJobTask(
+    final id = newClientId();
+    _write(
+      OpType.taskAdd,
+      id: id,
+      payload: {'description': text},
+      online: () => _field.addJobTask(
         id: widget.id,
-        body: TaskInput(description: text),
+        body: TaskInput(description: text, clientId: id),
       ),
     );
   }

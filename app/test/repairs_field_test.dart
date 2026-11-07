@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:traydcraft_app/app/api.dart';
+import 'package:traydcraft_app/features/field/offline/kv_store.dart';
 import 'package:traydcraft_app/app/shell.dart';
 import 'package:traydcraft_app/features/field/job_screen.dart';
 import 'package:traydcraft_app/features/repairs/repair_screen.dart';
@@ -22,7 +23,10 @@ Future<void> _pump(
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [dioProvider.overrideWithValue(fakeDio(http))],
+      overrides: [
+        dioProvider.overrideWithValue(fakeDio(http)),
+        kvStoreProvider.overrideWithValue(MemoryKvStore()),
+      ],
       child: MaterialApp(
         locale: Locale(locale),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -417,7 +421,10 @@ void main() {
     );
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [dioProvider.overrideWithValue(fakeDio(http))],
+        overrides: [
+          dioProvider.overrideWithValue(fakeDio(http)),
+          kvStoreProvider.overrideWithValue(MemoryKvStore()),
+        ],
         child: MaterialApp.router(
           routerConfig: router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,

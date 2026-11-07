@@ -28,6 +28,7 @@ import '../features/repairs/repair_screen.dart';
 import '../features/repairs/repairs_page.dart';
 import '../features/quotations/quotations_page.dart';
 import 'session.dart';
+import '../features/field/offline/offline_ui.dart' show OfflineSyncHost;
 import 'shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -46,8 +47,9 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
       ShellRoute(
-        builder: (context, state, child) =>
-            AppShell(location: state.matchedLocation, child: child),
+        builder: (context, state, child) => OfflineSyncHost(
+          child: AppShell(location: state.matchedLocation, child: child),
+        ),
         routes: [
           GoRoute(
             path: '/quotations',

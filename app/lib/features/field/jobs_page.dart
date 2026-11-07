@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,9 @@ import 'package:intl/intl.dart';
 import '../../app/api.dart';
 import '../../l10n/l10n.dart';
 import 'job_form.dart';
+import 'offline/job_cache.dart';
+import 'offline/offline_queue.dart';
+import 'offline/offline_ui.dart';
 
 final _day = DateFormat('EEE dd/MM');
 final _time = DateFormat('HH:mm');
@@ -32,13 +37,74 @@ class _JobsPageState extends ConsumerState<JobsPage> {
   bool _activeOnly = true;
   String _technician = 'all';
 
-  Future<List<Job>> _fetch(bool planner) {
+  /// Set when the list comes from the local copy because the server cannot be reached.
+  DateTime? _offlineAt;
+  StreamSubscription<AppliedOp>? _applied;
+
+  @override
+  void initState() {
+    super.initState();
+    _applied = ref.read(offlineQueueProvider).applied.listen((_) {
+      // A change was synced: the task counts may have moved.
+      if (mounted && _jobs != null) {
+        _reload(
+          (ref.read(meProvider).value?.permissions ?? const []).contains(
+            'field.plan',
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _applied?.cancel();
+    super.dispose();
+  }
+
+  Future<List<Job>> _fetch(bool planner) async {
     final field = ref.read(apiProvider).field;
-    if (!planner) return field.listMyJobs();
-    return field.listJobs(
-      status: _activeOnly ? 'active' : null,
-      technician: _technician == 'all' ? null : _technician,
-    );
+    final cache = ref.read(jobCacheProvider);
+    if (planner) {
+      _offlineAt = null;
+      return field.listJobs(
+        status: _activeOnly ? 'active' : null,
+        technician: _technician == 'all' ? null : _technician,
+      );
+    }
+    // A technician's jobs are kept on the device, so the day can be read without signal.
+    try {
+      final jobs = await field.listMyJobs();
+      _offlineAt = null;
+      unawaited(_keep(cache, jobs));
+      return jobs;
+    } catch (e) {
+      if (isNetworkError(e)) {
+        final cached = await cache.loadList();
+        if (cached != null) {
+          _offlineAt = cached.savedAt;
+          return cached.jobs;
+        }
+      }
+      rethrow;
+    }
+  }
+
+  /// Saves the list and the details of the open jobs, one after the other, for offline use.
+  Future<void> _keep(JobCache cache, List<Job> jobs) async {
+    try {
+      await cache.saveList(jobs);
+      final field = ref.read(apiProvider).field;
+      for (final j
+          in jobs
+              .where((j) => j.status == 'planned' || j.status == 'in_progress')
+              .take(20)) {
+        if (!mounted) return;
+        await cache.saveDetail(await field.getJob(id: j.id));
+      }
+    } catch (_) {
+      // Best effort: the copy is a convenience.
+    }
   }
 
   void _reload(bool planner) => setState(() => _jobs = _fetch(planner));
@@ -112,6 +178,18 @@ class _JobsPageState extends ConsumerState<JobsPage> {
                 ],
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Column(
+              children: [
+                if (_offlineAt != null) ...[
+                  OfflineNote(savedAt: _offlineAt!),
+                  const SizedBox(height: 8),
+                ],
+                const PendingSyncBanner(),
+              ],
+            ),
+          ),
           Expanded(
             child: FutureBuilder<List<Job>>(
               future: _jobs,

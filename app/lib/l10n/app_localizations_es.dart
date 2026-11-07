@@ -2431,4 +2431,119 @@ class AppLocalizationsEs extends AppLocalizations {
   String kbUpdatedOn(String date) {
     return 'Actualizado el $date';
   }
+
+  @override
+  String offlineWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cambios pendientes de sincronizar',
+      one: '1 cambio pendiente de sincronizar',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String offlineFailedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count requieren su atención',
+      one: '1 requiere su atención',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineQueueTitle => 'Cambios pendientes de sincronizar';
+
+  @override
+  String get offlineSyncNow => 'Sincronizar ahora';
+
+  @override
+  String get offlineRetry => 'Reintentar';
+
+  @override
+  String get offlineDiscard => 'Descartar';
+
+  @override
+  String get offlineDiscardQuestion =>
+      '¿Descartar este cambio? No se enviará al servidor.';
+
+  @override
+  String get offlineAllSynced => 'Todo está sincronizado.';
+
+  @override
+  String offlineAttempts(int count) {
+    return 'Intentos: $count';
+  }
+
+  @override
+  String offlineLastError(String message) {
+    return 'Último error: $message';
+  }
+
+  @override
+  String get offlineRejected =>
+      'El servidor rechazó este cambio. Puede que el trabajo se haya reasignado, cancelado o modificado entretanto.';
+
+  @override
+  String offlineDataFrom(String time) {
+    return 'Sin conexión: datos de $time';
+  }
+
+  @override
+  String get offlinePendingSync => 'Pendiente de sincronizar';
+
+  @override
+  String get offlineQueuedMessage =>
+      'Sin conexión: guardado en este dispositivo, se enviará cuando vuelva a estar en línea.';
+
+  @override
+  String offlinePhotosWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos pendientes de subir',
+      one: '1 foto pendiente de subir',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineTooLarge =>
+      'Demasiado grande para guardarlo sin conexión. Conéctese para enviarlo.';
+
+  @override
+  String get offlineReload => 'Recargar';
+
+  @override
+  String get offlineOpStart => 'Iniciar el trabajo';
+
+  @override
+  String get offlineOpTaskDone => 'Tarea marcada';
+
+  @override
+  String get offlineOpTaskUndone => 'Tarea desmarcada';
+
+  @override
+  String get offlineOpTaskAdd => 'Nueva tarea';
+
+  @override
+  String get offlineOpWorkLog => 'Registro de tiempo';
+
+  @override
+  String get offlineOpPart => 'Pieza utilizada';
+
+  @override
+  String get offlineOpComplete => 'Completar el trabajo';
+
+  @override
+  String get offlineOpDecline => 'El cliente se negó a firmar';
+
+  @override
+  String get offlineOpSignature => 'Firma del cliente';
+
+  @override
+  String get offlineOpPhoto => 'Foto';
 }

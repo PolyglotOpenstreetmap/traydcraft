@@ -2429,4 +2429,119 @@ class AppLocalizationsNl extends AppLocalizations {
   String kbUpdatedOn(String date) {
     return 'Bijgewerkt op $date';
   }
+
+  @override
+  String offlineWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count wijzigingen wachten op synchronisatie',
+      one: '1 wijziging wacht op synchronisatie',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String offlineFailedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vragen je aandacht',
+      one: '1 vraagt je aandacht',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineQueueTitle => 'Wijzigingen die wachten op synchronisatie';
+
+  @override
+  String get offlineSyncNow => 'Nu synchroniseren';
+
+  @override
+  String get offlineRetry => 'Opnieuw proberen';
+
+  @override
+  String get offlineDiscard => 'Weggooien';
+
+  @override
+  String get offlineDiscardQuestion =>
+      'Deze wijziging weggooien? Ze wordt niet naar de server gestuurd.';
+
+  @override
+  String get offlineAllSynced => 'Alles is gesynchroniseerd.';
+
+  @override
+  String offlineAttempts(int count) {
+    return 'Pogingen: $count';
+  }
+
+  @override
+  String offlineLastError(String message) {
+    return 'Laatste fout: $message';
+  }
+
+  @override
+  String get offlineRejected =>
+      'De server weigerde deze wijziging. De opdracht is misschien intussen herverdeeld, geannuleerd of aangepast.';
+
+  @override
+  String offlineDataFrom(String time) {
+    return 'Offline: gegevens van $time';
+  }
+
+  @override
+  String get offlinePendingSync => 'Wacht op synchronisatie';
+
+  @override
+  String get offlineQueuedMessage =>
+      'Geen verbinding: bewaard op dit toestel, het wordt verstuurd zodra je weer online bent.';
+
+  @override
+  String offlinePhotosWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s wachten om geüpload te worden',
+      one: '1 foto wacht om geüpload te worden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineTooLarge =>
+      'Te groot om offline te bewaren. Maak verbinding om het te versturen.';
+
+  @override
+  String get offlineReload => 'Herladen';
+
+  @override
+  String get offlineOpStart => 'Opdracht starten';
+
+  @override
+  String get offlineOpTaskDone => 'Taak afgevinkt';
+
+  @override
+  String get offlineOpTaskUndone => 'Vinkje bij taak weggehaald';
+
+  @override
+  String get offlineOpTaskAdd => 'Nieuwe taak';
+
+  @override
+  String get offlineOpWorkLog => 'Tijdregistratie';
+
+  @override
+  String get offlineOpPart => 'Gebruikt onderdeel';
+
+  @override
+  String get offlineOpComplete => 'Opdracht afronden';
+
+  @override
+  String get offlineOpDecline => 'Klant weigert te tekenen';
+
+  @override
+  String get offlineOpSignature => 'Handtekening klant';
+
+  @override
+  String get offlineOpPhoto => 'Foto';
 }
