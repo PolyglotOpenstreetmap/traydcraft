@@ -14,7 +14,10 @@ ALTER TABLE products.products
     ADD CONSTRAINT products_reorder_range CHECK (reorder_max IS NULL OR reorder_min IS NULL OR reorder_max >= reorder_min);
 CREATE UNIQUE INDEX products_barcode_idx ON products.products (barcode) WHERE barcode IS NOT NULL;
 
-ALTER TABLE products.products DROP CONSTRAINT IF EXISTS products_tracking_check;
+-- The check added with the column in 20261105000006_engineering.sql is named products_tracking_check
+-- (table_column_check). Drop it by that name, without IF EXISTS: if it were missing, this migration
+-- should fail instead of leaving two tracking checks side by side.
+ALTER TABLE products.products DROP CONSTRAINT products_tracking_check;
 ALTER TABLE products.products
     ADD CONSTRAINT products_tracking_check CHECK (tracking IN ('none', 'serial', 'lot'));
 
@@ -81,9 +84,13 @@ CREATE TABLE inventory.locations (
     warehouse_id  uuid REFERENCES inventory.warehouses(id),
     code          text NOT NULL CHECK (btrim(code) <> ''),
     name          text NOT NULL DEFAULT '',
-    -- internal: real stock. The others are virtual: the other side of receipts, issues, adjustments.
+    -- internal: real stock. The others are virtual, the other side of a move: supplier (receipts),
+    -- customer (shipments, returns), production_consumption (components used), production_output
+    -- (finished goods), transit (stock on its way, for two-step transfers and deliveries), adjustment
+    -- (counts and corrections), scrap.
     kind          text NOT NULL DEFAULT 'internal'
-                  CHECK (kind IN ('internal', 'supplier', 'customer', 'production', 'adjustment', 'scrap')),
+                  CHECK (kind IN ('internal', 'supplier', 'customer', 'production_consumption', 'production_output',
+                                  'transit', 'adjustment', 'scrap')),
     active        boolean NOT NULL DEFAULT true,
     created_at    timestamptz NOT NULL DEFAULT now(),
     CHECK ((kind = 'internal') = (warehouse_id IS NOT NULL)),

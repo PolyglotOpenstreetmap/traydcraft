@@ -117,6 +117,10 @@ pub enum SerialEffect {
     Scrap,
     /// A delivery or scrapping is undone: back in stock; `clear_customer` removes the customer.
     Restore { clear_customer: bool },
+    /// A delivered or installed unit comes back from the customer (a `return` receipt): in stock at
+    /// the receiving location, customer removed. The as-built genealogy (ADR 0011) is untouched:
+    /// only units that are not built into another unit can be returned.
+    Return,
 }
 
 /// A move to post. `id` is chosen by the client and makes retries safe.
@@ -249,8 +253,8 @@ async fn load_location(conn: &mut PgConnection, company_id: Uuid, id: Uuid) -> A
     .ok_or(AppError::NotFound("location"))
 }
 
-/// The virtual location of a kind (`supplier`, `customer`, `production`, `adjustment`, `scrap`),
-/// created on first use.
+/// The virtual location of a kind (`supplier`, `customer`, `production_consumption`,
+/// `production_output`, `transit`, `adjustment`, `scrap`), created on first use.
 pub async fn virtual_location(
     conn: &mut PgConnection,
     company_id: Uuid,
@@ -501,8 +505,20 @@ async fn check_tracking(conn: &mut PgConnection, m: &NewMove, product: &Product)
                     "the serial unit belongs to another product".into(),
                 ));
             }
-            let restoring = matches!(m.serial_effect, SerialEffect::Restore { .. });
-            if restoring {
+            if matches!(m.serial_effect, SerialEffect::Return) {
+                if !matches!(u.status.as_str(), "delivered" | "installed") || u.built_into.is_some()
+                {
+                    return Err(AppError::Conflict(format!(
+                        "{} is {}; only a delivered or installed unit can come back as a return",
+                        u.serial_number,
+                        if u.built_into.is_some() {
+                            "built into another unit"
+                        } else {
+                            u.status.as_str()
+                        }
+                    )));
+                }
+            } else if matches!(m.serial_effect, SerialEffect::Restore { .. }) {
                 if !matches!(u.status.as_str(), "delivered" | "scrapped" | "installed") {
                     return Err(AppError::Conflict(format!(
                         "{} is {}, it was not delivered or scrapped by this move",
@@ -814,19 +830,29 @@ async fn move_serial(
         SerialEffect::Restore { clear_customer } => {
             serials::set_status_from_stock(conn, unit, "in_stock", None, clear_customer).await?
         }
+        SerialEffect::Return => {
+            serials::set_status_from_stock(conn, unit, "in_stock", None, true).await?
+        }
     }
     Ok(())
 }
 
 /// Reverses a move: a new move with the locations swapped. A move can be reversed once and a
-/// reversal cannot be reversed.
+/// reversal cannot be reversed. A reversal that would take stock below what is reserved is a 409
+/// unless `force` is set (inventory administrators only).
 pub async fn reverse_move(
     conn: &mut PgConnection,
     user: &CurrentUser,
     original_id: Uuid,
     new_id: Uuid,
     note: &str,
+    force: bool,
 ) -> AppResult<Posted> {
+    if force && !user.can(Permission::InventoryAdmin) {
+        return Err(AppError::Forbidden(
+            "missing permission inventory.admin".into(),
+        ));
+    }
     let o = load_move(conn, user.company_id, original_id).await?;
     if let Some(rev) = o.reversed_of {
         return Err(AppError::Conflict(format!(
@@ -859,6 +885,9 @@ pub async fn reverse_move(
     m.unit_cost = o.unit_cost;
     m.currency = o.currency.clone();
     m.inherit_cost = true;
+    // A reversal that would take reserved stock is refused, unless an inventory administrator
+    // forces it (the orders then lack stock).
+    m.respect_reservations = !force;
     m.serial_effect = match o.reason.as_str() {
         "shipment" => SerialEffect::Restore {
             clear_customer: true,

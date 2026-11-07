@@ -115,6 +115,10 @@ pub struct AdjustmentInput {
 pub struct ReverseInput {
     /// Chosen by the client for the reversal move.
     pub id: Uuid,
+    /// Reverse even when that takes stock that is reserved for orders (they then lack stock).
+    /// Inventory administrators only, which this endpoint already requires.
+    #[serde(default)]
+    pub force: bool,
     #[serde(default)]
     pub note: String,
 }
@@ -226,6 +230,12 @@ async fn receive(
                         .await?
                         {
                             Some(id) => id,
+                            None if reason == "return" => {
+                                return Err(AppError::Validation(format!(
+                                    "serial number {} is not known; only a unit that was delivered can be returned",
+                                    serial.trim()
+                                )))
+                            }
                             None => {
                                 serials::register_unit(
                                     &mut tx,
@@ -272,6 +282,9 @@ async fn receive(
     );
     m.lot_id = lot_id;
     m.serial_unit_id = unit_id;
+    if reason == "return" && product.tracking == "serial" {
+        m.serial_effect = SerialEffect::Return;
+    }
     m.entered = entered;
     m.note = input.note;
     m.unit_cost = input.unit_cost;
@@ -282,7 +295,7 @@ async fn receive(
 }
 
 /// Takes stock out of a location. The reason decides where it goes: a customer (`shipment`),
-/// production (`consumption`, `repair_use`) or scrap.
+/// production consumption (`consumption`, `repair_use`) or scrap.
 #[utoipa::path(post, path = "/inventory/issues", tag = "inventory", request_body = IssueInput,
     responses((status = 201, body = StockMove), (status = 200, body = StockMove), (status = 409, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn issue(
@@ -295,7 +308,7 @@ async fn issue(
     let (target, effect) = match reason {
         "shipment" => ("customer", SerialEffect::Deliver(input.customer_id)),
         "scrap" => ("scrap", SerialEffect::Scrap),
-        "consumption" | "repair_use" => ("production", SerialEffect::None),
+        "consumption" | "repair_use" => ("production_consumption", SerialEffect::None),
         _ => {
             return Err(AppError::Validation(
                 "reason must be consumption, shipment, scrap or repair_use".into(),
@@ -510,7 +523,7 @@ async fn reverse(
 ) -> AppResult<(StatusCode, Json<StockMove>)> {
     user.require(Permission::InventoryAdmin)?;
     let mut tx = state.db.begin().await?;
-    let posted = reverse_move(&mut tx, &user, id, input.id, input.note.trim()).await?;
+    let posted = reverse_move(&mut tx, &user, id, input.id, input.note.trim(), input.force).await?;
     if let Posted::Created(ref mv) = posted {
         audit::record(
             &mut tx,
@@ -518,7 +531,7 @@ async fn reverse(
             "stock_move",
             id,
             "reversed",
-            serde_json::json!({ "reversal_id": mv.id, "note": input.note.trim() }),
+            serde_json::json!({ "reversal_id": mv.id, "note": input.note.trim(), "forced": input.force }),
         )
         .await?;
     }

@@ -18,11 +18,25 @@ tables below are explicit. The crate is `crates/inventory`, schema `inventory`, 
 * **Locations** (`inventory.locations`): bins inside a warehouse, `code` unique per warehouse,
   `kind = internal`. A warehouse is deactivated, a location is deactivated only when its balance is
   zero; neither is ever deleted once it has moves.
-* **Virtual locations** (`warehouse_id IS NULL`, one per company and kind): `supplier`, `customer`,
-  `production`, `adjustment`, `scrap`. They are the other side of a move, so **every move has a
-  `from` and a `to`** (double entry): for each product the balances over all locations of a company
-  add up to zero. Virtual locations may go negative, internal ones may not
-  (`stock_balances.allow_negative` + a check). They are created on first use.
+* **Virtual locations** (`warehouse_id IS NULL`, one per company and kind). They are the other side
+  of a move, so **every move has a `from` and a `to`** (double entry): for each product the balances
+  over all locations of a company add up to zero. Virtual locations may go negative, internal ones
+  may not (`stock_balances.allow_negative` + a check). They are created on first use. The kinds
+  (**decision**; a new kind widens the CHECK in the migration):
+
+  | kind | the other side of | used by |
+  |---|---|---|
+  | `supplier` | receipts | manual receipt now, purchase receipt (B2) |
+  | `customer` | shipments and customer returns | shipment, `return` receipt, delivery (B3) |
+  | `production_consumption` | components used up | `consumption`, `repair_use`, production (C1) |
+  | `production_output` | finished goods coming in | production output (C1) |
+  | `transit` | stock on its way | two-step transfers and deliveries (later) |
+  | `adjustment` | stock found or lost | adjustments, counts |
+  | `scrap` | stock thrown away | `scrap` |
+
+  Production output and consumption are separate kinds so each can be read on its own (what was
+  produced against what was consumed). The earlier single `production` kind was dropped before the
+  migration was deployed.
 
 ### The ledger: `inventory.stock_moves`
 * One row per product and lot or serial unit: `id` (client-chosen UUID, see *Idempotency*),
@@ -39,7 +53,10 @@ tables below are explicit. The crate is `crates/inventory`, schema `inventory`, 
 * **Immutable.** A trigger refuses `UPDATE`, `DELETE` and `TRUNCATE` on the table. A correction is
   a **reversal**: a new move with `from` and `to` swapped, `reversed_of` = the original and reason
   `reversal`. A move can be reversed once (unique `reversed_of`); a reversal cannot be reversed
-  (post a new move instead). A reversal fails like any move when it would make stock negative.
+  (post a new move instead). A reversal fails like any move when it would make stock negative, and
+  (**decision**) when it would take stock below what is reserved for orders (409); an inventory
+  administrator can pass `force` to reverse anyway (the orders then lack stock, shown as negative
+  available). A reversal copies the cost and currency of the original.
 * Money values use the project's decimals (ADR 0002): `numeric(18,4)` unit cost, strings in JSON,
   `rust_decimal` in Rust. Nothing here rounds money. Quantities are `numeric(18,4)`.
 
@@ -100,6 +117,11 @@ product has moves (trigger). Services are not stocked.
 * Issue reasons change the status in the same transaction: `shipment` → `delivered` (customer
   required), `scrap` → `scrapped`, `consumption` leaves it `in_stock` without a location until it is
   attached to a parent unit (which sets `built_in`, ADR 0011). Reversing restores `in_stock`.
+* **Customer return** (**decision**): a `return` receipt of a serial product takes an existing unit
+  that is `delivered` or `installed` and not built into another unit (a unit that is still a
+  component of another is refused; ADR 0011 genealogy links are untouched). The unit is `in_stock`
+  at the receiving location again and its customer is cleared. A `scrapped` unit does not come
+  back this way, and an unknown serial number is a 422 (nothing is registered by a return).
 * `engineering` refuses to change the status of, or attach, a unit that currently has a location
   (409, "issue it from stock"), so the two cannot disagree. Units that were registered before
   inventory existed have no location until they are received; they are not counted as stock.
@@ -135,14 +157,16 @@ product has moves (trigger). Services are not stocked.
   order line whose unit does not convert is a 422). Cancelling an order releases its reservations in
   the same transaction (`inventory::release_for_order`, called from `sales`). The order lifecycle
   states are unchanged.
-* Reserved stock is protected: an issue or transfer cannot take stock that is reserved. Adjustments,
-  counts can (physical reality wins); the line then shows a negative available quantity.
+* Reserved stock is protected: an issue or transfer cannot take stock that is reserved. Adjustments
+  and counts can (physical reality wins); the line then shows a negative available quantity.
 
 ### Availability
 For a product: `on_hand` = sum of balances in internal locations, `reserved` = active
 reservations, `available = on_hand - reserved`. The same three numbers are given per location and
 lot. **ATP on an order** counts warehouses of kind `warehouse` only (van stock belongs to the
-technician) and is `GET /inventory/orders/{id}/availability`. Open purchase orders and production
+technician) and is `GET /inventory/orders/{id}/availability`. **Expired lots** (`expiry_date` before
+today) stay in `on_hand` but are reported separately (`expired`) and are not available; what was
+reserved in them no longer reduces the good stock. Open purchase orders and production
 orders are not included until B2 and C1 exist.
 
 ### Counts and adjustments: `inventory.counts`, `inventory.count_lines`
