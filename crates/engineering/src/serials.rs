@@ -4,7 +4,7 @@
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::Json;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgConnection};
@@ -36,6 +36,11 @@ pub struct SerialUnit {
     pub parent_id: Option<Uuid>,
     pub parent_serial_number: Option<String>,
     pub notes: String,
+    /// The end of the warranty, if known.
+    pub warranty_until: Option<NaiveDate>,
+    pub warranty_note: String,
+    /// in_warranty | expired | unknown (no end date recorded)
+    pub warranty_status: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -97,6 +102,15 @@ pub struct SerialStatusInput {
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
+pub struct WarrantyInput {
+    /// The last day of the warranty; empty when unknown.
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
+    pub warranty_until: Option<NaiveDate>,
+    #[serde(default)]
+    pub warranty_note: String,
+}
+
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct AttachInput {
     pub child_id: Uuid,
 }
@@ -120,7 +134,9 @@ pub struct ListParams {
 
 const SELECT: &str = "SELECT s.id, s.product_id, p.code AS product_code, p.name AS product_name, s.serial_number,
         s.status, s.bom_id, b.revision AS bom_revision, s.customer_id, c.name AS customer_name,
-        link.parent_id, ps.serial_number AS parent_serial_number, s.notes, s.created_at, s.updated_at
+        link.parent_id, ps.serial_number AS parent_serial_number, s.notes, s.warranty_until, s.warranty_note,
+        CASE WHEN s.warranty_until IS NULL THEN 'unknown' WHEN s.warranty_until >= current_date THEN 'in_warranty'
+             ELSE 'expired' END AS warranty_status, s.created_at, s.updated_at
      FROM engineering.serial_units s
      JOIN products.products p ON p.id = s.product_id
      LEFT JOIN engineering.boms b ON b.id = s.bom_id
@@ -382,6 +398,40 @@ async fn set_status(
     Ok(Json(d))
 }
 
+/// Sets the warranty of a unit: until when, and a note (terms, contract).
+#[utoipa::path(put, path = "/serials/{id}/warranty", tag = "engineering", params(("id" = Uuid, Path)),
+    request_body = WarrantyInput,
+    responses((status = 200, body = SerialUnitDetail), (status = 404, body = ErrorBody)))]
+async fn set_warranty(
+    State(state): State<AppState>,
+    user: CurrentUser,
+    Path(id): Path<Uuid>,
+    Json(input): Json<WarrantyInput>,
+) -> AppResult<Json<SerialUnitDetail>> {
+    user.require(Permission::SerialsWrite)?;
+    let mut tx = state.db.begin().await?;
+    lock(&mut tx, &[id]).await?;
+    load(&mut tx, user.company_id, id).await?;
+    sqlx::query("UPDATE engineering.serial_units SET warranty_until = $2, warranty_note = $3, updated_at = now() WHERE id = $1")
+        .bind(id)
+        .bind(input.warranty_until)
+        .bind(input.warranty_note.trim())
+        .execute(&mut *tx)
+        .await?;
+    audit::record(
+        &mut tx,
+        &user,
+        "serial_unit",
+        id,
+        "warranty_changed",
+        serde_json::json!({ "warranty_until": input.warranty_until }),
+    )
+    .await?;
+    let d = detail(&mut tx, user.company_id, id).await?;
+    tx.commit().await?;
+    Ok(Json(d))
+}
+
 /// Records that a serialised component was built into this unit. The component's product must be
 /// part of the unit's BOM revision, and no more units may be attached than the BOM quantity.
 #[utoipa::path(post, path = "/serials/{id}/components", tag = "engineering", params(("id" = Uuid, Path)),
@@ -555,6 +605,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(create_serial))
         .routes(routes!(get_serial))
         .routes(routes!(set_status))
+        .routes(routes!(set_warranty))
         .routes(routes!(attach_component))
         .routes(routes!(detach_component))
 }

@@ -16,12 +16,17 @@ SerialUnit _$SerialUnitFromJson(Map<String, dynamic> json) => SerialUnit(
   serialNumber: json['serial_number'] as String,
   status: json['status'] as String,
   updatedAt: DateTime.parse(json['updated_at'] as String),
+  warrantyNote: json['warranty_note'] as String,
+  warrantyStatus: json['warranty_status'] as String,
   bomId: json['bom_id'] as String?,
   bomRevision: (json['bom_revision'] as num?)?.toInt(),
   customerId: json['customer_id'] as String?,
   customerName: json['customer_name'] as String?,
   parentId: json['parent_id'] as String?,
   parentSerialNumber: json['parent_serial_number'] as String?,
+  warrantyUntil: json['warranty_until'] == null
+      ? null
+      : DateTime.parse(json['warranty_until'] as String),
 );
 
 Map<String, dynamic> _$SerialUnitToJson(SerialUnit instance) =>
@@ -41,4 +46,7 @@ Map<String, dynamic> _$SerialUnitToJson(SerialUnit instance) =>
       'serial_number': instance.serialNumber,
       'status': instance.status,
       'updated_at': instance.updatedAt.toIso8601String(),
+      'warranty_note': instance.warrantyNote,
+      'warranty_status': instance.warrantyStatus,
+      'warranty_until': ?instance.warrantyUntil?.toIso8601String(),
     };

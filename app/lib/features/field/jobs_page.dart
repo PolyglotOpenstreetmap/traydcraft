@@ -55,6 +55,11 @@ class _JobsPageState extends ConsumerState<JobsPage> {
         automaticallyImplyLeading: false,
         title: Text(planner ? l.jobs : l.myJobs),
         actions: [
+          TextButton.icon(
+            icon: const Icon(Icons.event_repeat),
+            label: Text(l.contracts),
+            onPressed: () => context.push('/jobs/contracts'),
+          ),
           if (planner)
             Padding(
               padding: const EdgeInsets.only(right: 8),

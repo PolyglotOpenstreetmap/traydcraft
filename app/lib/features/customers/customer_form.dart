@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/api.dart';
 import '../../shared/format.dart';
@@ -284,6 +285,18 @@ class _CustomerFormState extends ConsumerState<CustomerForm> {
             icon: const Icon(Icons.people_outline),
             label: Text(context.l10n.contacts),
             onPressed: () => showContactsDialog(context, c!),
+          ),
+        if (c != null &&
+            (ref.read(meProvider).value?.permissions.contains('field.read') ??
+                false))
+          TextButton.icon(
+            icon: const Icon(Icons.precision_manufacturing_outlined),
+            label: Text(context.l10n.customerEquipment),
+            onPressed: () {
+              final router = GoRouter.of(context);
+              Navigator.pop(context);
+              router.push('/jobs/equipment/${c!.id}');
+            },
           ),
         if (c != null)
           TextButton.icon(

@@ -7,7 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../app/api.dart';
 import '../../l10n/l10n.dart';
 import '../../shared/actions.dart';
+import '../../shared/format.dart' show date;
 import '../../shared/photos.dart';
+import 'job_extras.dart';
 import 'job_form.dart';
 import 'jobs_page.dart' show whenText;
 import 'work_log_dialog.dart';
@@ -144,6 +146,14 @@ class _JobScreenState extends ConsumerState<JobScreen> {
             '${j.customerName} · ${l.jobKind(j.kind)} · ${whenText(j, l)}',
             style: theme.textTheme.bodyMedium,
           ),
+          if (j.contractNumber != null)
+            Text(
+              [
+                l.contractLabel(j.contractNumber!),
+                if (j.dueDate != null) l.dueOnDate(date(j.dueDate)),
+              ].join(' · '),
+              style: theme.textTheme.bodySmall,
+            ),
           const SizedBox(height: 12),
           // Where to go
           Card(
@@ -338,6 +348,13 @@ class _JobScreenState extends ConsumerState<JobScreen> {
                 '${w.userName} · ${_stamp.format(w.startedAt.toLocal())}',
               ),
             ),
+          const Divider(height: 32),
+          JobExtras(
+            detail: d,
+            canWork: canWork,
+            planner: planner,
+            onChanged: (x) => setState(() => _d = x),
+          ),
           const Divider(height: 32),
           PhotoGallery(
             photos: [

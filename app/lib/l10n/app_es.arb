@@ -9,9 +9,11 @@
   "activeSince": "Activa desde el {date}. Los cambios se hacen con una nueva revisión.",
   "addComponent": "Añadir componente",
   "addComponentBySerial": "Añadir componente por número de serie (en stock)",
+  "addEquipment": "Añadir equipo",
   "addMember": "Añadir miembro",
   "addNote": "Añadir nota",
   "addNoteHint": "Añadir una nota interna",
+  "addPart": "Añadir pieza",
   "addPhone": "Añadir teléfono",
   "addPhoto": "Añadir foto",
   "addProduct": "Añadir producto",
@@ -22,6 +24,7 @@
   "addressForm": "Forma de trato",
   "addressFormal": "Formal (usted)",
   "addressInformal": "Informal (tú)",
+  "addVisit": "Añadir visita",
   "agreed": "Acordado",
   "all": "Todos",
   "allProducts": "Todos los productos",
@@ -41,6 +44,7 @@
   "attachments": "Archivos adjuntos",
   "attachmentsHelp": "Imágenes (JPEG, PNG, WebP) y PDF, hasta 12 MB",
   "automatic": "Automático",
+  "autoRenew": "Renovar automáticamente",
   "backIntoWork": "Volver a trabajar",
   "backToCurrentRevision": "Volver a la revisión actual",
   "billOfMaterials": "Lista de materiales",
@@ -69,6 +73,7 @@
   "cancelledReason": "Cancelado: {reason}",
   "cannotConfirmNewer": "Se está preparando una revisión más reciente de este pedido. Podrá confirmarla cuando se le haya enviado.",
   "cannotConfirmOther": "Este pedido no se puede confirmar.",
+  "captureSignature": "Capturar firma",
   "category": "Categoría",
   "categoryComplaint": "reclamación",
   "categoryLead": "prospecto (nueva solicitud)",
@@ -81,11 +86,13 @@
   "cc": "CC",
   "change": "Cambio",
   "changePriority": "Cambiar prioridad",
+  "checklistOnePerLine": "Lista de comprobación (una tarea por línea)",
   "chooseCustomerAndLine": "Elija un cliente y añada al menos una línea válida.",
   "choosePhoto": "Elegir de la galería",
   "chooseRebateTarget": "Elija un producto o familia e indique un porcentaje.",
   "chooseZonePrice": "Elija una zona e indique un precio.",
   "city": "Ciudad",
+  "clear": "Borrar",
   "close": "Cerrar",
   "code": "Código",
   "codeNameVatRequired": "El código, el nombre y el tipo de IVA son obligatorios.",
@@ -111,6 +118,26 @@
   "contactName": "Nombre del contacto",
   "contactPerson": "Persona de contacto",
   "contacts": "Contactos",
+  "contractEnded": "Finalizado",
+  "contractJobs": "Intervenciones de este contrato",
+  "contractLabel": "Contrato {number}",
+  "@contractLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "contractOpenJobs": "{count} intervenciones abiertas",
+  "@contractOpenJobs": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "contracts": "Contratos",
+  "contractSuspended": "Suspendido",
   "convertHelp": "¿El cliente quiere cambios? Cree primero una nueva revisión del presupuesto, vincúlela aquí y luego conviértala.",
   "convertToOrder": "Convertir en pedido",
   "countOf": "{count} de {total}",
@@ -130,13 +157,24 @@
   "csatTitle": "Satisfacción del cliente",
   "current": "Actual",
   "customer": "Cliente",
+  "customerDeclinedToSign": "El cliente se negó a firmar",
+  "customerEquipment": "Equipos del cliente",
   "customerLanguage": "Idioma del cliente",
   "customerMainNumber": "Número principal de {name}",
   "customerNamed": "Cliente: {name}",
   "customerOptional": "Cliente (opcional)",
   "customerReference": "Referencia del cliente",
   "customers": "Clientes",
+  "customerSignature": "Firma del cliente",
   "date": "Fecha",
+  "declinedToSignWithReason": "Se negó a firmar: {reason}",
+  "@declinedToSignWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "defaultTeam": "Equipo predeterminado para tickets nuevos",
   "deliveryFailed": "no enviado",
   "deliveryQueued": "pendiente de envío",
@@ -154,14 +192,27 @@
   "dismiss": "Rechazar",
   "dismissRequest": "Rechazar solicitud",
   "draftSaved": "Borrador guardado",
+  "drawSignatureFirst": "Dibuje primero una firma",
+  "dueOnDate": "Para el {date}",
+  "@dueOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "edit": "Editar",
   "editContact": "Editar contacto",
   "editDepartment": "Editar departamento",
   "editJob": "Editar trabajo",
   "email": "Correo electrónico",
   "emailAddresses": "Direcciones de correo (la primera es la principal)",
+  "endContract": "Finalizar contrato",
+  "endDate": "Fecha de fin",
   "enterChange": "Indique el cambio, p. ej. 4,5 para +4,5 %.",
   "enterValidNumbersLine": "Línea {line}: indique números válidos.",
+  "equipment": "Equipo",
+  "estimatedMinutes": "Minutos estimados",
   "expectedClose": "Cierre previsto",
   "expectedCloseDate": "Cierre previsto el {date}",
   "expectedValue": "Valor esperado",
@@ -172,6 +223,7 @@
   "family": "Familia",
   "familyNamed": "Familia {code}",
   "faultDescription": "Qué falla",
+  "firstDueDate": "Primer vencimiento",
   "firstName": "Nombre",
   "firstResponseMinutes": "Primera respuesta (min)",
   "from": "Desde",
@@ -192,8 +244,25 @@
   "internalQuestionHelp": "Pregunta interna. Pregunte al cliente en {language} con una respuesta y después anote la respuesta para su compañero como nota interna.",
   "internalTicket": "Ticket interno",
   "internalTicketHelp": "Una pregunta entre compañeros; no se envía nada al cliente.",
+  "interval": "Intervalo",
   "jobCancelled": "Cancelado",
   "jobCompleted": "Completado",
+  "jobCount": "{count} intervenciones",
+  "@jobCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "jobCreatedOnDate": "intervención creada el {date}",
+  "@jobCreatedOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "jobInProgress": "En curso",
   "jobKindInspection": "Inspección",
   "jobKindInstallation": "Instalación",
@@ -209,6 +278,7 @@
   "languageSameAsCustomer": "Igual que la empresa ({language})",
   "lastName": "Apellidos",
   "leadCreated": "Oportunidad creada",
+  "leadDays": "Crear la intervención (días antes)",
   "lineDiscount": "Dto. línea",
   "listPrice": "Precio de tarifa",
   "loadMore": "Cargar más",
@@ -237,6 +307,7 @@
   "messageSent": "Mensaje enviado",
   "minutes": "Minutos",
   "minutesShort": "{minutes} min",
+  "months": "Meses",
   "myJobs": "Mis trabajos",
   "myOrders": "Mis pedidos",
   "myProfile": "Mis datos",
@@ -247,6 +318,7 @@
   "netPrice": "Precio neto",
   "newAnswer": "Nueva respuesta",
   "newContact": "Nuevo contacto",
+  "newContract": "Nuevo contrato",
   "newCustomer": "Nuevo cliente",
   "newDepartment": "Nuevo departamento",
   "newFamily": "Nueva familia",
@@ -269,11 +341,15 @@
   "noBom": "Aún no hay lista de materiales.",
   "noContactLinked": "Ninguna persona de contacto vinculada",
   "noContacts": "Aún no hay contactos.",
+  "noContracts": "Sin contratos",
+  "noCustomerEquipment": "Este cliente no tiene equipos instalados",
   "noCustomerLinked": "Ningún cliente vinculado",
+  "noEquipment": "Ningún equipo vinculado",
   "noExpectedClose": "Sin fecha de cierre prevista",
   "noJobsAssigned": "No tiene trabajos asignados.",
   "noLines": "Aún no hay líneas.",
   "noOrdersYet": "Aún no tiene pedidos.",
+  "noParts": "Ninguna pieza registrada",
   "noPermission": "No tiene permiso para cambiar estos ajustes.",
   "noPhotos": "Aún no hay fotos.",
   "noPrices": "Aún no hay precios.",
@@ -284,6 +360,7 @@
   "noRepairs": "Sin reparaciones.",
   "noRepairsYet": "Aún no tiene reparaciones.",
   "noSerialComponents": "Sin componentes con número de serie.",
+  "noSignature": "Aún sin firmar",
   "noTeam": "Sin equipo",
   "noTechnicians": "Nadie asignado",
   "noTicketsYet": "Aún no tiene tickets.",
@@ -296,6 +373,7 @@
   "noteAdded": "Nota añadida",
   "noteOptional": "Observación (opcional)",
   "notes": "Observaciones",
+  "noUpcomingVisits": "Sin visitas previstas",
   "number": "Número",
   "numberRequired": "Número",
   "obsoleteRevision": "Revisión obsoleta (solo lectura).",
@@ -325,6 +403,8 @@
   "orderStatusReadyForShipping": "listo para el envío",
   "orders": "Pedidos",
   "owner": "Responsable",
+  "partFreeTextHint": "Elija un producto o escriba una descripción",
+  "partsUsed": "Piezas utilizadas",
   "paymentDays": "Plazo de pago (días)",
   "pdf": "PDF",
   "personTitle": "Tratamiento",
@@ -409,6 +489,9 @@
   "rebateSourceGeneral": "general",
   "rebateSourceProduct": "producto",
   "rebatesOf": "Descuentos · {customer}",
+  "recurrenceMonthList": "En los meses elegidos",
+  "recurrenceMonths": "Cada N meses",
+  "recurrenceWeeks": "Cada N semanas",
   "registerProduct": "Registrar {product}",
   "registerUnit": "Registrar unidad",
   "registered": "Registrado",
@@ -436,8 +519,23 @@
   "repairStatusWaitingCustomer": "Esperando al cliente",
   "repairStatusWaitingParts": "Esperando piezas",
   "repairs": "Reparaciones",
+  "replaceSignature": "Sustituir firma",
   "replyQueued": "Respuesta en cola de envío",
   "replyToCustomer": "Responder al cliente",
+  "reportQueued": "El informe se enviará",
+  "reportSend": "Enviar informe por correo",
+  "reportSentTo": "Enviado a {to} el {date}",
+  "@reportSentTo": {
+    "placeholders": {
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reportView": "Ver informe (PDF)",
   "repricingFailed": "No se han podido calcular los precios de hoy: {error}",
   "requestDismissedSnack": "Solicitud rechazada.",
   "requestLessUrgent": "Menos urgente",
@@ -447,7 +545,9 @@
   "requestStatusDismissed": "rechazada",
   "requestStatusOpen": "abierta",
   "required": "Obligatorio",
+  "resolutionHours": "Resolución en (horas)",
   "resolutionMinutes": "Resolución (min)",
+  "responseHours": "Respuesta en (horas)",
   "retry": "Reintentar",
   "revisionActivated": "Revisión activada",
   "revisionItem": "Revisión {revision} · {status} · {lines} líneas",
@@ -492,7 +592,22 @@
   "serialNumbersHelp": "Cada unidad tiene su propio número de serie e historial",
   "serialScrapped": "desechado",
   "server": "Servidor",
+  "serviceReport": "Informe de servicio",
+  "setWarranty": "Definir garantía",
   "showInactive": "Mostrar inactivos",
+  "signedByOn": "Firmado por {name} el {date}",
+  "@signedByOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "signerName": "Nombre del firmante",
+  "signHere": "Firme aquí",
   "signIn": "Iniciar sesión",
   "signOut": "Cerrar sesión",
   "signedInAs": "Conectado como {name}",
@@ -523,6 +638,7 @@
   "stageProposal": "propuesta",
   "stageQualified": "cualificada",
   "stageWon": "ganada",
+  "startDate": "Fecha de inicio",
   "startJob": "Empezar trabajo",
   "startWork": "Empezar el trabajo",
   "status": "Estado",
@@ -539,6 +655,7 @@
   "subject": "Asunto",
   "subjectOptional": "Asunto (opcional)",
   "suggested": "Sugerencia: {value}",
+  "suspendContract": "Suspender",
   "tags": "Etiquetas",
   "takePhoto": "Hacer una foto",
   "tasks": "Tareas",
@@ -586,6 +703,7 @@
   "unitPriceExclVat": "Precio unitario (sin IVA)",
   "unknownCaller": "Llamante desconocido",
   "until": "Hasta",
+  "upcomingVisits": "Próximas visitas",
   "updateToCurrentPrices": "Actualizar a precios actuales",
   "updated": "Actualizado",
   "uploadingFile": "Subiendo…",
@@ -600,10 +718,22 @@
   "vatOn": "IVA {rate} % sobre {base}",
   "vatPercent": "IVA %",
   "viaPortal": "A través del portal de clientes",
+  "visitTemplates": "Visitas",
+  "visitTitleRequired": "Cada visita necesita un título",
   "warranty": "Garantía",
+  "warrantyExpired": "Garantía vencida",
   "warrantyIn": "En garantía",
   "warrantyOut": "Fuera de garantía",
   "warrantyUnknown": "Desconocida",
+  "warrantyUntilDate": "hasta {date}",
+  "@warrantyUntilDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "warrantyUntilLabel": "Garantía hasta",
   "weighted": "ponderado {amount}",
   "whatWasAsked": "¿Qué se ha preguntado?",
   "whoIsCalling": "¿Quién llama?",

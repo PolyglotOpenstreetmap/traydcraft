@@ -16,6 +16,7 @@ import '../models/serial_input.dart';
 import '../models/serial_status_input.dart';
 import '../models/serial_unit_detail.dart';
 import '../models/serial_unit_page.dart';
+import '../models/warranty_input.dart';
 
 part 'engineering_client.g.dart';
 
@@ -106,5 +107,12 @@ abstract class EngineeringClient {
   Future<SerialUnitDetail> setStatus({
     @Path('id') required String id,
     @Body() required SerialStatusInput body,
+  });
+
+  /// Sets the warranty of a unit: until when, and a note (terms, contract).
+  @PUT('/api/v1/serials/{id}/warranty')
+  Future<SerialUnitDetail> setWarranty({
+    @Path('id') required String id,
+    @Body() required WarrantyInput body,
   });
 }

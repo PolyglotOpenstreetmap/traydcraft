@@ -158,6 +158,12 @@ abstract class AppLocalizations {
   /// **'Add component by serial number (in stock)'**
   String get addComponentBySerial;
 
+  /// No description provided for @addEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add equipment'**
+  String get addEquipment;
+
   /// No description provided for @addMember.
   ///
   /// In en, this message translates to:
@@ -175,6 +181,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add an internal note'**
   String get addNoteHint;
+
+  /// No description provided for @addPart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add part'**
+  String get addPart;
 
   /// No description provided for @addPhone.
   ///
@@ -235,6 +247,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Informal (Hi Sam)'**
   String get addressInformal;
+
+  /// No description provided for @addVisit.
+  ///
+  /// In en, this message translates to:
+  /// **'Add visit'**
+  String get addVisit;
 
   /// No description provided for @agreed.
   ///
@@ -349,6 +367,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Automatic'**
   String get automatic;
+
+  /// No description provided for @autoRenew.
+  ///
+  /// In en, this message translates to:
+  /// **'Renew automatically'**
+  String get autoRenew;
 
   /// No description provided for @backIntoWork.
   ///
@@ -518,6 +542,12 @@ abstract class AppLocalizations {
   /// **'This order cannot be confirmed.'**
   String get cannotConfirmOther;
 
+  /// No description provided for @captureSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture signature'**
+  String get captureSignature;
+
   /// No description provided for @category.
   ///
   /// In en, this message translates to:
@@ -590,6 +620,12 @@ abstract class AppLocalizations {
   /// **'Change priority'**
   String get changePriority;
 
+  /// No description provided for @checklistOnePerLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist (one task per line)'**
+  String get checklistOnePerLine;
+
   /// No description provided for @chooseCustomerAndLine.
   ///
   /// In en, this message translates to:
@@ -619,6 +655,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'City'**
   String get city;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
 
   /// No description provided for @close.
   ///
@@ -770,6 +812,42 @@ abstract class AppLocalizations {
   /// **'Contacts'**
   String get contacts;
 
+  /// No description provided for @contractEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get contractEnded;
+
+  /// No description provided for @contractJobs.
+  ///
+  /// In en, this message translates to:
+  /// **'Jobs of this contract'**
+  String get contractJobs;
+
+  /// No description provided for @contractLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Contract {number}'**
+  String contractLabel(String number);
+
+  /// No description provided for @contractOpenJobs.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} open jobs'**
+  String contractOpenJobs(String count);
+
+  /// No description provided for @contracts.
+  ///
+  /// In en, this message translates to:
+  /// **'Contracts'**
+  String get contracts;
+
+  /// No description provided for @contractSuspended.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspended'**
+  String get contractSuspended;
+
   /// No description provided for @convertHelp.
   ///
   /// In en, this message translates to:
@@ -884,6 +962,18 @@ abstract class AppLocalizations {
   /// **'Customer'**
   String get customer;
 
+  /// No description provided for @customerDeclinedToSign.
+  ///
+  /// In en, this message translates to:
+  /// **'The customer declined to sign'**
+  String get customerDeclinedToSign;
+
+  /// No description provided for @customerEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer equipment'**
+  String get customerEquipment;
+
   /// No description provided for @customerLanguage.
   ///
   /// In en, this message translates to:
@@ -920,11 +1010,23 @@ abstract class AppLocalizations {
   /// **'Customers'**
   String get customers;
 
+  /// No description provided for @customerSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer signature'**
+  String get customerSignature;
+
   /// No description provided for @date.
   ///
   /// In en, this message translates to:
   /// **'Date'**
   String get date;
+
+  /// No description provided for @declinedToSignWithReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined to sign: {reason}'**
+  String declinedToSignWithReason(String reason);
 
   /// No description provided for @defaultTeam.
   ///
@@ -1028,6 +1130,18 @@ abstract class AppLocalizations {
   /// **'Draft saved'**
   String get draftSaved;
 
+  /// No description provided for @drawSignatureFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw a signature first'**
+  String get drawSignatureFirst;
+
+  /// No description provided for @dueOnDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String dueOnDate(String date);
+
   /// No description provided for @edit.
   ///
   /// In en, this message translates to:
@@ -1064,6 +1178,18 @@ abstract class AppLocalizations {
   /// **'E-mail addresses (the first is primary)'**
   String get emailAddresses;
 
+  /// No description provided for @endContract.
+  ///
+  /// In en, this message translates to:
+  /// **'End contract'**
+  String get endContract;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get endDate;
+
   /// No description provided for @enterChange.
   ///
   /// In en, this message translates to:
@@ -1075,6 +1201,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Line {line}: enter valid numbers.'**
   String enterValidNumbersLine(int line);
+
+  /// No description provided for @equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get equipment;
+
+  /// No description provided for @estimatedMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated minutes'**
+  String get estimatedMinutes;
 
   /// No description provided for @expectedClose.
   ///
@@ -1135,6 +1273,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'What is wrong'**
   String get faultDescription;
+
+  /// No description provided for @firstDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'First due date'**
+  String get firstDueDate;
 
   /// No description provided for @firstName.
   ///
@@ -1256,6 +1400,12 @@ abstract class AppLocalizations {
   /// **'A question between colleagues; nothing is sent to the customer.'**
   String get internalTicketHelp;
 
+  /// No description provided for @interval.
+  ///
+  /// In en, this message translates to:
+  /// **'Interval'**
+  String get interval;
+
   /// No description provided for @jobCancelled.
   ///
   /// In en, this message translates to:
@@ -1267,6 +1417,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completed'**
   String get jobCompleted;
+
+  /// No description provided for @jobCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} jobs'**
+  String jobCount(String count);
+
+  /// No description provided for @jobCreatedOnDate.
+  ///
+  /// In en, this message translates to:
+  /// **'job created on {date}'**
+  String jobCreatedOnDate(String date);
 
   /// No description provided for @jobInProgress.
   ///
@@ -1357,6 +1519,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lead created'**
   String get leadCreated;
+
+  /// No description provided for @leadDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Create the job (days before)'**
+  String get leadDays;
 
   /// No description provided for @lineDiscount.
   ///
@@ -1526,6 +1694,12 @@ abstract class AppLocalizations {
   /// **'{minutes} min'**
   String minutesShort(String minutes);
 
+  /// No description provided for @months.
+  ///
+  /// In en, this message translates to:
+  /// **'Months'**
+  String get months;
+
   /// No description provided for @myJobs.
   ///
   /// In en, this message translates to:
@@ -1585,6 +1759,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New contact'**
   String get newContact;
+
+  /// No description provided for @newContract.
+  ///
+  /// In en, this message translates to:
+  /// **'New contract'**
+  String get newContract;
 
   /// No description provided for @newCustomer.
   ///
@@ -1718,11 +1898,29 @@ abstract class AppLocalizations {
   /// **'No contacts yet.'**
   String get noContacts;
 
+  /// No description provided for @noContracts.
+  ///
+  /// In en, this message translates to:
+  /// **'No contracts'**
+  String get noContracts;
+
+  /// No description provided for @noCustomerEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'This customer has no installed units'**
+  String get noCustomerEquipment;
+
   /// No description provided for @noCustomerLinked.
   ///
   /// In en, this message translates to:
   /// **'No customer linked'**
   String get noCustomerLinked;
+
+  /// No description provided for @noEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment linked'**
+  String get noEquipment;
 
   /// No description provided for @noExpectedClose.
   ///
@@ -1747,6 +1945,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have no orders yet.'**
   String get noOrdersYet;
+
+  /// No description provided for @noParts.
+  ///
+  /// In en, this message translates to:
+  /// **'No parts recorded'**
+  String get noParts;
 
   /// No description provided for @noPermission.
   ///
@@ -1807,6 +2011,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No serialised components.'**
   String get noSerialComponents;
+
+  /// No description provided for @noSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Not signed yet'**
+  String get noSignature;
 
   /// No description provided for @noTeam.
   ///
@@ -1879,6 +2089,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notes'**
   String get notes;
+
+  /// No description provided for @noUpcomingVisits.
+  ///
+  /// In en, this message translates to:
+  /// **'No visits due'**
+  String get noUpcomingVisits;
 
   /// No description provided for @number.
   ///
@@ -2053,6 +2269,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Owner'**
   String get owner;
+
+  /// No description provided for @partFreeTextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a product or type a description'**
+  String get partFreeTextHint;
+
+  /// No description provided for @partsUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Parts used'**
+  String get partsUsed;
 
   /// No description provided for @paymentDays.
   ///
@@ -2558,6 +2786,24 @@ abstract class AppLocalizations {
   /// **'Rebates · {customer}'**
   String rebatesOf(String customer);
 
+  /// No description provided for @recurrenceMonthList.
+  ///
+  /// In en, this message translates to:
+  /// **'In chosen months'**
+  String get recurrenceMonthList;
+
+  /// No description provided for @recurrenceMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Every N months'**
+  String get recurrenceMonths;
+
+  /// No description provided for @recurrenceWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Every N weeks'**
+  String get recurrenceWeeks;
+
   /// No description provided for @registerProduct.
   ///
   /// In en, this message translates to:
@@ -2720,6 +2966,12 @@ abstract class AppLocalizations {
   /// **'Repairs'**
   String get repairs;
 
+  /// No description provided for @replaceSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace signature'**
+  String get replaceSignature;
+
   /// No description provided for @replyQueued.
   ///
   /// In en, this message translates to:
@@ -2731,6 +2983,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reply to customer'**
   String get replyToCustomer;
+
+  /// No description provided for @reportQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'The report will be sent'**
+  String get reportQueued;
+
+  /// No description provided for @reportSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send report by e-mail'**
+  String get reportSend;
+
+  /// No description provided for @reportSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent to {to} on {date}'**
+  String reportSentTo(String to, String date);
+
+  /// No description provided for @reportView.
+  ///
+  /// In en, this message translates to:
+  /// **'View report (PDF)'**
+  String get reportView;
 
   /// No description provided for @repricingFailed.
   ///
@@ -2786,11 +3062,23 @@ abstract class AppLocalizations {
   /// **'Required'**
   String get required;
 
+  /// No description provided for @resolutionHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution within (hours)'**
+  String get resolutionHours;
+
   /// No description provided for @resolutionMinutes.
   ///
   /// In en, this message translates to:
   /// **'Resolution (min)'**
   String get resolutionMinutes;
+
+  /// No description provided for @responseHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Response within (hours)'**
+  String get responseHours;
 
   /// No description provided for @retry.
   ///
@@ -3056,11 +3344,41 @@ abstract class AppLocalizations {
   /// **'Server'**
   String get server;
 
+  /// No description provided for @serviceReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Service report'**
+  String get serviceReport;
+
+  /// No description provided for @setWarranty.
+  ///
+  /// In en, this message translates to:
+  /// **'Set warranty'**
+  String get setWarranty;
+
   /// No description provided for @showInactive.
   ///
   /// In en, this message translates to:
   /// **'Show inactive'**
   String get showInactive;
+
+  /// No description provided for @signedByOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed by {name} on {date}'**
+  String signedByOn(String name, String date);
+
+  /// No description provided for @signerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name of the signer'**
+  String get signerName;
+
+  /// No description provided for @signHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign here'**
+  String get signHere;
 
   /// No description provided for @signIn.
   ///
@@ -3242,6 +3560,12 @@ abstract class AppLocalizations {
   /// **'won'**
   String get stageWon;
 
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get startDate;
+
   /// No description provided for @startJob.
   ///
   /// In en, this message translates to:
@@ -3337,6 +3661,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested: {value}'**
   String suggested(String value);
+
+  /// No description provided for @suspendContract.
+  ///
+  /// In en, this message translates to:
+  /// **'Suspend'**
+  String get suspendContract;
 
   /// No description provided for @tags.
   ///
@@ -3620,6 +3950,12 @@ abstract class AppLocalizations {
   /// **'Until'**
   String get until;
 
+  /// No description provided for @upcomingVisits.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming visits'**
+  String get upcomingVisits;
+
   /// No description provided for @updateToCurrentPrices.
   ///
   /// In en, this message translates to:
@@ -3704,11 +4040,29 @@ abstract class AppLocalizations {
   /// **'Via the customer portal'**
   String get viaPortal;
 
+  /// No description provided for @visitTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Visits'**
+  String get visitTemplates;
+
+  /// No description provided for @visitTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Every visit needs a title'**
+  String get visitTitleRequired;
+
   /// No description provided for @warranty.
   ///
   /// In en, this message translates to:
   /// **'Warranty'**
   String get warranty;
+
+  /// No description provided for @warrantyExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty expired'**
+  String get warrantyExpired;
 
   /// No description provided for @warrantyIn.
   ///
@@ -3727,6 +4081,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown'**
   String get warrantyUnknown;
+
+  /// No description provided for @warrantyUntilDate.
+  ///
+  /// In en, this message translates to:
+  /// **'until {date}'**
+  String warrantyUntilDate(String date);
+
+  /// No description provided for @warrantyUntilLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Warranty until'**
+  String get warrantyUntilLabel;
 
   /// No description provided for @weighted.
   ///

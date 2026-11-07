@@ -9,9 +9,11 @@
   "activeSince": "Actief sinds {date}. Wijzigingen gebeuren via een nieuwe revisie.",
   "addComponent": "Component toevoegen",
   "addComponentBySerial": "Component toevoegen op serienummer (in stock)",
+  "addEquipment": "Installatie toevoegen",
   "addMember": "Lid toevoegen",
   "addNote": "Notitie toevoegen",
   "addNoteHint": "Interne opmerking toevoegen",
+  "addPart": "Onderdeel toevoegen",
   "addPhone": "Telefoonnummer toevoegen",
   "addPhoto": "Foto toevoegen",
   "addProduct": "Product toevoegen",
@@ -22,6 +24,7 @@
   "addressForm": "Aanspreekvorm",
   "addressFormal": "Formeel (u)",
   "addressInformal": "Informeel (je)",
+  "addVisit": "Bezoek toevoegen",
   "agreed": "Afgesproken",
   "all": "Alle",
   "allProducts": "Alle producten",
@@ -41,6 +44,7 @@
   "attachments": "Bijlagen",
   "attachmentsHelp": "Afbeeldingen (JPEG, PNG, WebP) en PDF, tot 12 MB",
   "automatic": "Automatisch",
+  "autoRenew": "Automatisch verlengen",
   "backIntoWork": "Terug in behandeling",
   "backToCurrentRevision": "Terug naar de huidige revisie",
   "billOfMaterials": "Stuklijst",
@@ -69,6 +73,7 @@
   "cancelledReason": "Geannuleerd: {reason}",
   "cannotConfirmNewer": "Er wordt een nieuwere revisie van deze order voorbereid. U kunt ze bevestigen zodra ze naar u is verstuurd.",
   "cannotConfirmOther": "Deze order kan niet worden bevestigd.",
+  "captureSignature": "Handtekening vastleggen",
   "category": "Categorie",
   "categoryComplaint": "klacht",
   "categoryLead": "lead (nieuwe vraag)",
@@ -81,11 +86,13 @@
   "cc": "Cc",
   "change": "Wijziging",
   "changePriority": "Prioriteit wijzigen",
+  "checklistOnePerLine": "Checklist (één taak per regel)",
   "chooseCustomerAndLine": "Kies een klant en voeg minstens één geldige lijn toe.",
   "choosePhoto": "Kies uit galerij",
   "chooseRebateTarget": "Kies een product of familie en geef een percentage in.",
   "chooseZonePrice": "Kies een zone en geef een prijs in.",
   "city": "Gemeente",
+  "clear": "Wissen",
   "close": "Sluiten",
   "code": "Code",
   "codeNameVatRequired": "Code, naam en btw-tarief zijn verplicht.",
@@ -111,6 +118,26 @@
   "contactName": "Naam contactpersoon",
   "contactPerson": "Contactpersoon",
   "contacts": "Contactpersonen",
+  "contractEnded": "Beëindigd",
+  "contractJobs": "Opdrachten van dit contract",
+  "contractLabel": "Contract {number}",
+  "@contractLabel": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "contractOpenJobs": "{count} open opdrachten",
+  "@contractOpenJobs": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "contracts": "Contracten",
+  "contractSuspended": "Opgeschort",
   "convertHelp": "Wil de klant nog iets wijzigen? Maak eerst een nieuwe revisie van de offerte, koppel die hier en zet ze dan om.",
   "convertToOrder": "Omzetten naar order",
   "countOf": "{count} van {total}",
@@ -130,13 +157,24 @@
   "csatTitle": "Klanttevredenheid",
   "current": "Huidig",
   "customer": "Klant",
+  "customerDeclinedToSign": "De klant weigerde te tekenen",
+  "customerEquipment": "Installaties van de klant",
   "customerLanguage": "Taal klant",
   "customerMainNumber": "Hoofdnummer van {name}",
   "customerNamed": "Klant: {name}",
   "customerOptional": "Klant (optioneel)",
   "customerReference": "Referentie klant",
   "customers": "Klanten",
+  "customerSignature": "Handtekening klant",
   "date": "Datum",
+  "declinedToSignWithReason": "Weigerde te tekenen: {reason}",
+  "@declinedToSignWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "defaultTeam": "Standaardteam voor nieuwe tickets",
   "deliveryFailed": "niet verzonden",
   "deliveryQueued": "wacht op verzending",
@@ -154,14 +192,27 @@
   "dismiss": "Afwijzen",
   "dismissRequest": "Aanvraag afwijzen",
   "draftSaved": "Concept opgeslagen",
+  "drawSignatureFirst": "Teken eerst een handtekening",
+  "dueOnDate": "Uit te voeren op {date}",
+  "@dueOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "edit": "Bewerken",
   "editContact": "Contactpersoon bewerken",
   "editDepartment": "Afdeling bewerken",
   "editJob": "Opdracht bewerken",
   "email": "E-mail",
   "emailAddresses": "E-mailadressen (het eerste is het hoofdadres)",
+  "endContract": "Contract beëindigen",
+  "endDate": "Einddatum",
   "enterChange": "Geef de wijziging in, bv. 4,5 voor +4,5 %.",
   "enterValidNumbersLine": "Lijn {line}: geef geldige getallen in.",
+  "equipment": "Installatie",
+  "estimatedMinutes": "Geschatte minuten",
   "expectedClose": "Verwachte afsluiting",
   "expectedCloseDate": "Verwachte afsluiting {date}",
   "expectedValue": "Verwachte waarde",
@@ -172,6 +223,7 @@
   "family": "Familie",
   "familyNamed": "Familie {code}",
   "faultDescription": "Wat is er mis",
+  "firstDueDate": "Eerste uitvoerdatum",
   "firstName": "Voornaam",
   "firstResponseMinutes": "Eerste reactie (min)",
   "from": "Vanaf",
@@ -192,8 +244,25 @@
   "internalQuestionHelp": "Interne vraag. Stel de vraag aan de klant in het {language} via een antwoord, en zet het antwoord daarna als interne notitie voor je collega.",
   "internalTicket": "Intern ticket",
   "internalTicketHelp": "Een vraag tussen collega's; er wordt niets naar de klant gestuurd.",
+  "interval": "Interval",
   "jobCancelled": "Geannuleerd",
   "jobCompleted": "Afgewerkt",
+  "jobCount": "{count} opdrachten",
+  "@jobCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "jobCreatedOnDate": "opdracht wordt aangemaakt op {date}",
+  "@jobCreatedOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "jobInProgress": "Bezig",
   "jobKindInspection": "Inspectie",
   "jobKindInstallation": "Installatie",
@@ -209,6 +278,7 @@
   "languageSameAsCustomer": "Zelfde als het bedrijf ({language})",
   "lastName": "Achternaam",
   "leadCreated": "Lead aangemaakt",
+  "leadDays": "Opdracht aanmaken (dagen vooraf)",
   "lineDiscount": "Lijnkorting",
   "listPrice": "Lijstprijs",
   "loadMore": "Meer laden",
@@ -237,6 +307,7 @@
   "messageSent": "Bericht verzonden",
   "minutes": "Minuten",
   "minutesShort": "{minutes} min",
+  "months": "Maanden",
   "myJobs": "Mijn opdrachten",
   "myOrders": "Mijn orders",
   "myProfile": "Mijn gegevens",
@@ -247,6 +318,7 @@
   "netPrice": "Nettoprijs",
   "newAnswer": "Nieuw antwoord",
   "newContact": "Nieuwe contactpersoon",
+  "newContract": "Nieuw contract",
   "newCustomer": "Nieuwe klant",
   "newDepartment": "Nieuwe afdeling",
   "newFamily": "Nieuwe familie",
@@ -269,11 +341,15 @@
   "noBom": "Nog geen stuklijst.",
   "noContactLinked": "Geen contactpersoon gekoppeld",
   "noContacts": "Nog geen contactpersonen.",
+  "noContracts": "Geen contracten",
+  "noCustomerEquipment": "Deze klant heeft geen geïnstalleerde toestellen",
   "noCustomerLinked": "Geen klant gekoppeld",
+  "noEquipment": "Geen installatie gekoppeld",
   "noExpectedClose": "Geen verwachte afsluitdatum",
   "noJobsAssigned": "Geen opdrachten aan u toegewezen.",
   "noLines": "Nog geen lijnen.",
   "noOrdersYet": "U hebt nog geen orders.",
+  "noParts": "Geen onderdelen geregistreerd",
   "noPermission": "U hebt geen toelating om deze instellingen te wijzigen.",
   "noPhotos": "Nog geen foto's.",
   "noPrices": "Nog geen prijzen.",
@@ -284,6 +360,7 @@
   "noRepairs": "Geen herstellingen.",
   "noRepairsYet": "U hebt nog geen herstellingen.",
   "noSerialComponents": "Geen componenten met serienummer.",
+  "noSignature": "Nog niet getekend",
   "noTeam": "Geen team",
   "noTechnicians": "Niemand toegewezen",
   "noTicketsYet": "U hebt nog geen tickets.",
@@ -296,6 +373,7 @@
   "noteAdded": "Notitie toegevoegd",
   "noteOptional": "Opmerking (optioneel)",
   "notes": "Opmerkingen",
+  "noUpcomingVisits": "Geen bezoeken gepland",
   "number": "Nummer",
   "numberRequired": "Getal",
   "obsoleteRevision": "Vervallen revisie (alleen lezen).",
@@ -325,6 +403,8 @@
   "orderStatusReadyForShipping": "klaar voor verzending",
   "orders": "Orders",
   "owner": "Verantwoordelijke",
+  "partFreeTextHint": "Kies een product of typ een omschrijving",
+  "partsUsed": "Gebruikte onderdelen",
   "paymentDays": "Betalingstermijn (dagen)",
   "pdf": "PDF",
   "personTitle": "Aanspreektitel",
@@ -409,6 +489,9 @@
   "rebateSourceGeneral": "algemeen",
   "rebateSourceProduct": "product",
   "rebatesOf": "Kortingen · {customer}",
+  "recurrenceMonthList": "In gekozen maanden",
+  "recurrenceMonths": "Om de N maanden",
+  "recurrenceWeeks": "Om de N weken",
   "registerProduct": "{product} registreren",
   "registerUnit": "Exemplaar registreren",
   "registered": "Geregistreerd",
@@ -436,8 +519,23 @@
   "repairStatusWaitingCustomer": "Wacht op klant",
   "repairStatusWaitingParts": "Wacht op onderdelen",
   "repairs": "Herstellingen",
+  "replaceSignature": "Handtekening vervangen",
   "replyQueued": "Antwoord klaar voor verzending",
   "replyToCustomer": "Antwoord aan klant",
+  "reportQueued": "De werkbon wordt verstuurd",
+  "reportSend": "Werkbon per e-mail versturen",
+  "reportSentTo": "Verstuurd naar {to} op {date}",
+  "@reportSentTo": {
+    "placeholders": {
+      "to": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reportView": "Werkbon bekijken (PDF)",
   "repricingFailed": "De prijzen van vandaag konden niet berekend worden: {error}",
   "requestDismissedSnack": "Aanvraag afgewezen.",
   "requestLessUrgent": "Minder dringend",
@@ -447,7 +545,9 @@
   "requestStatusDismissed": "afgewezen",
   "requestStatusOpen": "open",
   "required": "Verplicht",
+  "resolutionHours": "Oplossing binnen (uren)",
   "resolutionMinutes": "Oplossing (min)",
+  "responseHours": "Reactie binnen (uren)",
   "retry": "Opnieuw",
   "revisionActivated": "Revisie geactiveerd",
   "revisionItem": "Revisie {revision} · {status} · {lines} lijnen",
@@ -492,7 +592,22 @@
   "serialNumbersHelp": "Elk exemplaar krijgt een eigen serienummer en historiek",
   "serialScrapped": "afgedankt",
   "server": "Server",
+  "serviceReport": "Werkbon",
+  "setWarranty": "Garantie instellen",
   "showInactive": "Toon inactieve",
+  "signedByOn": "Getekend door {name} op {date}",
+  "@signedByOn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "signerName": "Naam van de ondertekenaar",
+  "signHere": "Teken hier",
   "signIn": "Aanmelden",
   "signOut": "Afmelden",
   "signedInAs": "Aangemeld als {name}",
@@ -523,6 +638,7 @@
   "stageProposal": "voorstel",
   "stageQualified": "gekwalificeerd",
   "stageWon": "gewonnen",
+  "startDate": "Startdatum",
   "startJob": "Start opdracht",
   "startWork": "Start werk",
   "status": "Status",
@@ -539,6 +655,7 @@
   "subject": "Onderwerp",
   "subjectOptional": "Onderwerp (optioneel)",
   "suggested": "Voorstel: {value}",
+  "suspendContract": "Opschorten",
   "tags": "Labels",
   "takePhoto": "Foto nemen",
   "tasks": "Taken",
@@ -586,6 +703,7 @@
   "unitPriceExclVat": "Eenheidsprijs (excl. btw)",
   "unknownCaller": "Onbekende beller",
   "until": "Tot",
+  "upcomingVisits": "Geplande bezoeken",
   "updateToCurrentPrices": "Bijwerken naar huidige prijzen",
   "updated": "Bijgewerkt",
   "uploadingFile": "Uploaden…",
@@ -600,10 +718,22 @@
   "vatOn": "Btw {rate} % op {base}",
   "vatPercent": "Btw %",
   "viaPortal": "Via het klantenportaal",
+  "visitTemplates": "Bezoeken",
+  "visitTitleRequired": "Elk bezoek heeft een titel nodig",
   "warranty": "Garantie",
+  "warrantyExpired": "Garantie verlopen",
   "warrantyIn": "Onder garantie",
   "warrantyOut": "Buiten garantie",
   "warrantyUnknown": "Onbekend",
+  "warrantyUntilDate": "tot {date}",
+  "@warrantyUntilDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "warrantyUntilLabel": "Garantie tot",
   "weighted": "gewogen {amount}",
   "whatWasAsked": "Wat werd er gevraagd?",
   "whoIsCalling": "Wie belt er?",

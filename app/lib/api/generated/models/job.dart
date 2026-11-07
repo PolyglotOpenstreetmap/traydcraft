@@ -11,36 +11,41 @@ part 'job.g.dart';
 @JsonSerializable()
 class Job {
   const Job({
-    required this.address,
+    required this.street,
     required this.city,
     required this.completionNotes,
+    required this.id,
     required this.countryCode,
     required this.customerId,
     required this.customerName,
-    required this.id,
+    required this.address,
     required this.instructions,
     required this.kind,
     required this.number,
     required this.postalCode,
-    required this.priority,
-    required this.siteName,
     required this.status,
-    required this.street,
-    required this.tasksDone,
     required this.tasksTotal,
     required this.technicians,
+    required this.reportSentTo,
     required this.title,
-    this.completedAt,
-    this.contactId,
+    required this.priority,
+    required this.tasksDone,
+    required this.siteName,
     this.contactName,
-    this.latitude,
-    this.longitude,
-    this.mapsUrl,
     this.repairId,
+    this.longitude,
+    this.latitude,
     this.scheduledEnd,
     this.scheduledStart,
+    this.dueDate,
     this.startedAt,
+    this.contractNumber,
+    this.reportSentAt,
+    this.contractId,
+    this.contactId,
+    this.completedAt,
     this.ticketId,
+    this.mapsUrl,
   });
   
   factory Job.fromJson(Map<String, Object?> json) => _$JobFromJson(json);
@@ -58,12 +63,22 @@ class Job {
   final String? contactId;
   @JsonKey(includeIfNull: false,name: 'contact_name')
   final String? contactName;
+
+  /// The maintenance contract this job was generated for.
+  @JsonKey(includeIfNull: false,name: 'contract_id')
+  final String? contractId;
+  @JsonKey(includeIfNull: false,name: 'contract_number')
+  final String? contractNumber;
   @JsonKey(name: 'country_code')
   final String countryCode;
   @JsonKey(name: 'customer_id')
   final String customerId;
   @JsonKey(name: 'customer_name')
   final String customerName;
+
+  /// The day a contract visit is due.
+  @JsonKey(includeIfNull: false,name: 'due_date')
+  final DateTime? dueDate;
   final String id;
 
   /// What has to be done there.
@@ -85,6 +100,12 @@ class Job {
   final String priority;
   @JsonKey(includeIfNull: false,name: 'repair_id')
   final String? repairId;
+
+  /// When the service report was last e-mailed to the customer.
+  @JsonKey(includeIfNull: false,name: 'report_sent_at')
+  final DateTime? reportSentAt;
+  @JsonKey(name: 'report_sent_to')
+  final String reportSentTo;
   @JsonKey(includeIfNull: false,name: 'scheduled_end')
   final DateTime? scheduledEnd;
   @JsonKey(includeIfNull: false,name: 'scheduled_start')
