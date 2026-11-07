@@ -229,11 +229,19 @@ and every query filters on it; an id of another company is "not found".
 ## Consequences
 * Availability is a cheap read of the balance table; history is complete and auditable
   (`audit.events` for configuration, the ledger itself for moves).
-* Valuation is limited to the snapshot of the standard cost; FIFO/average costing, landed cost and
-  the export to Exact are later work.
+* Valuation is limited to the cost stored on each move (booked or standard); FIFO/average costing,
+  landed cost and the export to Exact are later work.
+* The reservation shape is fixed for B2, B3 and C1: they reserve and consume through
+  `set_reserved`, `release_reference` and `NewMove.consume_reservation`, and add their reference
+  type to the CHECK in the migration. A reversal never recreates a consumed reservation.
+* Counts overwrite movements made while counting (see *Counts*); a count that must not do that has to
+  be done on a place that is not moving.
 
 ## Not yet
 Purchasing receipts (B2) and delivery consumption (B3) will post moves with their own reasons and
 references; production (C1) posts `production_output` and `consumption`. Deferred: two-step
-transfers, putaway rules, bin capacity, quarantine locations, stock on open POs/MOs in ATP, returns
-of delivered serial units, cycle-count scheduling, valuation, reorder proposals (MRP, C2).
+transfers and deliveries through the `transit` location (the kind exists, nothing posts to it yet),
+putaway rules, bin capacity, quarantine locations, stock on open POs/MOs in ATP, cycle-count
+scheduling, valuation, reorder proposals (MRP, C2); in the app, naming the reservation to consume
+when issuing (the API has it) and an HTTP endpoint for non-sales reservations (the Rust function
+exists).
