@@ -38,7 +38,7 @@ pub fn split_subject(requested: Option<&str>, first_moved: &str, source: &str) -
 /// and contact. The new ticket starts open with its own service level clock, in the same team and
 /// with the same owner; both tickets get a note and an audit event. A split cannot be undone
 /// (merge can join tickets again). Returns the new ticket.
-#[utoipa::path(post, path = "/tickets/{id}/split", tag = "helpdesk", params(("id" = Uuid, Path)), request_body = SplitInput,
+#[utoipa::path(post, path = "/tickets/{id}/split", tag = "helpdesk", operation_id = "split_ticket", params(("id" = Uuid, Path)), request_body = SplitInput,
     responses((status = 201, body = TicketDetail), (status = 404, body = ErrorBody), (status = 409, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn split(
     State(state): State<AppState>,

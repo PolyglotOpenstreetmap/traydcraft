@@ -43,7 +43,7 @@ pub const ACTION_KINDS: [&str; 6] = [
 /// What a ticket must look like for a rule to apply. Every given condition has to hold; a list
 /// holds when the ticket has any one of its values. Empty conditions match every ticket.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub struct Conditions {
+pub struct RuleConditions {
     #[serde(default)]
     pub priorities: Vec<String>,
     #[serde(default)]
@@ -71,7 +71,7 @@ pub struct Conditions {
 /// `set_owner` (`user_id`), `set_team` (`team_id`), `set_priority` (`value`), `set_category`
 /// (`value`), `add_tag` (`value`), `set_internal` (`flag`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
-pub struct Action {
+pub struct RuleAction {
     pub kind: String,
     pub user_id: Option<Uuid>,
     pub team_id: Option<Uuid>,
@@ -88,8 +88,8 @@ pub struct Rule {
     pub position: i32,
     /// created | updated | customer_replied
     pub trigger: String,
-    pub conditions: Conditions,
-    pub actions: Vec<Action>,
+    pub conditions: RuleConditions,
+    pub actions: Vec<RuleAction>,
     /// Later rules are not looked at when this one matched.
     pub stop_on_match: bool,
     pub updated_at: DateTime<Utc>,
@@ -102,8 +102,8 @@ pub struct RuleInput {
     pub active: bool,
     pub trigger: String,
     #[serde(default)]
-    pub conditions: Conditions,
-    pub actions: Vec<Action>,
+    pub conditions: RuleConditions,
+    pub actions: Vec<RuleAction>,
     #[serde(default)]
     pub stop_on_match: bool,
 }
@@ -137,7 +137,7 @@ pub struct Facts {
 
 /// A change a rule made (or, in a dry run, would make).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-pub struct Change {
+pub struct RuleChange {
     pub kind: String,
     pub from: Option<String>,
     pub to: Option<String>,
@@ -145,13 +145,13 @@ pub struct Change {
 
 /// What happened to one rule in one evaluation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-pub struct Outcome {
+pub struct RuleOutcome {
     pub rule_id: Uuid,
     pub rule_name: String,
     /// matched | no_match | inactive | other_trigger | after_stop
     pub result: String,
     /// The changes that actually change the ticket (actions that change nothing are left out).
-    pub changes: Vec<Change>,
+    pub changes: Vec<RuleChange>,
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ fn any_of(list: &[String], value: &str) -> bool {
 }
 
 /// True when every condition holds for the ticket.
-pub fn matches(c: &Conditions, f: &Facts) -> bool {
+pub fn matches(c: &RuleConditions, f: &Facts) -> bool {
     let domain = f
         .contact_email
         .rsplit_once('@')
@@ -203,13 +203,13 @@ pub fn matches(c: &Conditions, f: &Facts) -> bool {
 
 /// Applies one action to the facts. Returns the change, or `None` when the ticket already looks
 /// like that (nothing to do, nothing to audit).
-pub fn apply(a: &Action, f: &mut Facts) -> Option<Change> {
+pub fn apply(a: &RuleAction, f: &mut Facts) -> Option<RuleChange> {
     let s = |v: &Option<String>| v.as_deref().unwrap_or_default().to_string();
     match a.kind.as_str() {
         "set_owner" if f.owner_user_id != a.user_id && a.user_id.is_some() => {
             let from = f.owner_user_id.map(|u| u.to_string());
             f.owner_user_id = a.user_id;
-            Some(Change {
+            Some(RuleChange {
                 kind: a.kind.clone(),
                 from,
                 to: a.user_id.map(|u| u.to_string()),
@@ -218,7 +218,7 @@ pub fn apply(a: &Action, f: &mut Facts) -> Option<Change> {
         "set_team" if f.team_id != a.team_id && a.team_id.is_some() => {
             let from = f.team_id.map(|u| u.to_string());
             f.team_id = a.team_id;
-            Some(Change {
+            Some(RuleChange {
                 kind: a.kind.clone(),
                 from,
                 to: a.team_id.map(|u| u.to_string()),
@@ -226,7 +226,7 @@ pub fn apply(a: &Action, f: &mut Facts) -> Option<Change> {
         }
         "set_priority" if a.value.as_deref().is_some_and(|v| v != f.priority) => {
             let from = std::mem::replace(&mut f.priority, s(&a.value));
-            Some(Change {
+            Some(RuleChange {
                 kind: a.kind.clone(),
                 from: Some(from),
                 to: a.value.clone(),
@@ -234,7 +234,7 @@ pub fn apply(a: &Action, f: &mut Facts) -> Option<Change> {
         }
         "set_category" if a.value.as_deref().is_some_and(|v| v != f.category) => {
             let from = std::mem::replace(&mut f.category, s(&a.value));
-            Some(Change {
+            Some(RuleChange {
                 kind: a.kind.clone(),
                 from: Some(from),
                 to: a.value.clone(),
@@ -246,7 +246,7 @@ pub fn apply(a: &Action, f: &mut Facts) -> Option<Change> {
                 return None;
             }
             f.tags.push(tag.clone());
-            Some(Change {
+            Some(RuleChange {
                 kind: a.kind.clone(),
                 from: None,
                 to: Some(tag),
@@ -255,7 +255,7 @@ pub fn apply(a: &Action, f: &mut Facts) -> Option<Change> {
         "set_internal" if a.flag.is_some_and(|v| v != f.internal) => {
             let from = f.internal;
             f.internal = a.flag.unwrap_or_default();
-            Some(Change {
+            Some(RuleChange {
                 kind: a.kind.clone(),
                 from: Some(from.to_string()),
                 to: Some(f.internal.to_string()),
@@ -268,7 +268,7 @@ pub fn apply(a: &Action, f: &mut Facts) -> Option<Change> {
 /// Runs the rules for `trigger` over the facts, in order of position. Each rule is looked at once;
 /// the changes of a rule are visible to the rules after it. A rule with `stop_on_match` ends the
 /// run. Returns one outcome per rule and the facts as they end up.
-pub fn evaluate(rules: &[Rule], trigger: &str, facts: &Facts) -> (Vec<Outcome>, Facts) {
+pub fn evaluate(rules: &[Rule], trigger: &str, facts: &Facts) -> (Vec<RuleOutcome>, Facts) {
     let mut facts = facts.clone();
     let mut ordered: Vec<&Rule> = rules.iter().collect();
     ordered.sort_by_key(|r| (r.position, r.id));
@@ -293,7 +293,7 @@ pub fn evaluate(rules: &[Rule], trigger: &str, facts: &Facts) -> (Vec<Outcome>, 
             }
             stopped = r.stop_on_match;
         }
-        out.push(Outcome {
+        out.push(RuleOutcome {
             rule_id: r.id,
             rule_name: r.name.clone(),
             result: result.into(),
@@ -419,7 +419,7 @@ pub async fn run(
     company_id: Uuid,
     ticket_id: Uuid,
     trigger: &str,
-) -> AppResult<Vec<Outcome>> {
+) -> AppResult<Vec<RuleOutcome>> {
     let rules = load_rules(conn, company_id).await?;
     if !rules.iter().any(|r| r.active && r.trigger == trigger) {
         return Ok(Vec::new());
@@ -461,7 +461,7 @@ async fn apply_change(
     conn: &mut PgConnection,
     company_id: Uuid,
     ticket_id: Uuid,
-    change: &Change,
+    change: &RuleChange,
     rule: Option<&Rule>,
 ) -> AppResult<bool> {
     let to = change.to.clone().unwrap_or_default();
@@ -796,7 +796,7 @@ async fn delete_rule(
 }
 
 /// Sets the order in which rules run. The list must contain every rule of the company once.
-#[utoipa::path(put, path = "/helpdesk/automation/order", tag = "helpdesk", request_body = RuleOrder,
+#[utoipa::path(put, path = "/helpdesk/automation/order", tag = "helpdesk", operation_id = "reorder_rules", request_body = RuleOrder,
     responses((status = 200, body = Vec<Rule>), (status = 422, body = ErrorBody)))]
 async fn reorder(
     State(state): State<AppState>,
@@ -855,7 +855,7 @@ pub struct DryRun {
     pub ticket_number: String,
     pub trigger: String,
     /// One entry per rule, in running order. Nothing was changed.
-    pub rules: Vec<Outcome>,
+    pub rules: Vec<RuleOutcome>,
 }
 
 /// Shows which rules would match the ticket for an event and what they would change, without
@@ -921,8 +921,8 @@ mod tests {
         }
     }
 
-    fn act(kind: &str) -> Action {
-        Action {
+    fn act(kind: &str) -> RuleAction {
+        RuleAction {
             kind: kind.into(),
             user_id: None,
             team_id: None,
@@ -931,7 +931,12 @@ mod tests {
         }
     }
 
-    fn rule(name: &str, position: i32, conditions: Conditions, actions: Vec<Action>) -> Rule {
+    fn rule(
+        name: &str,
+        position: i32,
+        conditions: RuleConditions,
+        actions: Vec<RuleAction>,
+    ) -> Rule {
         Rule {
             id: Uuid::from_u128(position as u128),
             name: name.into(),
@@ -945,8 +950,8 @@ mod tests {
         }
     }
 
-    fn priority(v: &str) -> Action {
-        Action {
+    fn priority(v: &str) -> RuleAction {
+        RuleAction {
             value: Some(v.into()),
             ..act("set_priority")
         }
@@ -954,13 +959,13 @@ mod tests {
 
     #[test]
     fn empty_conditions_match_everything() {
-        assert!(matches(&Conditions::default(), &facts()));
+        assert!(matches(&RuleConditions::default(), &facts()));
     }
 
     #[test]
     fn every_given_condition_must_hold() {
         let f = facts();
-        let ok = Conditions {
+        let ok = RuleConditions {
             priorities: vec!["normal".into(), "high".into()],
             categories: vec!["question".into()],
             statuses: vec!["open".into()],
@@ -974,47 +979,47 @@ mod tests {
         };
         assert!(matches(&ok, &f));
         for broken in [
-            Conditions {
+            RuleConditions {
                 priorities: vec!["low".into()],
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 categories: vec!["lead".into()],
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 statuses: vec!["closed".into()],
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 customer_languages: vec!["de".into()],
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 channels: vec!["portal".into()],
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 subject_contains: Some("leak".into()),
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 sender_domain: Some("beta.example".into()),
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 tag: Some("urgent".into()),
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 owner: Some("set".into()),
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 team_id: Some(Uuid::from_u128(9)),
                 ..ok.clone()
             },
-            Conditions {
+            RuleConditions {
                 customer_id: Some(Uuid::from_u128(9)),
                 ..ok.clone()
             },
@@ -1027,7 +1032,7 @@ mod tests {
     fn a_customer_language_condition_needs_a_known_customer() {
         let mut f = facts();
         f.customer_language = None;
-        let c = Conditions {
+        let c = RuleConditions {
             customer_languages: vec!["nl".into()],
             ..Default::default()
         };
@@ -1044,18 +1049,18 @@ mod tests {
             (Some("normal"), Some("high"))
         );
         assert_eq!(f.priority, "high");
-        let tag = Action {
+        let tag = RuleAction {
             value: Some("Warranty".into()),
             ..act("add_tag")
         };
         assert_eq!(apply(&tag, &mut f), None, "already tagged");
-        let tag = Action {
+        let tag = RuleAction {
             value: Some("vip".into()),
             ..act("add_tag")
         };
         assert!(apply(&tag, &mut f).is_some());
         assert_eq!(f.tags, vec!["warranty", "vip"]);
-        let internal = Action {
+        let internal = RuleAction {
             flag: Some(true),
             ..act("set_internal")
         };
@@ -1071,12 +1076,12 @@ mod tests {
             rule(
                 "second",
                 2,
-                Conditions {
+                RuleConditions {
                     priorities: vec!["urgent".into()],
                     team_id: Some(team),
                     ..Default::default()
                 },
-                vec![Action {
+                vec![RuleAction {
                     value: Some("escalated".into()),
                     ..act("add_tag")
                 }],
@@ -1084,13 +1089,13 @@ mod tests {
             rule(
                 "first",
                 1,
-                Conditions {
+                RuleConditions {
                     subject_contains: Some("noise".into()),
                     ..Default::default()
                 },
                 vec![
                     priority("urgent"),
-                    Action {
+                    RuleAction {
                         team_id: Some(team),
                         ..act("set_team")
                     },
@@ -1112,17 +1117,17 @@ mod tests {
     #[test]
     fn all_matching_rules_apply_unless_one_stops_the_run() {
         let mut rules = vec![
-            rule("a", 1, Conditions::default(), vec![priority("high")]),
+            rule("a", 1, RuleConditions::default(), vec![priority("high")]),
             rule(
                 "b",
                 2,
-                Conditions::default(),
-                vec![Action {
+                RuleConditions::default(),
+                vec![RuleAction {
                     value: Some("x".into()),
                     ..act("add_tag")
                 }],
             ),
-            rule("c", 3, Conditions::default(), vec![priority("low")]),
+            rule("c", 3, RuleConditions::default(), vec![priority("low")]),
         ];
         let (out, end) = evaluate(&rules, "created", &facts());
         assert!(out.iter().all(|o| o.result == "matched"));
@@ -1136,9 +1141,14 @@ mod tests {
 
     #[test]
     fn inactive_rules_and_other_triggers_are_skipped() {
-        let mut off = rule("off", 1, Conditions::default(), vec![priority("high")]);
+        let mut off = rule("off", 1, RuleConditions::default(), vec![priority("high")]);
         off.active = false;
-        let mut other = rule("other", 2, Conditions::default(), vec![priority("high")]);
+        let mut other = rule(
+            "other",
+            2,
+            RuleConditions::default(),
+            vec![priority("high")],
+        );
         other.trigger = "updated".into();
         let (out, end) = evaluate(&[off, other], "created", &facts());
         assert_eq!(out[0].result, "inactive");
@@ -1152,7 +1162,7 @@ mod tests {
         let r = rule(
             "flip",
             1,
-            Conditions {
+            RuleConditions {
                 priorities: vec!["normal".into()],
                 ..Default::default()
             },
@@ -1161,7 +1171,7 @@ mod tests {
         let r2 = rule(
             "flip back",
             2,
-            Conditions {
+            RuleConditions {
                 priorities: vec!["high".into()],
                 ..Default::default()
             },

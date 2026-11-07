@@ -652,7 +652,7 @@ async fn build(
 
 /// The helpdesk report for a period. Response and resolution times are in business time when the
 /// company's calendar is on (see `basis`). Days are the company's local days.
-#[utoipa::path(get, path = "/helpdesk/reports", tag = "helpdesk", params(ReportParams),
+#[utoipa::path(get, path = "/helpdesk/reports", tag = "helpdesk", operation_id = "get_report", params(ReportParams),
     responses((status = 200, body = Report), (status = 403, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn get_report(
     State(state): State<AppState>,
@@ -680,7 +680,7 @@ pub struct ExportParams {
 }
 
 /// One table of the report as a CSV file.
-#[utoipa::path(get, path = "/helpdesk/reports/export", tag = "helpdesk", params(ExportParams),
+#[utoipa::path(get, path = "/helpdesk/reports/export", tag = "helpdesk", operation_id = "export_report", params(ExportParams),
     responses((status = 200, body = String, content_type = "text/csv"), (status = 403, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn export(
     State(state): State<AppState>,
