@@ -6,6 +6,7 @@
 pub mod answers;
 pub mod attachments;
 pub mod classify;
+pub mod collab;
 pub mod csat;
 pub mod email;
 pub mod extras;

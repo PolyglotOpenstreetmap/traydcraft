@@ -367,7 +367,7 @@ async fn assign(
 ) -> AppResult<Json<TicketDetail>> {
     user.require(Permission::HelpdeskWrite)?;
     let mut tx = state.db.begin().await?;
-    crate::tickets::load_ticket(&mut tx, user.company_id, id).await?;
+    let old = crate::tickets::load_ticket(&mut tx, user.company_id, id).await?;
     if let Some(team) = input.team_id {
         let ok: bool = sqlx::query_scalar(
             "SELECT EXISTS (SELECT 1 FROM helpdesk.teams WHERE id = $1 AND company_id = $2 AND active)",
@@ -393,6 +393,23 @@ async fn assign(
     .bind(input.owner_user_id)
     .execute(&mut *tx)
     .await?;
+    if old.team_id != input.team_id {
+        crate::collab::record_event(
+            &mut tx,
+            user.company_id,
+            id,
+            "assigned",
+            Some(user.user_id),
+            crate::collab::EventData {
+                to_value: Some("team".into()),
+                target_team_id: input.team_id,
+                ..Default::default()
+            },
+        )
+        .await?;
+    }
+    crate::collab::owner_changed(&mut tx, &user, id, old.owner_user_id, input.owner_user_id)
+        .await?;
     audit::record(
         &mut tx,
         &user,

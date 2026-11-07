@@ -94,6 +94,18 @@ async fn add_tag(
     .execute(&mut *tx)
     .await?;
     if added.rows_affected() > 0 {
+        crate::collab::record_event(
+            &mut tx,
+            user.company_id,
+            id,
+            "tag_added",
+            Some(user.user_id),
+            crate::collab::EventData {
+                to_value: Some(tag.clone()),
+                ..Default::default()
+            },
+        )
+        .await?;
         audit::record(
             &mut tx,
             &user,
@@ -126,6 +138,18 @@ async fn remove_tag(
         .execute(&mut *tx)
         .await?;
     if removed.rows_affected() > 0 {
+        crate::collab::record_event(
+            &mut tx,
+            user.company_id,
+            id,
+            "tag_removed",
+            Some(user.user_id),
+            crate::collab::EventData {
+                to_value: Some(tag.clone()),
+                ..Default::default()
+            },
+        )
+        .await?;
         audit::record(
             &mut tx,
             &user,
@@ -400,6 +424,24 @@ async fn merge(
     .await?;
     crate::sla::sync(&mut tx, id).await?;
     crate::sla::sync(&mut tx, target_id).await?;
+    for (ticket, from, to) in [
+        (id, None, Some(target.number.clone())),
+        (target_id, Some(source.number.clone()), None),
+    ] {
+        crate::collab::record_event(
+            &mut tx,
+            user.company_id,
+            ticket,
+            "merged",
+            Some(user.user_id),
+            crate::collab::EventData {
+                from_value: from,
+                to_value: to,
+                ..Default::default()
+            },
+        )
+        .await?;
+    }
     for (ticket, other) in [(id, &target.number), (target_id, &source.number)] {
         audit::record(
             &mut tx,

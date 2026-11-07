@@ -113,6 +113,9 @@ async fn main() -> anyhow::Result<()> {
             Ok(n) => tracing::info!(n, "SLA breaches escalated"),
             Err(e) => tracing::error!(error = ?e, "SLA escalation failed"),
         }
+        if let Err(e) = traydcraft_helpdesk::collab::cleanup_presence(&db).await {
+            tracing::error!(error = ?e, "presence cleanup failed");
+        }
         match traydcraft_fieldservice::contracts::generate_due_visits(&db, traydcraft_core::today())
             .await
         {

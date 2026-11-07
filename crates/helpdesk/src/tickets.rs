@@ -92,6 +92,17 @@ pub struct Ticket {
     pub csat_rating: Option<String>,
     pub csat_comment: Option<String>,
     pub csat_rated_at: Option<DateTime<Utc>>,
+    /// Set when a colleague escalated the ticket by hand.
+    pub escalated_at: Option<DateTime<Utc>>,
+    pub escalated_by: Option<Uuid>,
+    pub escalated_by_name: Option<String>,
+    /// For the caller: there is activity by others since they last read the ticket and they are
+    /// involved (see `collab`). Filled by the list and by `GET /tickets/{id}`.
+    #[sqlx(skip)]
+    pub unread: bool,
+    /// For the caller: they follow the ticket. Filled like `unread`.
+    #[sqlx(skip)]
+    pub watching: bool,
     /// Due times, breach flags and minutes remaining.
     #[sqlx(skip)]
     pub sla: TicketSla,
@@ -159,6 +170,10 @@ pub struct Article {
 pub struct TicketDetail {
     pub ticket: Ticket,
     pub articles: Vec<Article>,
+    /// Colleagues who follow the ticket.
+    pub watchers: Vec<crate::collab::Watcher>,
+    /// Colleagues who opened the ticket, most recent first ("seen by").
+    pub readers: Vec<crate::collab::Reader>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -187,6 +202,12 @@ pub struct ListParams {
     pub sla: Option<String>,
     /// Tickets with this tag.
     pub tag: Option<String>,
+    /// Only tickets that are unread for me.
+    pub unread: Option<bool>,
+    /// Only tickets I follow.
+    pub watching: Option<bool>,
+    /// Only tickets that were escalated by hand.
+    pub escalated: Option<bool>,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
 }
@@ -333,6 +354,7 @@ const SELECT: &str = "SELECT t.id, t.number, t.subject, t.status, t.priority, t.
         coalesce((SELECT sum(e.minutes) FROM helpdesk.time_entries e WHERE e.ticket_id = t.id), 0)::bigint AS time_minutes,
         t.merged_into_id, (SELECT m.number FROM helpdesk.tickets m WHERE m.id = t.merged_into_id) AS merged_into_number,
         cs.rating AS csat_rating, cs.comment AS csat_comment, cs.rated_at AS csat_rated_at,
+        t.escalated_at, t.escalated_by, eb.display_name AS escalated_by_name,
         t.first_response_due_at AS sla_first_response_due_at, t.resolution_due_at AS sla_resolution_due_at,
         t.sla_first_response_minutes, t.sla_resolution_minutes, t.sla_paused_at
      FROM helpdesk.tickets t
@@ -342,6 +364,7 @@ const SELECT: &str = "SELECT t.id, t.number, t.subject, t.status, t.priority, t.
                         ORDER BY s.rated_at DESC LIMIT 1) cs ON true
      LEFT JOIN crm.customers c ON c.id = t.customer_id
      LEFT JOIN core.users u ON u.id = t.owner_user_id
+     LEFT JOIN core.users eb ON eb.id = t.escalated_by
      LEFT JOIN sales.quotations q ON q.id = t.quotation_id
      LEFT JOIN crm.opportunities op ON op.id = t.opportunity_id
      LEFT JOIN sales.orders o ON o.id = t.order_id";
@@ -379,7 +402,14 @@ pub async fn load_detail(
     for a in &mut articles {
         a.attachments = files.remove(&a.id).unwrap_or_default();
     }
-    Ok(TicketDetail { ticket, articles })
+    let watchers = crate::collab::load_watchers(conn, id).await?;
+    let readers = crate::collab::load_readers(conn, id).await?;
+    Ok(TicketDetail {
+        ticket,
+        articles,
+        watchers,
+        readers,
+    })
 }
 
 fn check_one_of(field: &str, value: &str, allowed: &[&str]) -> AppResult<()> {
@@ -431,13 +461,33 @@ pub async fn add_linked_note(
     Ok(())
 }
 
-async fn set_status(conn: &mut PgConnection, ticket_id: Uuid, status: &str) -> AppResult<()> {
+async fn set_status(
+    conn: &mut PgConnection,
+    user: &CurrentUser,
+    ticket_id: Uuid,
+    status: &str,
+) -> AppResult<()> {
     check_one_of("status", status, &STATUSES)?;
-    let was_closed: bool =
-        sqlx::query_scalar("SELECT status = 'closed' FROM helpdesk.tickets WHERE id = $1")
-            .bind(ticket_id)
-            .fetch_one(&mut *conn)
-            .await?;
+    let old: String = sqlx::query_scalar("SELECT status FROM helpdesk.tickets WHERE id = $1")
+        .bind(ticket_id)
+        .fetch_one(&mut *conn)
+        .await?;
+    let was_closed = old == "closed";
+    if old != status {
+        crate::collab::record_event(
+            conn,
+            user.company_id,
+            ticket_id,
+            "status",
+            Some(user.user_id),
+            crate::collab::EventData {
+                from_value: Some(old),
+                to_value: Some(status.into()),
+                ..Default::default()
+            },
+        )
+        .await?;
+    }
     sqlx::query(
         "UPDATE helpdesk.tickets SET status = $2, updated_at = now(),
                 closed_at = CASE WHEN $2 = 'closed' THEN coalesce(closed_at, now()) ELSE NULL END
@@ -526,15 +576,20 @@ async fn list_tickets(
                OR (t.owner_user_id IS NULL AND t.team_id IN (SELECT m.team_id FROM helpdesk.team_members m WHERE m.user_id = $10)))
           AND (NOT $11 OR (t.owner_user_id IS NULL AND t.team_id IS NULL))
           AND ($12::text IS NULL OR EXISTS (SELECT 1 FROM helpdesk.ticket_tags g WHERE g.ticket_id = t.id AND g.tag = $12))
+          AND (NOT $13 OR {unread})
+          AND (NOT $14 OR {watching})
+          AND (NOT $15 OR t.escalated_at IS NOT NULL)
           AND {}",
-        sla_filter.as_deref().unwrap_or("true")
+        sla_filter.as_deref().unwrap_or("true"),
+        unread = crate::collab::unread_sql("$10"),
+        watching = crate::collab::watching_sql("$10"),
     );
     let mine = p.mine.unwrap_or(false);
     let only_unassigned = p.unassigned.unwrap_or(false);
     let items: Vec<Ticket> = sqlx::query_as(&format!(
         "{SELECT} {filter}
          ORDER BY CASE t.priority WHEN 'urgent' THEN 0 WHEN 'high' THEN 1 ELSE 2 END, t.updated_at DESC
-         LIMIT $13 OFFSET $14"
+         LIMIT $16 OFFSET $17"
     ))
     .bind(user.company_id)
     .bind(&pattern)
@@ -548,11 +603,25 @@ async fn list_tickets(
     .bind(user.user_id)
     .bind(only_unassigned)
     .bind(&tag)
+    .bind(p.unread.unwrap_or(false))
+    .bind(p.watching.unwrap_or(false))
+    .bind(p.escalated.unwrap_or(false))
     .bind(p.limit.unwrap_or(50).clamp(1, 500))
     .bind(p.offset.unwrap_or(0).max(0))
     .fetch_all(&state.db)
     .await?;
-    let items = items.into_iter().map(Ticket::with_sla).collect();
+    let mut items: Vec<Ticket> = items.into_iter().map(Ticket::with_sla).collect();
+    let ids: Vec<Uuid> = items.iter().map(|t| t.id).collect();
+    let flags = {
+        let mut conn = state.db.acquire().await?;
+        crate::collab::viewer_flags(&mut conn, user.user_id, &ids).await?
+    };
+    for t in &mut items {
+        if let Some((unread, watching)) = flags.get(&t.id) {
+            t.unread = *unread;
+            t.watching = *watching;
+        }
+    }
     let total = sqlx::query_scalar(&format!(
         "SELECT count(*) FROM helpdesk.tickets t LEFT JOIN crm.customers c ON c.id = t.customer_id {filter}"
     ))
@@ -568,6 +637,9 @@ async fn list_tickets(
     .bind(user.user_id)
     .bind(only_unassigned)
     .bind(&tag)
+    .bind(p.unread.unwrap_or(false))
+    .bind(p.watching.unwrap_or(false))
+    .bind(p.escalated.unwrap_or(false))
     .fetch_one(&state.db)
     .await?;
     Ok(Json(TicketPage { items, total }))
@@ -582,7 +654,15 @@ async fn get_ticket(
 ) -> AppResult<Json<TicketDetail>> {
     user.require(Permission::HelpdeskRead)?;
     let mut conn = state.db.acquire().await?;
-    Ok(Json(load_detail(&mut conn, user.company_id, id).await?))
+    let mut d = load_detail(&mut conn, user.company_id, id).await?;
+    if let Some((unread, watching)) = crate::collab::viewer_flags(&mut conn, user.user_id, &[id])
+        .await?
+        .get(&id)
+    {
+        d.ticket.unread = *unread;
+        d.ticket.watching = *watching;
+    }
+    Ok(Json(d))
 }
 
 #[utoipa::path(post, path = "/tickets", tag = "helpdesk", request_body = NewTicketInput,
@@ -657,6 +737,16 @@ async fn create_ticket(
     .await?;
     add_note(&mut tx, &user, id, &input.body).await?;
     crate::teams::assign_default_team(&mut tx, user.company_id, id).await?;
+    crate::collab::record_event(
+        &mut tx,
+        user.company_id,
+        id,
+        "created",
+        Some(user.user_id),
+        Default::default(),
+    )
+    .await?;
+    crate::collab::add_watcher(&mut tx, user.company_id, id, user.user_id).await?;
     sla::sync(&mut tx, id).await?;
     audit::record(
         &mut tx,
@@ -689,7 +779,7 @@ async fn update_ticket(
         return Err(AppError::Validation("subject is required".into()));
     }
     let mut tx = state.db.begin().await?;
-    load_ticket(&mut tx, user.company_id, id).await?;
+    let old = load_ticket(&mut tx, user.company_id, id).await?;
     let mut input = input;
     if let Some(c) = input.contact_id {
         let contact = traydcraft_crm::contacts::get_contact(&mut tx, c).await?;
@@ -769,7 +859,24 @@ async fn update_ticket(
     .bind(input.contact_id)
     .execute(&mut *tx)
     .await?;
-    set_status(&mut tx, id, &input.status).await?;
+    if old.priority != input.priority {
+        crate::collab::record_event(
+            &mut tx,
+            user.company_id,
+            id,
+            "priority",
+            Some(user.user_id),
+            crate::collab::EventData {
+                from_value: Some(old.priority.clone()),
+                to_value: Some(input.priority.clone()),
+                ..Default::default()
+            },
+        )
+        .await?;
+    }
+    crate::collab::owner_changed(&mut tx, &user, id, old.owner_user_id, input.owner_user_id)
+        .await?;
+    set_status(&mut tx, &user, id, &input.status).await?;
     audit::record(
         &mut tx,
         &user,
@@ -800,9 +907,10 @@ async fn add_note_handler(
     let mut tx = state.db.begin().await?;
     load_ticket(&mut tx, user.company_id, id).await?;
     let note_id = add_note(&mut tx, &user, id, &input.body).await?;
+    crate::collab::add_watcher(&mut tx, user.company_id, id, user.user_id).await?;
     crate::attachments::link(&mut tx, id, note_id, &input.attachment_ids, None).await?;
     match &input.status {
-        Some(s) => set_status(&mut tx, id, s).await?,
+        Some(s) => set_status(&mut tx, &user, id, s).await?,
         None => {
             sqlx::query("UPDATE helpdesk.tickets SET updated_at = now() WHERE id = $1")
                 .bind(id)
@@ -923,6 +1031,22 @@ async fn reply(
     .execute(&mut *tx)
     .await?;
     crate::attachments::link(&mut tx, id, article_id, &input.attachment_ids, None).await?;
+    crate::collab::add_watcher(&mut tx, user.company_id, id, user.user_id).await?;
+    if ticket.owner_user_id.is_none() {
+        crate::collab::record_event(
+            &mut tx,
+            user.company_id,
+            id,
+            "assigned",
+            Some(user.user_id),
+            crate::collab::EventData {
+                to_value: Some("owner".into()),
+                target_user_id: Some(user.user_id),
+                ..Default::default()
+            },
+        )
+        .await?;
+    }
     sqlx::query(
         "UPDATE helpdesk.tickets SET first_response_at = coalesce(first_response_at, now()),
                 owner_user_id = coalesce(owner_user_id, $2) WHERE id = $1",
@@ -933,6 +1057,7 @@ async fn reply(
     .await?;
     set_status(
         &mut tx,
+        &user,
         id,
         input.status.as_deref().unwrap_or("pending_customer"),
     )
@@ -1120,6 +1245,17 @@ async fn production_question(
     .execute(&mut *tx)
     .await?;
     add_note(&mut tx, &user, id, &input.body).await?;
+    crate::collab::record_event(
+        &mut tx,
+        user.company_id,
+        id,
+        "created",
+        Some(user.user_id),
+        Default::default(),
+    )
+    .await?;
+    crate::collab::add_watcher(&mut tx, user.company_id, id, o.salesperson_id).await?;
+    crate::collab::add_watcher(&mut tx, user.company_id, id, user.user_id).await?;
     audit::record(
         &mut tx,
         &user,
@@ -1261,6 +1397,16 @@ async fn log_call(
             .execute(&mut *tx)
             .await?;
             crate::teams::assign_default_team(&mut tx, user.company_id, id).await?;
+            crate::collab::record_event(
+                &mut tx,
+                user.company_id,
+                id,
+                "created",
+                Some(user.user_id),
+                Default::default(),
+            )
+            .await?;
+            crate::collab::add_watcher(&mut tx, user.company_id, id, user.user_id).await?;
             id
         }
     };
@@ -1350,4 +1496,5 @@ pub fn router() -> OpenApiRouter<AppState> {
         .merge(crate::attachments::router())
         .merge(crate::extras::router())
         .merge(crate::csat::router())
+        .merge(crate::collab::router())
 }
