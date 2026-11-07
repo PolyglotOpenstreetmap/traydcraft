@@ -7,51 +7,58 @@ part of 'ticket.dart';
 // **************************************************************************
 
 Ticket _$TicketFromJson(Map<String, dynamic> json) => Ticket(
-  id: json['id'] as String,
+  priority: json['priority'] as String,
   category: json['category'] as String,
-  timeMinutes: (json['time_minutes'] as num).toInt(),
   contactEmail: json['contact_email'] as String,
-  tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
   contactName: json['contact_name'] as String,
   createdAt: DateTime.parse(json['created_at'] as String),
+  number: json['number'] as String,
+  articleCount: (json['article_count'] as num).toInt(),
+  id: json['id'] as String,
+  internal: json['internal'] as bool,
+  tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
+  subject: json['subject'] as String,
   status: json['status'] as String,
   sla: TicketSla.fromJson(json['sla'] as Map<String, dynamic>),
-  updatedAt: DateTime.parse(json['updated_at'] as String),
-  priority: json['priority'] as String,
-  number: json['number'] as String,
+  watching: json['watching'] as bool,
+  unread: json['unread'] as bool,
   language: json['language'] as String,
-  articleCount: (json['article_count'] as num).toInt(),
-  internal: json['internal'] as bool,
-  subject: json['subject'] as String,
+  updatedAt: DateTime.parse(json['updated_at'] as String),
+  timeMinutes: (json['time_minutes'] as num).toInt(),
+  firstResponseAt: json['first_response_at'] == null
+      ? null
+      : DateTime.parse(json['first_response_at'] as String),
   mergedIntoId: json['merged_into_id'] as String?,
   mergedIntoNumber: json['merged_into_number'] as String?,
-  customerName: json['customer_name'] as String?,
-  customerId: json['customer_id'] as String?,
+  escalatedByName: json['escalated_by_name'] as String?,
+  opportunityId: json['opportunity_id'] as String?,
   opportunityNumber: json['opportunity_number'] as String?,
   orderId: json['order_id'] as String?,
   orderNumber: json['order_number'] as String?,
   ownerName: json['owner_name'] as String?,
   ownerUserId: json['owner_user_id'] as String?,
-  csatRating: json['csat_rating'] as String?,
+  escalatedBy: json['escalated_by'] as String?,
   quotationId: json['quotation_id'] as String?,
   quotationNumber: json['quotation_number'] as String?,
   quotationRevision: (json['quotation_revision'] as num?)?.toInt(),
   quotationStatus: json['quotation_status'] as String?,
+  escalatedAt: json['escalated_at'] == null
+      ? null
+      : DateTime.parse(json['escalated_at'] as String),
+  customerName: json['customer_name'] as String?,
+  customerId: json['customer_id'] as String?,
+  suggestedCategory: json['suggested_category'] as String?,
+  csatRating: json['csat_rating'] as String?,
+  teamId: json['team_id'] as String?,
+  teamName: json['team_name'] as String?,
   csatRatedAt: json['csat_rated_at'] == null
       ? null
       : DateTime.parse(json['csat_rated_at'] as String),
-  csatComment: json['csat_comment'] as String?,
-  opportunityId: json['opportunity_id'] as String?,
-  suggestedCategory: json['suggested_category'] as String?,
   contactId: json['contact_id'] as String?,
-  teamId: json['team_id'] as String?,
-  teamName: json['team_name'] as String?,
   closedAt: json['closed_at'] == null
       ? null
       : DateTime.parse(json['closed_at'] as String),
-  firstResponseAt: json['first_response_at'] == null
-      ? null
-      : DateTime.parse(json['first_response_at'] as String),
+  csatComment: json['csat_comment'] as String?,
 );
 
 Map<String, dynamic> _$TicketToJson(Ticket instance) => <String, dynamic>{
@@ -67,6 +74,9 @@ Map<String, dynamic> _$TicketToJson(Ticket instance) => <String, dynamic>{
   'csat_rating': ?instance.csatRating,
   'customer_id': ?instance.customerId,
   'customer_name': ?instance.customerName,
+  'escalated_at': ?instance.escalatedAt?.toIso8601String(),
+  'escalated_by': ?instance.escalatedBy,
+  'escalated_by_name': ?instance.escalatedByName,
   'first_response_at': ?instance.firstResponseAt?.toIso8601String(),
   'id': instance.id,
   'internal': instance.internal,
@@ -93,5 +103,7 @@ Map<String, dynamic> _$TicketToJson(Ticket instance) => <String, dynamic>{
   'team_id': ?instance.teamId,
   'team_name': ?instance.teamName,
   'time_minutes': instance.timeMinutes,
+  'unread': instance.unread,
   'updated_at': instance.updatedAt.toIso8601String(),
+  'watching': instance.watching,
 };
