@@ -12,6 +12,7 @@ Module overview: [ARCHITECTURE.md](ARCHITECTURE.md).
 | Order lifecycle (revisions, confirmation, priority) | Done, [ADR 0016](adr/0016-order-lifecycle.md) |
 | A1 Helpdesk SLA, teams, attachments, tags, merge, time, CSAT | Done, ADR 0017 (PR #2) |
 | A2 Knowledge base | Done, ADR 0018 (PR #2) |
+| A4 Helpdesk business hours, automation rules, split, reporting | Done, ADR 0021 |
 | A3 Field service completion | Open |
 | B1 Inventory foundation | Open |
 | B2 Purchasing | Open (needs B1) |
@@ -36,7 +37,8 @@ client, Flutter screens, five-language strings, tests and an ADR.
 - Maintenance contracts: contract, visit template and recurrence that generates jobs; SLA on contracts.
 - Offline queue in the Flutter app (the server is already idempotent, [ADR 0006](adr/0006-offline-sync.md)).
 
-Remaining helpdesk gaps (from ADR 0017): automation rules, ticket split, reporting, business hours.
+Helpdesk follow-up, done ([ADR 0021](adr/0021-helpdesk-business-hours-automation-reporting.md)): business hours and holidays in the SLA, automation rules, ticket split, reporting with CSV export.
+Remaining helpdesk gaps: per-team calendars, e-mail actions in automation rules, scheduled report mails, SLA notices to the customer.
 Remaining knowledge base gaps (ADR 0018): non-image attachments, analytics, semantic search, a public web page.
 
 ## Track B - Supply chain (sequential)
