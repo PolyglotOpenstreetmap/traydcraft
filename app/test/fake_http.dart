@@ -202,6 +202,8 @@ Map<String, Object?> departmentJson(
 
 /// The fields every ticket carries since the helpdesk got SLA, tags and time tracking.
 Map<String, Object?> ticketExtras() => {
+  'unread': false,
+  'watching': false,
   'tags': <String>[],
   'time_minutes': 0,
   'sla': {
@@ -212,4 +214,10 @@ Map<String, Object?> ticketExtras() => {
     'first_response_breached': false,
     'resolution_breached': false,
   },
+};
+
+/// The collaboration fields every ticket detail carries (watchers and readers).
+Map<String, Object?> detailExtras() => {
+  'watchers': <Object?>[],
+  'readers': <Object?>[],
 };

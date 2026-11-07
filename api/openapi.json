@@ -9525,6 +9525,42 @@
             }
           },
           {
+            "name": "unread",
+            "in": "query",
+            "description": "Only tickets that are unread for me.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "watching",
+            "in": "query",
+            "description": "Only tickets I follow.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "escalated",
+            "in": "query",
+            "description": "Only tickets that were escalated by hand.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -10004,6 +10040,195 @@
         }
       }
     },
+    "/api/v1/tickets/{id}/delegate": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Hands the ticket over to a colleague with an optional internal comment. The previous owner\nand the caller become watchers; the new owner is told by mail, comment included.",
+        "operationId": "delegate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DelegateInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/escalate": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Escalates a ticket by hand: records who and why, optionally raises the priority one step and\ntells the target (a person; or the leads of a team; or, without a target, the leads of the\nticket's team, else its members, else the administrators). The caller becomes a watcher.",
+        "operationId": "escalate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EscalateInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/events": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "The activity timeline: events and messages (customer and colleagues, internal notes\nincluded), oldest first. Internal: never shown to customers.",
+        "operationId": "timeline",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimelineItem"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tickets/{id}/kb-entries/{entry_id}/render": {
       "get": {
         "tags": [
@@ -10316,6 +10541,149 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/presence": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Colleagues (not the caller) active on the ticket during the last 60 seconds.",
+        "operationId": "presence_list",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PresenceEntry"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Heartbeat: \"I am viewing / replying to this ticket\". Returns who else is active, so one call\nper beat is enough. Advisory only: nothing is locked.",
+        "operationId": "presence_beat",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresenceInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PresenceEntry"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/read": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Marks the ticket as read by the caller (call it when the ticket was opened and shown).",
+        "operationId": "mark_read",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
           },
           "404": {
             "description": "",
@@ -10686,6 +11054,169 @@
             }
           },
           "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/watch": {
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Follow the ticket yourself.",
+        "operationId": "watch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Watcher"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Stop following the ticket. Replying to it later makes you a watcher again.",
+        "operationId": "unwatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Watcher"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tickets/{id}/watchers": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Adds a colleague as a watcher.",
+        "operationId": "add_watcher",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatcherInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Watcher"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
             "description": "",
             "content": {
               "application/json": {
@@ -12453,6 +12984,26 @@
           }
         }
       },
+      "DelegateInput": {
+        "type": "object",
+        "required": [
+          "to_user_id"
+        ],
+        "properties": {
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Internal comment for the new owner; never sent to the customer."
+          },
+          "to_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The new owner."
+          }
+        }
+      },
       "Department": {
         "type": "object",
         "required": [
@@ -12973,6 +13524,38 @@
           },
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "EscalateInput": {
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "raise_priority": {
+            "type": "boolean",
+            "description": "Raise the priority one step (low < normal < high < urgent)."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this ticket needs more attention (required)."
+          },
+          "to_team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Escalate to a team (its leads, else its members, are told). Not together with `to_user_id`."
+          },
+          "to_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Escalate to a person."
           }
         }
       },
@@ -15272,6 +15855,45 @@
           }
         }
       },
+      "PresenceEntry": {
+        "type": "object",
+        "description": "A colleague who is looking at (or answering) the ticket right now.",
+        "required": [
+          "user_id",
+          "user_name",
+          "mode",
+          "seen_at"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "viewing | replying"
+          },
+          "seen_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_name": {
+            "type": "string"
+          }
+        }
+      },
+      "PresenceInput": {
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "viewing | replying"
+          }
+        }
+      },
       "PriceZone": {
         "type": "object",
         "required": [
@@ -16146,6 +16768,28 @@
           "valid_until": {
             "type": "string",
             "format": "date"
+          }
+        }
+      },
+      "Reader": {
+        "type": "object",
+        "description": "Somebody who opened the ticket, and when they last did.",
+        "required": [
+          "user_id",
+          "user_name",
+          "last_read_at"
+        ],
+        "properties": {
+          "last_read_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_name": {
+            "type": "string"
           }
         }
       },
@@ -17715,6 +18359,8 @@
           "updated_at",
           "tags",
           "time_minutes",
+          "unread",
+          "watching",
           "sla"
         ],
         "properties": {
@@ -17779,6 +18425,27 @@
             "format": "uuid"
           },
           "customer_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "escalated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Set when a colleague escalated the ticket by hand."
+          },
+          "escalated_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "escalated_by_name": {
             "type": [
               "string",
               "null"
@@ -17931,9 +18598,17 @@
             "format": "int64",
             "description": "Total logged time in minutes."
           },
+          "unread": {
+            "type": "boolean",
+            "description": "For the caller: there is activity by others since they last read the ticket and they are\ninvolved (see `collab`). Filled by the list and by `GET /tickets/{id}`."
+          },
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "watching": {
+            "type": "boolean",
+            "description": "For the caller: they follow the ticket. Filled like `unread`."
           }
         }
       },
@@ -17941,7 +18616,9 @@
         "type": "object",
         "required": [
           "ticket",
-          "articles"
+          "articles",
+          "watchers",
+          "readers"
         ],
         "properties": {
           "articles": {
@@ -17950,8 +18627,22 @@
               "$ref": "#/components/schemas/Article"
             }
           },
+          "readers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reader"
+            },
+            "description": "Colleagues who opened the ticket, most recent first (\"seen by\")."
+          },
           "ticket": {
             "$ref": "#/components/schemas/Ticket"
+          },
+          "watchers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Watcher"
+            },
+            "description": "Colleagues who follow the ticket."
           }
         }
       },
@@ -18159,6 +18850,106 @@
           }
         }
       },
+      "TimelineItem": {
+        "type": "object",
+        "description": "One line of the activity timeline: an event or a message, oldest first.",
+        "required": [
+          "id",
+          "source",
+          "kind",
+          "at",
+          "comment"
+        ],
+        "properties": {
+          "actor_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actor_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The colleague (events, notes, replies) or the customer's name (incoming messages)."
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Events: the internal reason or comment. Messages: the first 300 characters."
+          },
+          "from_value": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "status / priority: the old value; merged: the number of the merged ticket."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Events: created | assigned | delegated | escalated | status | priority | merged |\ntag_added | tag_removed. Messages: email_in | email_out | note | call_in | call_out | portal_in."
+          },
+          "previous_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "previous_user_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "description": "event | message"
+          },
+          "target_team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "target_team_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target_user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "target_user_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "to_value": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "status / priority: the new value; assigned: `owner` or `team`; tags: the tag;\nmerged: the target ticket number."
+          }
+        }
+      },
       "UpcomingVisit": {
         "type": "object",
         "required": [
@@ -18330,6 +19121,39 @@
             ],
             "format": "date",
             "description": "The last day of the warranty; empty when unknown."
+          }
+        }
+      },
+      "Watcher": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "user_name",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_name": {
+            "type": "string"
+          }
+        }
+      },
+      "WatcherInput": {
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },

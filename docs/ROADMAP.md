@@ -13,6 +13,7 @@ Module overview: [ARCHITECTURE.md](ARCHITECTURE.md).
 | A1 Helpdesk SLA, teams, attachments, tags, merge, time, CSAT | Done, ADR 0017 (PR #2) |
 | A2 Knowledge base | Done, ADR 0018 (PR #2) |
 | A3 Field service completion | Done, ADR 0020 and [ADR 0022](adr/0022-technician-offline-queue.md) |
+| A4 Helpdesk collaboration (manual escalation, hand-over, watchers, unread, timeline, soft presence) | Done, [ADR 0023](adr/0023-helpdesk-collaboration.md) |
 | B1 Inventory foundation | Open |
 | B2 Purchasing | Open (needs B1) |
 | B3 Delivery | Open (needs B1) |
@@ -36,7 +37,9 @@ client, Flutter screens, five-language strings, tests and an ADR.
 - Maintenance contracts: contract, visit template and recurrence that generates jobs; SLA on contracts.
 - Offline queue in the Flutter app ([ADR 0006](adr/0006-offline-sync.md), [ADR 0022](adr/0022-technician-offline-queue.md)). Done.
 
-Remaining helpdesk gaps (from ADR 0017): automation rules, ticket split, reporting, business hours.
+Helpdesk collaboration is done (ADR 0023: escalate, hand over, watchers, unread, activity timeline, soft presence).
+Remaining helpdesk gaps (from ADR 0017 and 0023): automation rules, ticket split, reporting, business hours,
+a per-user language and notification preferences, mentions.
 Remaining knowledge base gaps (ADR 0018): non-image attachments, analytics, semantic search, a public web page.
 
 ## Track B - Supply chain (sequential)

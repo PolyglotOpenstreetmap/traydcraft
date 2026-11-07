@@ -11,45 +11,50 @@ part 'ticket.g.dart';
 @JsonSerializable()
 class Ticket {
   const Ticket({
-    required this.id,
+    required this.priority,
     required this.category,
-    required this.timeMinutes,
     required this.contactEmail,
-    required this.tags,
     required this.contactName,
     required this.createdAt,
+    required this.number,
+    required this.articleCount,
+    required this.id,
+    required this.internal,
+    required this.tags,
+    required this.subject,
     required this.status,
     required this.sla,
-    required this.updatedAt,
-    required this.priority,
-    required this.number,
+    required this.watching,
+    required this.unread,
     required this.language,
-    required this.articleCount,
-    required this.internal,
-    required this.subject,
+    required this.updatedAt,
+    required this.timeMinutes,
+    this.firstResponseAt,
     this.mergedIntoId,
     this.mergedIntoNumber,
-    this.customerName,
-    this.customerId,
+    this.escalatedByName,
+    this.opportunityId,
     this.opportunityNumber,
     this.orderId,
     this.orderNumber,
     this.ownerName,
     this.ownerUserId,
-    this.csatRating,
+    this.escalatedBy,
     this.quotationId,
     this.quotationNumber,
     this.quotationRevision,
     this.quotationStatus,
-    this.csatRatedAt,
-    this.csatComment,
-    this.opportunityId,
+    this.escalatedAt,
+    this.customerName,
+    this.customerId,
     this.suggestedCategory,
-    this.contactId,
+    this.csatRating,
     this.teamId,
     this.teamName,
+    this.csatRatedAt,
+    this.contactId,
     this.closedAt,
-    this.firstResponseAt,
+    this.csatComment,
   });
   
   factory Ticket.fromJson(Map<String, Object?> json) => _$TicketFromJson(json);
@@ -83,6 +88,14 @@ class Ticket {
   final String? customerId;
   @JsonKey(includeIfNull: false,name: 'customer_name')
   final String? customerName;
+
+  /// Set when a colleague escalated the ticket by hand.
+  @JsonKey(includeIfNull: false,name: 'escalated_at')
+  final DateTime? escalatedAt;
+  @JsonKey(includeIfNull: false,name: 'escalated_by')
+  final String? escalatedBy;
+  @JsonKey(includeIfNull: false,name: 'escalated_by_name')
+  final String? escalatedByName;
   @JsonKey(includeIfNull: false,name: 'first_response_at')
   final DateTime? firstResponseAt;
   final String id;
@@ -142,8 +155,15 @@ class Ticket {
   /// Total logged time in minutes.
   @JsonKey(name: 'time_minutes')
   final int timeMinutes;
+
+  /// For the caller: there is activity by others since they last read the ticket and they are.
+  /// involved (see `collab`). Filled by the list and by `GET /tickets/{id}`.
+  final bool unread;
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+
+  /// For the caller: they follow the ticket. Filled like `unread`.
+  final bool watching;
 
   Map<String, Object?> toJson() => _$TicketToJson(this);
 }

@@ -49,6 +49,7 @@ class _Fake implements HttpClientAdapter {
     final Object? json = switch (key) {
       'GET /api/v1/tickets/t1' => {
         'ticket': _ticket(internal: internal),
+        ...detailExtras(),
         'articles': [
           {
             'id': 'a1',

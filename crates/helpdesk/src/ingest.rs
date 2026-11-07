@@ -227,6 +227,15 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             .execute(&mut *tx)
             .await?;
             crate::sla::sync(&mut tx, t.id).await?;
+            crate::collab::notify_watchers(
+                &mut tx,
+                company_id,
+                t.id,
+                None,
+                &[],
+                crate::collab::Change::CustomerReply,
+            )
+            .await?;
             (t.id, t.number)
         }
         None => {
@@ -272,6 +281,15 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             .execute(&mut *tx)
             .await?;
             crate::teams::assign_default_team(&mut tx, company_id, id).await?;
+            crate::collab::record_event(
+                &mut tx,
+                company_id,
+                id,
+                "created",
+                None,
+                Default::default(),
+            )
+            .await?;
             crate::sla::sync(&mut tx, id).await?;
             (id, number)
         }

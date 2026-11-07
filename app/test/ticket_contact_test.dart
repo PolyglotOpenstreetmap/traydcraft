@@ -54,6 +54,7 @@ void main() {
       addTearDown(tester.view.reset);
       final detail = {
         'ticket': _ticket(),
+        ...detailExtras(),
         'articles': [
           _article('a1', 'portal_in', {
             'body': 'Het lekt.',

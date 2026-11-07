@@ -49,6 +49,9 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
   String? _team;
   String? _sla;
   String? _tag;
+  bool _unread = false;
+  bool _watching = false;
+  bool _escalated = false;
 
   void _reload() => _list.currentState?.reload();
 
@@ -70,6 +73,9 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
           teamId: _team,
           sla: _sla,
           tag: _tag,
+          unread: _unread ? true : null,
+          watching: _watching ? true : null,
+          escalated: _escalated ? true : null,
           status: _status == 'all' ? null : _status,
           offset: offset,
           limit: limit,
@@ -89,6 +95,33 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
             selected: {_owner},
             onSelectionChanged: (s) {
               setState(() => _owner = s.first);
+              _reload();
+            },
+          ),
+          FilterChip(
+            key: const ValueKey('filter-unread'),
+            label: Text(l.collabFilterUnread),
+            selected: _unread,
+            onSelected: (v) {
+              setState(() => _unread = v);
+              _reload();
+            },
+          ),
+          FilterChip(
+            key: const ValueKey('filter-watching'),
+            label: Text(l.collabFilterWatching),
+            selected: _watching,
+            onSelected: (v) {
+              setState(() => _watching = v);
+              _reload();
+            },
+          ),
+          FilterChip(
+            key: const ValueKey('filter-escalated'),
+            label: Text(l.collabFilterEscalated),
+            selected: _escalated,
+            onSelected: (v) {
+              setState(() => _escalated = v);
               _reload();
             },
           ),
@@ -192,8 +225,72 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
         ),
       ],
       columns: [
-        EntityColumn(l.number, (t) => t.number),
-        EntityColumn(l.subject, (t) => t.subject, flex: 3),
+        EntityColumn(
+          l.number,
+          (t) => t.number,
+          cell: (context, t) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (t.unread)
+                Tooltip(
+                  message: l.collabUnreadTooltip,
+                  child: Icon(
+                    Icons.circle,
+                    key: ValueKey('unread-${t.id}'),
+                    size: 10,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                )
+              else
+                const SizedBox(width: 10),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  t.number,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: t.unread ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        EntityColumn(
+          l.subject,
+          (t) => '${t.unread ? '● ' : ''}${t.subject}',
+          flex: 3,
+          cell: (context, t) => Row(
+            children: [
+              if (t.escalatedAt != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: Tooltip(
+                    message: l.collabEscalatedBy(t.escalatedByName ?? ''),
+                    child: Chip(
+                      key: ValueKey('escalated-${t.id}'),
+                      visualDensity: VisualDensity.compact,
+                      avatar: Icon(
+                        Icons.trending_up,
+                        size: 14,
+                        color: Colors.red.shade700,
+                      ),
+                      label: Text(l.collabEscalatedBadge),
+                    ),
+                  ),
+                ),
+              Flexible(
+                child: Text(
+                  t.subject,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: t.unread ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
         EntityColumn(
           l.customer,
           (t) =>

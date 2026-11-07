@@ -181,6 +181,8 @@ pub async fn open(
     .await?;
     insert_message(conn, id, &contact, &email, subject.trim(), body).await?;
     crate::teams::assign_default_team(conn, v.company_id, id).await?;
+    crate::collab::record_event(conn, v.company_id, id, "created", None, Default::default())
+        .await?;
     crate::sla::sync(conn, id).await?;
     audit::record_system(
         conn,
@@ -253,6 +255,15 @@ pub async fn add_message(
     .execute(&mut *conn)
     .await?;
     crate::sla::sync(conn, ticket_id).await?;
+    crate::collab::notify_watchers(
+        conn,
+        v.company_id,
+        ticket_id,
+        None,
+        &[],
+        crate::collab::Change::CustomerReply,
+    )
+    .await?;
     audit::record_system(
         conn,
         v.company_id,

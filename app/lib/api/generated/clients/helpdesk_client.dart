@@ -10,6 +10,8 @@ import '../models/call_input.dart';
 import '../models/convert_ticket_input.dart';
 import '../models/csat_info.dart';
 import '../models/csat_input.dart';
+import '../models/delegate_input.dart';
+import '../models/escalate_input.dart';
 import '../models/file_info.dart';
 import '../models/helpdesk_settings.dart';
 import '../models/inbound_result.dart';
@@ -19,6 +21,8 @@ import '../models/new_ticket_input.dart';
 import '../models/note_input.dart';
 import '../models/prepared_answer.dart';
 import '../models/prepared_answer_input.dart';
+import '../models/presence_entry.dart';
+import '../models/presence_input.dart';
 import '../models/production_question_input.dart';
 import '../models/rendered_answer.dart';
 import '../models/reply_input.dart';
@@ -34,6 +38,9 @@ import '../models/ticket_input.dart';
 import '../models/ticket_page.dart';
 import '../models/time_entries.dart';
 import '../models/time_entry_input.dart';
+import '../models/timeline_item.dart';
+import '../models/watcher.dart';
+import '../models/watcher_input.dart';
 
 part 'helpdesk_client.g.dart';
 
@@ -140,6 +147,12 @@ abstract class HelpdeskClient {
   /// [sla] - `breached` or `at_risk` (under 25 % of a window left).
   ///
   /// [tag] - Tickets with this tag.
+  ///
+  /// [unread] - Only tickets that are unread for me.
+  ///
+  /// [watching] - Only tickets I follow.
+  ///
+  /// [escalated] - Only tickets that were escalated by hand.
   @GET('/api/v1/tickets')
   Future<TicketPage> listTickets({
     @Query('q') String? q,
@@ -152,6 +165,9 @@ abstract class HelpdeskClient {
     @Query('unassigned') bool? unassigned,
     @Query('sla') String? sla,
     @Query('tag') String? tag,
+    @Query('unread') bool? unread,
+    @Query('watching') bool? watching,
+    @Query('escalated') bool? escalated,
     @Query('limit') int? limit,
     @Query('offset') int? offset,
   });
@@ -215,6 +231,30 @@ abstract class HelpdeskClient {
     @Body() required ConvertTicketInput body,
   });
 
+  /// Hands the ticket over to a colleague with an optional internal comment. The previous owner.
+  /// and the caller become watchers; the new owner is told by mail, comment included.
+  @POST('/api/v1/tickets/{id}/delegate')
+  Future<TicketDetail> delegate({
+    @Path('id') required String id,
+    @Body() required DelegateInput body,
+  });
+
+  /// Escalates a ticket by hand: records who and why, optionally raises the priority one step and.
+  /// tells the target (a person; or the leads of a team; or, without a target, the leads of the.
+  /// ticket's team, else its members, else the administrators). The caller becomes a watcher.
+  @POST('/api/v1/tickets/{id}/escalate')
+  Future<TicketDetail> escalate({
+    @Path('id') required String id,
+    @Body() required EscalateInput body,
+  });
+
+  /// The activity timeline: events and messages (customer and colleagues, internal notes.
+  /// included), oldest first. Internal: never shown to customers.
+  @GET('/api/v1/tickets/{id}/events')
+  Future<List<TimelineItem>> timeline({
+    @Path('id') required String id,
+  });
+
   /// Turns the ticket into a sales lead: creates an opportunity for its customer and links it.
   @POST('/api/v1/tickets/{id}/lead')
   Future<TicketDetail> createLead({
@@ -243,6 +283,26 @@ abstract class HelpdeskClient {
   Future<RenderedAnswer> renderAnswer({
     @Path('id') required String id,
     @Path('answer_id') required String answerId,
+  });
+
+  /// Colleagues (not the caller) active on the ticket during the last 60 seconds.
+  @GET('/api/v1/tickets/{id}/presence')
+  Future<List<PresenceEntry>> presenceList({
+    @Path('id') required String id,
+  });
+
+  /// Heartbeat: "I am viewing / replying to this ticket". Returns who else is active, so one call.
+  /// per beat is enough. Advisory only: nothing is locked.
+  @POST('/api/v1/tickets/{id}/presence')
+  Future<List<PresenceEntry>> presenceBeat({
+    @Path('id') required String id,
+    @Body() required PresenceInput body,
+  });
+
+  /// Marks the ticket as read by the caller (call it when the ticket was opened and shown).
+  @POST('/api/v1/tickets/{id}/read')
+  Future<void> markRead({
+    @Path('id') required String id,
   });
 
   /// Queues an e-mail to the customer. The worker sends it; delivery status shows on the article.
@@ -280,5 +340,24 @@ abstract class HelpdeskClient {
   Future<TimeEntries> deleteTime({
     @Path('id') required String id,
     @Path('entry_id') required String entryId,
+  });
+
+  /// Follow the ticket yourself.
+  @PUT('/api/v1/tickets/{id}/watch')
+  Future<List<Watcher>> watch({
+    @Path('id') required String id,
+  });
+
+  /// Stop following the ticket. Replying to it later makes you a watcher again.
+  @DELETE('/api/v1/tickets/{id}/watch')
+  Future<List<Watcher>> unwatch({
+    @Path('id') required String id,
+  });
+
+  /// Adds a colleague as a watcher.
+  @POST('/api/v1/tickets/{id}/watchers')
+  Future<List<Watcher>> addWatcher({
+    @Path('id') required String id,
+    @Body() required WatcherInput body,
   });
 }

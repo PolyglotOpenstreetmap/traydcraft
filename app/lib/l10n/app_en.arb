@@ -1449,5 +1449,252 @@
   "offlineOpComplete": "Complete job",
   "offlineOpDecline": "Customer declined to sign",
   "offlineOpSignature": "Customer signature",
-  "offlineOpPhoto": "Photo"
+  "offlineOpPhoto": "Photo",
+  "collabEscalate": "Escalate",
+  "collabEscalateTitle": "Escalate ticket",
+  "collabDelegate": "Hand over",
+  "collabDelegateTitle": "Hand over ticket",
+  "collabEscalateTo": "Escalate to",
+  "collabNoTarget": "Leads of the ticket's team",
+  "collabPerson": "Colleague",
+  "collabTeam": "Team",
+  "collabHandOverTo": "New owner",
+  "collabReasonRequired": "Reason (required)",
+  "collabRaisePriority": "Raise priority one step",
+  "collabCommentOptional": "Comment for the new owner (optional)",
+  "collabInternalHint": "Internal: never sent to the customer.",
+  "collabEscalated": "Ticket escalated",
+  "collabHandedOver": "Ticket handed over",
+  "collabEscalatedBadge": "Escalated",
+  "collabEscalatedBy": "Escalated by {name}",
+  "@collabEscalatedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "collabWatch": "Watch",
+  "collabUnwatch": "Stop watching",
+  "collabWatchers": "Watchers",
+  "collabNoWatchers": "Nobody follows this ticket",
+  "collabAddWatcher": "Add watcher",
+  "collabActivity": "Activity",
+  "collabNoActivity": "No activity yet",
+  "collabSeenBy": "Seen by {readers}",
+  "@collabSeenBy": {
+    "placeholders": {
+      "readers": {
+        "type": "String"
+      }
+    }
+  },
+  "collabFilterUnread": "Unread",
+  "collabFilterWatching": "Watching",
+  "collabFilterEscalated": "Escalated",
+  "collabUnreadTooltip": "Unread",
+  "collabReplying": "{count, plural, one{{names} is replying} other{{names} are replying}} — coordinate before sending",
+  "@collabReplying": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "collabViewing": "{count, plural, one{{names} is viewing this ticket} other{{names} are viewing this ticket}}",
+  "@collabViewing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "collabConfirmSend": "{count, plural, one{{names} is replying to this ticket right now.} other{{names} are replying to this ticket right now.}} Send anyway?",
+  "@collabConfirmSend": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "collabSendAnyway": "Send anyway",
+  "collabSystem": "System",
+  "collabEventCreated": "{actor} created the ticket",
+  "@collabEventCreated": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventAssignedOwner": "{actor} assigned the ticket to {owner}",
+  "@collabEventAssignedOwner": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "owner": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventOwnerCleared": "{actor} removed the owner",
+  "@collabEventOwnerCleared": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventTeam": "{actor} moved the ticket to team {team}",
+  "@collabEventTeam": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "team": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventTeamCleared": "{actor} removed the team",
+  "@collabEventTeamCleared": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventDelegated": "{actor} handed the ticket over to {owner}",
+  "@collabEventDelegated": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "owner": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventEscalated": "{actor} escalated the ticket",
+  "@collabEventEscalated": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventStatus": "{actor} changed the status from {before} to {after}",
+  "@collabEventStatus": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventPriority": "{actor} changed the priority from {before} to {after}",
+  "@collabEventPriority": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventMergedInto": "{actor} merged this ticket into {number}",
+  "@collabEventMergedInto": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventMergedFrom": "{actor} merged {number} into this ticket",
+  "@collabEventMergedFrom": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventTagAdded": "{actor} added the tag {tag}",
+  "@collabEventTagAdded": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "collabEventTagRemoved": "{actor} removed the tag {tag}",
+  "@collabEventTagRemoved": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "collabMsgCustomer": "{actor} (customer) wrote",
+  "@collabMsgCustomer": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  },
+  "collabMsgReply": "{actor} replied to the customer",
+  "@collabMsgReply": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  },
+  "collabMsgNote": "{actor} added an internal note",
+  "@collabMsgNote": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  },
+  "collabMsgCall": "{actor} logged a call",
+  "@collabMsgCall": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      }
+    }
+  }
 }
