@@ -809,10 +809,13 @@ async fn update_job(
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct TaskInput {
     pub description: String,
+    /// Chosen by the client: sending the same id again returns the first task instead of adding a
+    /// second one (offline retries). The same id with another description is a 409.
+    pub client_id: Option<Uuid>,
 }
 
 #[utoipa::path(post, path = "/field/jobs/{id}/tasks", tag = "field", operation_id = "add_job_task", params(("id" = Uuid, Path)),
-    request_body = TaskInput, responses((status = 201, body = JobDetail), (status = 403, body = ErrorBody)))]
+    request_body = TaskInput, responses((status = 201, body = JobDetail), (status = 403, body = ErrorBody), (status = 409, body = ErrorBody)))]
 async fn add_task(
     State(state): State<AppState>,
     user: CurrentUser,
@@ -825,11 +828,24 @@ async fn add_task(
     let mut tx = state.db.begin().await?;
     ensure_can_work(&mut tx, &user, id).await?;
     ensure_open(&load_job(&mut tx, &user, id).await?)?;
-    sqlx::query(
-        "INSERT INTO field.job_tasks (id, job_id, position, description)
-         VALUES ($1, $2, (SELECT coalesce(max(position), 0) + 1 FROM field.job_tasks WHERE job_id = $2), $3)",
+    let description = input.description.trim();
+    let inserted = sqlx::query(
+        "INSERT INTO field.job_tasks (id, job_id, position, description, client_id)
+         VALUES ($1, $2, (SELECT coalesce(max(position), 0) + 1 FROM field.job_tasks WHERE job_id = $2), $3, $4)
+         ON CONFLICT (job_id, client_id) WHERE client_id IS NOT NULL DO NOTHING",
     )
-    .bind(new_id()).bind(id).bind(input.description.trim()).execute(&mut *tx).await?;
+    .bind(new_id()).bind(id).bind(description).bind(input.client_id).execute(&mut *tx).await?;
+    if inserted.rows_affected() == 0 {
+        let same: bool = sqlx::query_scalar(
+            "SELECT EXISTS (SELECT 1 FROM field.job_tasks WHERE job_id = $1 AND client_id = $2 AND description = $3)",
+        )
+        .bind(id).bind(input.client_id).bind(description).fetch_one(&mut *tx).await?;
+        if !same {
+            return Err(AppError::Conflict(
+                "this id belongs to another record".into(),
+            ));
+        }
+    }
     let d = load_detail(&mut tx, &user, id).await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(d)))
@@ -902,6 +918,8 @@ pub struct CompleteInput {
     pub notes: String,
 }
 
+/// Completing a job that is already completed with the same text changes nothing (safe to retry);
+/// with other text it is a 409.
 #[utoipa::path(post, path = "/field/jobs/{id}/complete", tag = "field", operation_id = "complete_job", params(("id" = Uuid, Path)),
     request_body = CompleteInput, responses((status = 200, body = JobDetail), (status = 409, body = ErrorBody), (status = 422, body = ErrorBody)))]
 async fn complete_job(
@@ -916,6 +934,11 @@ async fn complete_job(
     let mut tx = state.db.begin().await?;
     ensure_can_work(&mut tx, &user, id).await?;
     let job = load_job(&mut tx, &user, id).await?;
+    if job.status == "completed" && job.completion_notes == input.notes.trim() {
+        // A retry of the same completion (the answer was lost): nothing to do.
+        let d = load_detail(&mut tx, &user, id).await?;
+        return Ok(Json(d));
+    }
     ensure_open(&job)?;
     sqlx::query(
         "UPDATE field.jobs SET status = 'completed', completed_at = now(), started_at = coalesce(started_at, now()),
@@ -1056,8 +1079,10 @@ async fn add_work_log(
     .await?;
     if inserted.rows_affected() == 0 {
         // The same id again: fine if it is the same entry, an error if the id belongs to another job.
-        let same: bool = sqlx::query_scalar("SELECT EXISTS (SELECT 1 FROM field.work_logs WHERE id = $1 AND job_id = $2 AND user_id = $3)")
-            .bind(log_id).bind(id).bind(user.user_id).fetch_one(&mut *tx).await?;
+        let same: bool = sqlx::query_scalar("SELECT EXISTS (SELECT 1 FROM field.work_logs WHERE id = $1 AND job_id = $2 AND user_id = $3
+                 AND kind = $4 AND started_at = $5 AND ended_at = $6 AND notes = $7)")
+            .bind(log_id).bind(id).bind(user.user_id).bind(&input.kind).bind(input.started_at).bind(input.ended_at).bind(input.notes.trim())
+            .fetch_one(&mut *tx).await?;
         if !same {
             return Err(AppError::Conflict(
                 "this id belongs to another record".into(),
@@ -1109,6 +1134,11 @@ async fn upload_photo(
         &user.display_name,
     )
     .await?;
+    if file.size_bytes as usize != body.len() {
+        return Err(AppError::Conflict(
+            "this photo id belongs to another picture".into(),
+        ));
+    }
     let inserted = sqlx::query("INSERT INTO field.job_photos (id, job_id, file_id, caption) VALUES ($1, $2, $3, $4) ON CONFLICT (file_id) DO NOTHING")
         .bind(new_id()).bind(id).bind(file.id).bind(p.caption.as_deref().unwrap_or("").trim())
         .execute(&mut *tx)

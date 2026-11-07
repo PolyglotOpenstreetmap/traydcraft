@@ -1079,3 +1079,225 @@ async fn an_auto_renewing_contract_is_extended_before_it_ends(db: PgPool) {
         0
     );
 }
+
+// ---------------------------------------------------------------------------------------------
+// Offline queue replays (ADR 0022): every technician write can be sent twice.
+// ---------------------------------------------------------------------------------------------
+
+async fn upload(app: &axum::Router, id: &str, client: &str, bytes: Vec<u8>) -> (StatusCode, Value) {
+    let (s, _, body) = raw(
+        app,
+        Who::Staff(TECH),
+        Method::POST,
+        &format!("/api/v1/field/jobs/{id}/photos?client_id={client}&filename=a.jpg"),
+        Some(("application/octet-stream", bytes)),
+    )
+    .await;
+    (s, serde_json::from_slice(&body).unwrap_or(Value::Null))
+}
+
+#[sqlx::test(migrator = "traydcraft_api::MIGRATOR")]
+async fn a_replayed_task_is_added_once_and_another_description_is_a_conflict(db: PgPool) {
+    let app = setup(db.clone()).await;
+    let id = started(&app).await;
+    let uri = format!("/api/v1/field/jobs/{id}/tasks");
+    let cid = "00000000-0000-7000-8000-00000000bbb1";
+    let body = json!({ "description": "Check the filter", "client_id": cid });
+    let (s, first) = post(&app, TECH, &uri, body.clone()).await;
+    assert_eq!(s, StatusCode::CREATED, "{first}");
+    let (s, again) = post(&app, TECH, &uri, body).await;
+    assert_eq!(s, StatusCode::CREATED);
+    assert_eq!(again["tasks"], first["tasks"], "same result");
+    assert_eq!(again["tasks"].as_array().unwrap().len(), 3, "2 planned + 1");
+    let (s, e) = post(
+        &app,
+        TECH,
+        &uri,
+        json!({ "description": "Something else", "client_id": cid }),
+    )
+    .await;
+    assert_eq!(s, StatusCode::CONFLICT, "{e}");
+    // Without a client id nothing changes: every call adds a task.
+    post(&app, TECH, &uri, json!({ "description": "Plain" })).await;
+    let (_, d) = post(&app, TECH, &uri, json!({ "description": "Plain" })).await;
+    assert_eq!(d["tasks"].as_array().unwrap().len(), 5);
+    let n: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM field.job_tasks WHERE client_id = $1::uuid")
+            .bind(cid)
+            .fetch_one(&db)
+            .await
+            .unwrap();
+    assert_eq!(n, 1);
+}
+
+#[sqlx::test(migrator = "traydcraft_api::MIGRATOR")]
+async fn a_replayed_work_log_is_stored_once_and_other_content_is_a_conflict(db: PgPool) {
+    let app = setup(db.clone()).await;
+    let id = started(&app).await;
+    let uri = format!("/api/v1/field/jobs/{id}/work-logs");
+    let lid = "00000000-0000-7000-8000-00000000ccc1";
+    let end = chrono::Utc::now() - chrono::Duration::minutes(10);
+    let start = end - chrono::Duration::minutes(45);
+    let body = json!({ "id": lid, "kind": "travel", "started_at": start, "ended_at": end, "notes": "Drive" });
+    let (s, first) = post(&app, TECH, &uri, body.clone()).await;
+    assert_eq!(s, StatusCode::CREATED, "{first}");
+    let (s, again) = post(&app, TECH, &uri, body).await;
+    assert_eq!(s, StatusCode::CREATED);
+    assert_eq!(again["work_logs"], first["work_logs"]);
+    assert_eq!(again["work_logs"].as_array().unwrap().len(), 1);
+    assert_eq!(again["travel_minutes"], 45);
+    let changed = json!({ "id": lid, "kind": "travel", "started_at": start, "ended_at": end, "notes": "Other" });
+    assert_eq!(
+        post(&app, TECH, &uri, changed).await.0,
+        StatusCode::CONFLICT
+    );
+    let longer = json!({ "id": lid, "kind": "travel", "started_at": start - chrono::Duration::minutes(5), "ended_at": end, "notes": "Drive" });
+    assert_eq!(post(&app, TECH, &uri, longer).await.0, StatusCode::CONFLICT);
+}
+
+#[sqlx::test(migrator = "traydcraft_api::MIGRATOR")]
+async fn a_replayed_part_is_stored_once_and_other_content_is_a_conflict(db: PgPool) {
+    let app = setup(db.clone()).await;
+    let id = started(&app).await;
+    let uri = format!("/api/v1/field/jobs/{id}/parts");
+    let body = json!({ "id": "00000000-0000-7000-8000-00000000ddd1", "description": "Gasket", "quantity": "2" });
+    let (s, first) = post(&app, TECH, &uri, body.clone()).await;
+    assert_eq!(s, StatusCode::CREATED, "{first}");
+    let (s, again) = post(&app, TECH, &uri, body.clone()).await;
+    assert_eq!(s, StatusCode::CREATED);
+    assert_eq!(again["parts"], first["parts"]);
+    assert_eq!(again["parts"].as_array().unwrap().len(), 1);
+    let mut other = body.clone();
+    other["quantity"] = json!("3");
+    assert_eq!(post(&app, TECH, &uri, other).await.0, StatusCode::CONFLICT);
+    let mut other = body;
+    other["description"] = json!("Seal");
+    assert_eq!(post(&app, TECH, &uri, other).await.0, StatusCode::CONFLICT);
+}
+
+#[sqlx::test(migrator = "traydcraft_api::MIGRATOR")]
+async fn a_replayed_photo_is_stored_once_and_another_picture_is_a_conflict(db: PgPool) {
+    let app = setup(db.clone()).await;
+    let id = started(&app).await;
+    let cid = "00000000-0000-7000-8000-00000000eee1";
+    let (s, first) = upload(&app, &id, cid, jpeg(1)).await;
+    assert_eq!(s, StatusCode::CREATED, "{first}");
+    let (s, again) = upload(&app, &id, cid, jpeg(1)).await;
+    assert_eq!(s, StatusCode::CREATED);
+    assert_eq!(again["photos"], first["photos"]);
+    assert_eq!(again["photos"].as_array().unwrap().len(), 1);
+    let mut bigger = jpeg(1);
+    bigger.extend([0u8; 8]);
+    assert_eq!(upload(&app, &id, cid, bigger).await.0, StatusCode::CONFLICT);
+}
+
+#[sqlx::test(migrator = "traydcraft_api::MIGRATOR")]
+async fn a_replayed_signature_or_refusal_changes_nothing(db: PgPool) {
+    let app = setup(db.clone()).await;
+    let id = started(&app).await;
+    let uri = format!("/api/v1/field/jobs/{id}/signature?signer_name=Sofie&client_id=00000000-0000-7000-8000-00000000fff1");
+    let up = |png: Vec<u8>| {
+        raw(
+            &app,
+            Who::Staff(TECH),
+            Method::POST,
+            &uri,
+            Some(("image/png", png)),
+        )
+    };
+    assert_eq!(up(PNG.to_vec()).await.0, StatusCode::CREATED);
+    let at: chrono::DateTime<chrono::Utc> =
+        sqlx::query_scalar("SELECT signed_at FROM field.job_signatures WHERE job_id = $1::uuid")
+            .bind(&id)
+            .fetch_one(&db)
+            .await
+            .unwrap();
+    assert_eq!(up(PNG.to_vec()).await.0, StatusCode::CREATED, "replay");
+    let at2: chrono::DateTime<chrono::Utc> =
+        sqlx::query_scalar("SELECT signed_at FROM field.job_signatures WHERE job_id = $1::uuid")
+            .bind(&id)
+            .fetch_one(&db)
+            .await
+            .unwrap();
+    assert_eq!(at, at2);
+    assert_eq!(
+        up(png_variant(7)).await.0,
+        StatusCode::CONFLICT,
+        "same id, other image"
+    );
+    let events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM audit.events WHERE entity_id = $1::uuid AND action = 'signed'",
+    )
+    .bind(&id)
+    .fetch_one(&db)
+    .await
+    .unwrap();
+    assert_eq!(events, 1);
+
+    // Declined: the same refusal twice is one record; a different reason replaces it.
+    let uri = format!("/api/v1/field/jobs/{id}/signature/declined");
+    let body = json!({ "signer_name": "Sofie", "reason": "No time" });
+    let (s, first) = post(&app, TECH, &uri, body.clone()).await;
+    assert_eq!(s, StatusCode::CREATED, "{first}");
+    let (s, again) = post(&app, TECH, &uri, body).await;
+    assert_eq!(s, StatusCode::CREATED);
+    assert_eq!(
+        again["signature"], first["signature"],
+        "signed_at untouched"
+    );
+    let rows: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM field.job_signatures WHERE job_id = $1::uuid")
+            .bind(&id)
+            .fetch_one(&db)
+            .await
+            .unwrap();
+    assert_eq!(rows, 1);
+}
+
+#[sqlx::test(migrator = "traydcraft_api::MIGRATOR")]
+async fn start_tick_and_complete_can_be_replayed(db: PgPool) {
+    let app = setup(db.clone()).await;
+    let j = plan(&app, json!({})).await;
+    let id = jid(&j);
+    let task = j["tasks"][0]["id"].as_str().unwrap().to_string();
+    let base = format!("/api/v1/field/jobs/{id}");
+    for _ in 0..2 {
+        assert_eq!(
+            post(&app, TECH, &format!("{base}/start"), json!({}))
+                .await
+                .0,
+            StatusCode::OK
+        );
+        let (s, d) = post(
+            &app,
+            TECH,
+            &format!("{base}/tasks/{task}/done"),
+            json!({ "done": true }),
+        )
+        .await;
+        assert_eq!(s, StatusCode::OK);
+        assert_eq!(d["job"]["tasks_done"], 1);
+    }
+    let body = json!({ "notes": "Seals replaced" });
+    let (s, first) = post(&app, TECH, &format!("{base}/complete"), body.clone()).await;
+    assert_eq!(s, StatusCode::OK, "{first}");
+    let (s, again) = post(&app, TECH, &format!("{base}/complete"), body).await;
+    assert_eq!(s, StatusCode::OK, "{again}");
+    assert_eq!(again["job"]["completed_at"], first["job"]["completed_at"]);
+    let (s, e) = post(
+        &app,
+        TECH,
+        &format!("{base}/complete"),
+        json!({ "notes": "Different" }),
+    )
+    .await;
+    assert_eq!(s, StatusCode::CONFLICT, "{e}");
+    let events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM audit.events WHERE entity_id = $1::uuid AND action = 'completed'",
+    )
+    .bind(&id)
+    .fetch_one(&db)
+    .await
+    .unwrap();
+    assert_eq!(events, 1);
+}

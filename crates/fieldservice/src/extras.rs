@@ -339,10 +339,18 @@ async fn add_part(
     .await?;
     if inserted.rows_affected() == 0 {
         let same: bool = sqlx::query_scalar(
-            "SELECT EXISTS (SELECT 1 FROM field.job_parts WHERE id = $1 AND job_id = $2)",
+            "SELECT EXISTS (SELECT 1 FROM field.job_parts WHERE id = $1 AND job_id = $2
+                 AND product_id IS NOT DISTINCT FROM $3 AND description = $4 AND quantity = $5 AND unit = $6
+                 AND serial_unit_id IS NOT DISTINCT FROM $7 AND billable = $8)",
         )
         .bind(part_id)
         .bind(id)
+        .bind(input.product_id)
+        .bind(&description)
+        .bind(input.quantity)
+        .bind(&unit)
+        .bind(input.serial_unit_id)
+        .bind(input.billable.unwrap_or(true))
         .fetch_one(&mut *tx)
         .await?;
         if !same {
@@ -473,6 +481,11 @@ async fn sign_job(
         &user.display_name,
     )
     .await?;
+    if file.size_bytes as usize != body.len() {
+        return Err(AppError::Conflict(
+            "this id belongs to another signature".into(),
+        ));
+    }
     let linked_elsewhere: bool = sqlx::query_scalar(
         "SELECT EXISTS (SELECT 1 FROM field.job_signatures WHERE file_id = $1 AND job_id <> $2)",
     )
@@ -506,15 +519,18 @@ async fn sign_job(
                 .await?;
         }
     }
-    audit::record(
-        &mut tx,
-        &user,
-        "job",
-        id,
-        "signed",
-        serde_json::json!({ "signer": name }),
-    )
-    .await?;
+    // A replay of the same upload (same file id) changes nothing, so it is not audited twice.
+    if old != Some(Some(file.id)) {
+        audit::record(
+            &mut tx,
+            &user,
+            "job",
+            id,
+            "signed",
+            serde_json::json!({ "signer": name }),
+        )
+        .await?;
+    }
     let d = super::load_detail(&mut tx, &user, id).await?;
     tx.commit().await?;
     Ok((StatusCode::CREATED, Json(d)))
@@ -546,6 +562,20 @@ async fn decline_signature(
     }
     let mut tx = state.db.begin().await?;
     ensure_signable(&mut tx, &user, id).await?;
+    // Declining again with the same name and reason (a retry) changes nothing.
+    let same: bool = sqlx::query_scalar(
+        "SELECT EXISTS (SELECT 1 FROM field.job_signatures WHERE job_id = $1 AND declined
+             AND signer_name = $2 AND decline_reason = $3)",
+    )
+    .bind(id)
+    .bind(input.signer_name.trim())
+    .bind(input.reason.trim())
+    .fetch_one(&mut *tx)
+    .await?;
+    if same {
+        let d = super::load_detail(&mut tx, &user, id).await?;
+        return Ok((StatusCode::CREATED, Json(d)));
+    }
     let old: Option<Option<Uuid>> =
         sqlx::query_scalar("SELECT file_id FROM field.job_signatures WHERE job_id = $1")
             .bind(id)
