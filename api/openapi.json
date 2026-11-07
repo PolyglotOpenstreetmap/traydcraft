@@ -1847,6 +1847,438 @@
         }
       }
     },
+    "/api/v1/helpdesk/automation/dry-run": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Shows which rules would match the ticket for an event and what they would change, without\nchanging anything.",
+        "operationId": "dry_run",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DryRunInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DryRun"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/automation/order": {
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Sets the order in which rules run. The list must contain every rule of the company once.",
+        "operationId": "reorder_rules",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleOrder"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rule"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/automation/rules": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "list_rules",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rule"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "create_rule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/automation/rules/{id}": {
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "update_rule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rule"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "delete_rule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/calendar": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "get_calendar",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessCalendar"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Sets the working week and time zone and switches the calendar on or off. Open tickets get new\ndue times.",
+        "operationId": "put_calendar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalendarInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessCalendar"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/calendar/holidays": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "add_holiday",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HolidayInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Holiday"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/calendar/holidays/{id}": {
+      "delete": {
+        "tags": [
+          "helpdesk"
+        ],
+        "operationId": "delete_holiday",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/helpdesk/calls": {
       "post": {
         "tags": [
@@ -1922,6 +2354,244 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/InboundResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/reports": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "The helpdesk report for a period. Response and resolution times are in business time when the\ncompany's calendar is on (see `basis`). Days are the company's local days.",
+        "operationId": "get_report",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "First day (inclusive), `YYYY-MM-DD`. Default: 29 days before `to`.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Last day (inclusive). Default: today.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "team_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "description": "`day` (default) or `week` (weeks start on Monday).",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/helpdesk/reports/export": {
+      "get": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "One table of the report as a CSV file.",
+        "operationId": "export_report",
+        "parameters": [
+          {
+            "name": "table",
+            "in": "query",
+            "description": "volume | backlog_status | backlog_priority | backlog_team | backlog_owner | times | sla |\nbreaches_by_team | top_categories | top_tags | time_by_user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date"
+            }
+          },
+          {
+            "name": "team_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "group",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
                 }
               }
             }
@@ -9367,6 +10037,78 @@
         }
       }
     },
+    "/api/v1/tickets/{id}/split": {
+      "post": {
+        "tags": [
+          "helpdesk"
+        ],
+        "summary": "Moves the selected messages, with their attachments, into a new ticket for the same customer\nand contact. The new ticket starts open with its own service level clock, in the same team and\nwith the same owner; both tickets get a note and an audit event. A split cannot be undone\n(merge can join tickets again). Returns the new ticket.",
+        "operationId": "split_ticket",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SplitInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/tickets/{id}/tags": {
       "post": {
         "tags": [
@@ -10203,6 +10945,59 @@
           }
         }
       },
+      "BusinessCalendar": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "time_zone",
+          "hours",
+          "holidays"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "description": "When off, SLA times are plain elapsed time."
+          },
+          "holidays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Holiday"
+            }
+          },
+          "hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkingHours"
+            }
+          },
+          "time_zone": {
+            "type": "string",
+            "description": "An IANA name such as `Europe/Brussels`."
+          }
+        }
+      },
+      "CalendarInput": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "time_zone",
+          "hours"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "hours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkingHours"
+            }
+          },
+          "time_zone": {
+            "type": "string"
+          }
+        }
+      },
       "CallInput": {
         "type": "object",
         "description": "A phone call, logged on a ticket (existing or new).",
@@ -10798,6 +11593,27 @@
           }
         }
       },
+      "CountRow": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "key": {
+            "type": "string",
+            "description": "The value (status, priority, category, tag) or an id for teams and owners; empty = none."
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
       "CsatInfo": {
         "type": "object",
         "required": [
@@ -10845,6 +11661,36 @@
           "rating": {
             "type": "string",
             "description": "good | bad"
+          }
+        }
+      },
+      "CsatStats": {
+        "type": "object",
+        "required": [
+          "responses",
+          "good",
+          "bad"
+        ],
+        "properties": {
+          "average_percent": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Average satisfaction: share of \"good\" ratings, 0-100."
+          },
+          "bad": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "good": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "responses": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -11227,6 +12073,72 @@
         "properties": {
           "done": {
             "type": "boolean"
+          }
+        }
+      },
+      "DryRun": {
+        "type": "object",
+        "required": [
+          "ticket_number",
+          "trigger",
+          "rules"
+        ],
+        "properties": {
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RuleOutcome"
+            },
+            "description": "One entry per rule, in running order. Nothing was changed."
+          },
+          "ticket_number": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "string"
+          }
+        }
+      },
+      "DryRunInput": {
+        "type": "object",
+        "required": [
+          "ticket_id",
+          "trigger"
+        ],
+        "properties": {
+          "ticket_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trigger": {
+            "type": "string",
+            "description": "created | updated | customer_replied"
+          }
+        }
+      },
+      "DurationStats": {
+        "type": "object",
+        "required": [
+          "count"
+        ],
+        "properties": {
+          "average_minutes": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "p90_minutes": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
           }
         }
       },
@@ -11741,6 +12653,43 @@
             ],
             "format": "uuid",
             "description": "New tickets from e-mail, the portal and the phone start in this team."
+          }
+        }
+      },
+      "Holiday": {
+        "type": "object",
+        "required": [
+          "id",
+          "day",
+          "name"
+        ],
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "HolidayInput": {
+        "type": "object",
+        "required": [
+          "day",
+          "name"
+        ],
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -15228,6 +16177,122 @@
           }
         }
       },
+      "Report": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "group",
+          "basis",
+          "volume",
+          "backlog_by_status",
+          "backlog_by_priority",
+          "backlog_by_team",
+          "backlog_by_owner",
+          "first_response",
+          "resolution",
+          "sla",
+          "breaches_by_team",
+          "csat",
+          "top_categories",
+          "top_tags",
+          "time_by_user",
+          "time_billable_minutes",
+          "time_non_billable_minutes"
+        ],
+        "properties": {
+          "backlog_by_owner": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            }
+          },
+          "backlog_by_priority": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            }
+          },
+          "backlog_by_status": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            }
+          },
+          "backlog_by_team": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            }
+          },
+          "basis": {
+            "type": "string",
+            "description": "How response and resolution times are measured: `business` (the company's calendar is\non) or `elapsed`."
+          },
+          "breaches_by_team": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamBreaches"
+            }
+          },
+          "csat": {
+            "$ref": "#/components/schemas/CsatStats"
+          },
+          "first_response": {
+            "$ref": "#/components/schemas/DurationStats"
+          },
+          "from": {
+            "type": "string",
+            "format": "date"
+          },
+          "group": {
+            "type": "string",
+            "description": "day | week"
+          },
+          "resolution": {
+            "$ref": "#/components/schemas/DurationStats"
+          },
+          "sla": {
+            "$ref": "#/components/schemas/SlaStats"
+          },
+          "time_billable_minutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "time_by_user": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeRow"
+            }
+          },
+          "time_non_billable_minutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "to": {
+            "type": "string",
+            "format": "date"
+          },
+          "top_categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            }
+          },
+          "top_tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            }
+          },
+          "volume": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VolumePoint"
+            }
+          }
+        }
+      },
       "RepricingComparison": {
         "type": "object",
         "description": "What would change if a quotation were repriced at today's prices.",
@@ -15396,6 +16461,276 @@
             "format": "uuid"
           },
           "note": {
+            "type": "string"
+          }
+        }
+      },
+      "Rule": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "active",
+          "position",
+          "trigger",
+          "conditions",
+          "actions",
+          "stop_on_match",
+          "updated_at"
+        ],
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RuleAction"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "conditions": {
+            "$ref": "#/components/schemas/RuleConditions"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Rules run in this order."
+          },
+          "stop_on_match": {
+            "type": "boolean",
+            "description": "Later rules are not looked at when this one matched."
+          },
+          "trigger": {
+            "type": "string",
+            "description": "created | updated | customer_replied"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RuleAction": {
+        "type": "object",
+        "description": "One change a rule makes. `kind` decides which of the other fields is used:\n`set_owner` (`user_id`), `set_team` (`team_id`), `set_priority` (`value`), `set_category`\n(`value`), `add_tag` (`value`), `set_internal` (`flag`).",
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "flag": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "value": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RuleChange": {
+        "type": "object",
+        "description": "A change a rule made (or, in a dry run, would make).",
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "from": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "to": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RuleConditions": {
+        "type": "object",
+        "description": "What a ticket must look like for a rule to apply. Every given condition has to hold; a list\nholds when the ticket has any one of its values. Empty conditions match every ticket.",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "email | portal | phone | manual | internal"
+          },
+          "customer_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "customer_languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The language of the customer (nl, fr, en, de, es)."
+          },
+          "owner": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`empty` (nobody owns the ticket) or `set` (somebody does)."
+          },
+          "priorities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "sender_domain": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The part of the contact's address after the `@`, case-insensitive."
+          },
+          "statuses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "subject_contains": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Case-insensitive part of the subject."
+          },
+          "tag": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "RuleInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "trigger",
+          "actions"
+        ],
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RuleAction"
+            }
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "conditions": {
+            "$ref": "#/components/schemas/RuleConditions"
+          },
+          "name": {
+            "type": "string"
+          },
+          "stop_on_match": {
+            "type": "boolean"
+          },
+          "trigger": {
+            "type": "string"
+          }
+        }
+      },
+      "RuleOrder": {
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Every rule of the company, in the wanted order."
+          }
+        }
+      },
+      "RuleOutcome": {
+        "type": "object",
+        "description": "What happened to one rule in one evaluation.",
+        "required": [
+          "rule_id",
+          "rule_name",
+          "result",
+          "changes"
+        ],
+        "properties": {
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RuleChange"
+            },
+            "description": "The changes that actually change the ticket (actions that change nothing are left out)."
+          },
+          "result": {
+            "type": "string",
+            "description": "matched | no_match | inactive | other_trigger | after_stop"
+          },
+          "rule_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "rule_name": {
             "type": "string"
           }
         }
@@ -15707,6 +17042,60 @@
           }
         }
       },
+      "SlaStats": {
+        "type": "object",
+        "required": [
+          "tickets",
+          "breached",
+          "compliant"
+        ],
+        "properties": {
+          "breached": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "compliance_percent": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Share of tickets that did not breach, 0-100."
+          },
+          "compliant": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tickets": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tickets with a service level that were created in the period."
+          }
+        }
+      },
+      "SplitInput": {
+        "type": "object",
+        "required": [
+          "article_ids"
+        ],
+        "properties": {
+          "article_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The messages (articles) that move to the new ticket. At least one, and not all of them."
+          },
+          "subject": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The subject of the new ticket; default: the subject of the first moved message, else the\nsubject of this ticket."
+          }
+        }
+      },
       "StageInput": {
         "type": "object",
         "required": [
@@ -15894,6 +17283,34 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "TeamBreaches": {
+        "type": "object",
+        "required": [
+          "team",
+          "tickets",
+          "breached"
+        ],
+        "properties": {
+          "breached": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "team": {
+            "type": "string"
+          },
+          "team_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "tickets": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -16416,6 +17833,37 @@
           }
         }
       },
+      "TimeRow": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "name",
+          "total_minutes",
+          "billable_minutes",
+          "non_billable_minutes"
+        ],
+        "properties": {
+          "billable_minutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "non_billable_minutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_minutes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "VatGroup": {
         "type": "object",
         "required": [
@@ -16432,6 +17880,29 @@
           },
           "vat_rate": {
             "type": "string"
+          }
+        }
+      },
+      "VolumePoint": {
+        "type": "object",
+        "required": [
+          "period",
+          "created",
+          "closed"
+        ],
+        "properties": {
+          "closed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "created": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "period": {
+            "type": "string",
+            "format": "date",
+            "description": "The day, or the Monday of the week."
           }
         }
       },
@@ -16509,6 +17980,28 @@
           "started_at": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "WorkingHours": {
+        "type": "object",
+        "required": [
+          "weekday",
+          "start_time",
+          "end_time"
+        ],
+        "properties": {
+          "end_time": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string",
+            "description": "`HH:MM`, local time."
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32",
+            "description": "1 = Monday ... 7 = Sunday. A weekday that is not listed is closed."
           }
         }
       },
