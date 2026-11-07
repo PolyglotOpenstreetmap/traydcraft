@@ -24,3 +24,4 @@ accepted one; mark superseded records as such.
 | [0017](0017-helpdesk-sla-teams-attachments.md) | Helpdesk: SLA and escalation, teams, attachments, tags, merge, time, satisfaction | Accepted |
 | [0018](0018-knowledge-base.md) | Knowledge base: five languages, full-text search, versions, portal and public reading | Accepted |
 | [0020](0020-field-service-reports-contracts.md) | Field service: signature, parts, installed base and warranty, service report, maintenance contracts | Accepted |
+| [0022](0022-technician-offline-queue.md) | Technician offline queue: idempotent field writes, persistent replay queue, read cache | Accepted |
