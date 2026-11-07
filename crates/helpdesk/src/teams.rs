@@ -402,6 +402,7 @@ async fn assign(
         serde_json::json!({ "team_id": input.team_id, "owner_user_id": input.owner_user_id }),
     )
     .await?;
+    crate::automation::run(&mut tx, user.company_id, id, "updated").await?;
     let d = load_detail(&mut tx, user.company_id, id).await?;
     tx.commit().await?;
     Ok(Json(d))

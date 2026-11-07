@@ -186,6 +186,12 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
             },
           ),
         OutlinedButton.icon(
+          key: const ValueKey('open-reports'),
+          icon: const Icon(Icons.bar_chart),
+          label: Text(l.helpdeskReports),
+          onPressed: () => context.push('/helpdesk/reports'),
+        ),
+        OutlinedButton.icon(
           icon: const Icon(Icons.text_snippet_outlined),
           label: Text(l.preparedAnswers),
           onPressed: () => context.push('/helpdesk/answers'),

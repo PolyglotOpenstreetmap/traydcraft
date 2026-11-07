@@ -3,6 +3,13 @@
   "accepted": "Accepted",
   "accessToken": "Access token",
   "account": "Account",
+  "action": "Action",
+  "actionAddTag": "Add tag",
+  "actionSetCategory": "Set category",
+  "actionSetInternal": "Mark as internal",
+  "actionSetOwner": "Set owner",
+  "actionSetPriority": "Set priority",
+  "actionSetTeam": "Set team",
   "actions": "Actions",
   "activate": "Activate",
   "active": "Active",
@@ -14,6 +21,8 @@
       }
     }
   },
+  "add": "Add",
+  "addAction": "Add action",
   "addComponent": "Add component",
   "addComponentBySerial": "Add component by serial number (in stock)",
   "addMember": "Add member",
@@ -41,6 +50,8 @@
   "addressInformal": "Informal (Hi Sam)",
   "agreed": "Agreed",
   "all": "All",
+  "allCategories": "All categories",
+  "allOwners": "All owners",
   "allProducts": "All products",
   "allStatuses": "All statuses",
   "allTags": "All tags",
@@ -67,6 +78,7 @@
       }
     }
   },
+  "anyValue": "Any",
   "appLanguage": "Language",
   "appTitle": "traydcraft",
   "apply": "Apply",
@@ -75,17 +87,33 @@
   "attachments": "Attachments",
   "attachmentsHelp": "Images (JPEG, PNG, WebP) and PDF, up to 12 MB",
   "automatic": "Automatic",
+  "automationHelp": "Rules run in this order when a ticket is created, changed or answered by the customer. A rule applies when all its conditions match. Rules change tickets only; they send no e-mail.",
+  "automationRules": "Automation rules",
   "backIntoWork": "Back into work",
   "backToCurrentRevision": "Back to current revision",
+  "backlogByOwner": "Open tickets by owner",
+  "backlogByPriority": "Open tickets by priority",
+  "backlogByStatus": "Open tickets by status",
+  "backlogByTeam": "Open tickets by team",
+  "basisBusiness": "business hours",
+  "basisElapsed": "elapsed time",
   "billOfMaterials": "Bill of materials",
   "billable": "Billable",
   "bomActive": "active",
   "bomObsolete": "obsolete",
   "bomRev": "BOM rev.",
   "bomRevision": "BOM revision",
+  "breached": "Breached",
+  "breachesByTeam": "SLA breaches by team",
   "builtInto": "Built into",
   "bulkKeepsQuotes": "Quotations before this date keep using the current prices",
   "bulkPriceChange": "Bulk price change",
+  "businessHours": "Business hours",
+  "businessHoursEnabled": "Count business hours only",
+  "businessHoursHelp": "Service level times count only the hours below, on days that are not holidays. Switched off, they run around the clock.",
+  "businessHoursInvalidTime": "Enter times as HH:MM.",
+  "businessHoursRecompute": "Saving recalculates the due times of all open tickets.",
+  "businessHoursSaved": "Saved. Open tickets were recalculated.",
   "byStage": "by stage",
   "callIncoming": "Incoming call",
   "callLogged": "Call logged",
@@ -129,12 +157,20 @@
   "cc": "Cc",
   "change": "Change",
   "changePriority": "Change priority",
+  "channel": "Channel",
+  "channelEmail": "E-mail",
+  "channelInternal": "Internal question",
+  "channelManual": "Entered by hand",
+  "channelPhone": "Phone",
+  "channelPortal": "Portal",
   "chooseCustomerAndLine": "Choose a customer and add at least one valid line.",
   "choosePhoto": "Choose from gallery",
   "chooseRebateTarget": "Choose a product or family and enter a percentage.",
   "chooseZonePrice": "Choose a zone and enter a price.",
   "city": "City",
   "close": "Close",
+  "closedLabel": "closed",
+  "closes": "Closes",
   "code": "Code",
   "codeNameVatRequired": "Code, name and VAT rate are required.",
   "completeJob": "Complete job",
@@ -193,7 +229,9 @@
   "create": "Create",
   "createLead": "Create lead",
   "createRepair": "Create repair",
+  "created": "created",
   "csatAlready": "This survey was already answered.",
+  "csatAverage": "Customer satisfaction",
   "csatBad": "Not satisfied",
   "csatComment": "Comment (optional)",
   "csatEnabled": "Send a satisfaction survey when a ticket is closed",
@@ -208,8 +246,17 @@
       }
     }
   },
+  "csatResponses": "{count} responses",
+  "@csatResponses": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "csatThanks": "Thank you for your feedback!",
   "csatTitle": "Customer satisfaction",
+  "csvCopied": "CSV copied to the clipboard",
   "current": "Current",
   "customer": "Customer",
   "customerLanguage": "Customer language",
@@ -234,6 +281,7 @@
   "customers": "Customers",
   "date": "Date",
   "defaultTeam": "Default team for new tickets",
+  "deleteRuleConfirm": "Delete this rule? Tickets that it changed keep their changes.",
   "deliveryFailed": "not sent",
   "deliveryQueued": "waiting to send",
   "deliverySent": "sent",
@@ -250,6 +298,9 @@
   "dismiss": "Dismiss",
   "dismissRequest": "Dismiss request",
   "draftSaved": "Draft saved",
+  "dryRun": "Try on a ticket",
+  "dryRunHelp": "Shows which rules would apply to a ticket and what they would change. Nothing is changed.",
+  "dryRunRun": "Run test",
   "edit": "Edit",
   "editContact": "Edit contact",
   "editDepartment": "Edit department",
@@ -278,6 +329,7 @@
   "expectedValueEur": "Expected value (€)",
   "expectedValueOptional": "Expected value (optional)",
   "explode": "Explode",
+  "exportCsv": "Copy as CSV",
   "families": "Families",
   "family": "Family",
   "familyNamed": "Family {code}",
@@ -291,6 +343,7 @@
   "faultDescription": "What is wrong",
   "firstName": "First name",
   "firstResponseMinutes": "First response (min)",
+  "firstResponseTime": "First response",
   "from": "From",
   "fromYou": "You",
   "generalRebateInfo": "General rebate on all products: {percent} % (net-priced products are never discounted).",
@@ -311,8 +364,13 @@
     }
   },
   "helpdesk": "Helpdesk",
+  "helpdeskReports": "Reports",
   "helpdeskSettings": "Helpdesk settings",
   "history": "History",
+  "holidayDate": "Date",
+  "holidayInvalid": "Enter a date (YYYY-MM-DD) and a name.",
+  "holidays": "Holidays",
+  "holidaysHelp": "Days on which the helpdesk is closed.",
   "inactive": "inactive",
   "inactiveContact": "No longer active (left the company)",
   "indicativeLine": "{description} (indicative, to confirm)",
@@ -366,6 +424,14 @@
       }
     }
   },
+  "lastDays": "Last {days} days",
+  "@lastDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
   "lastName": "Last name",
   "leadCreated": "Lead created",
   "lineDiscount": "Line disc.",
@@ -410,6 +476,8 @@
       }
     }
   },
+  "moveDown": "Move down",
+  "moveUp": "Move up",
   "myJobs": "My jobs",
   "myOrders": "My orders",
   "myProfile": "My details",
@@ -449,8 +517,10 @@
       }
     }
   },
+  "newRule": "New rule",
   "newTeam": "New team",
   "newTicket": "New ticket",
+  "no": "No",
   "noAccess": "Your account has no access to any section yet. Ask an administrator.",
   "noActiveBom": "No active bill of materials.",
   "noBom": "No bill of materials yet.",
@@ -470,12 +540,14 @@
   "noRebates": "No product or family rebates.",
   "noRepairs": "No repairs.",
   "noRepairsYet": "You have no repairs yet.",
+  "noRules": "No rules yet.",
   "noSerialComponents": "No serialised components.",
   "noTeam": "No team",
   "noTechnicians": "Nobody assigned",
   "noTicketsYet": "You have no tickets yet.",
   "noTimeEntries": "No time logged yet.",
   "nobodyFound": "Nobody found with this number.",
+  "nonBillable": "Not billable",
   "none": "None",
   "notClosed": "Not closed",
   "notRouted": "Not routed yet",
@@ -509,6 +581,7 @@
       }
     }
   },
+  "opens": "Opens",
   "opportunities": "Opportunities",
   "opportunity": "Opportunity",
   "opportunityOptional": "Opportunity (optional)",
@@ -533,8 +606,13 @@
   "orderStatusReadyForShipping": "ready for shipping",
   "orders": "Orders",
   "owner": "Owner",
+  "ownerEmpty": "Nobody",
+  "ownerSet": "Somebody",
+  "p90": "90% within",
   "paymentDays": "Payment days",
   "pdf": "PDF",
+  "perDay": "Per day",
+  "perWeek": "Per week",
   "personTitle": "Title",
   "phone": "Phone",
   "phoneCall": "Phone call",
@@ -782,6 +860,8 @@
   "requestStatusOpen": "open",
   "required": "Required",
   "resolutionMinutes": "Resolution (min)",
+  "resolutionTime": "Resolution",
+  "responseTimes": "Response and resolution times",
   "retry": "Retry",
   "revisionActivated": "Revision activated",
   "revisionItem": "Revision {revision} · {status} · {lines} lines",
@@ -841,6 +921,19 @@
   "roundTo": "Round to",
   "routeNote": "Note for the department",
   "routeRepair": "Route to department",
+  "ruleActions": "Actions",
+  "ruleConditions": "Conditions (all must match)",
+  "ruleConditionsHelp": "Pick any number of values per line; a ticket needs one of them. Empty lines are ignored.",
+  "ruleNameRequired": "A rule needs a name.",
+  "ruleResultAfterStop": "skipped (stopped)",
+  "ruleResultInactive": "off",
+  "ruleResultMatched": "applies",
+  "ruleResultNoMatch": "no match",
+  "ruleResultOtherTrigger": "other event",
+  "ruleTrigger": "When",
+  "ruleTriggerCreated": "A ticket is created",
+  "ruleTriggerCustomerReplied": "The customer replies",
+  "ruleTriggerUpdated": "A ticket is updated by staff",
   "salesperson": "Salesperson",
   "save": "Save",
   "saveChanges": "Save changes",
@@ -863,6 +956,7 @@
   "sendLoginLink": "Send login link",
   "sendOrderConfirmation": "Send order confirmation",
   "sendOrderConfirmationHelp": "The order confirmation is e-mailed to the customer as a PDF. The revision can no longer be edited afterwards.",
+  "senderDomain": "Sender domain",
   "serial": "serial",
   "serialBuiltIn": "built in",
   "serialDelivered": "delivered",
@@ -897,8 +991,21 @@
     }
   },
   "sla": "SLA",
+  "slaAndSatisfaction": "SLA and satisfaction",
   "slaAtRisk": "At risk",
   "slaBreached": "Breached",
+  "slaCompliance": "SLA compliance",
+  "slaComplianceDetail": "{breached} of {total} breached",
+  "@slaComplianceDetail": {
+    "placeholders": {
+      "breached": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "slaDue": "Due {date}",
   "@slaDue": {
     "placeholders": {
@@ -932,6 +1039,19 @@
   "slaPolicies": "Service levels (SLA)",
   "slaPoliciesHelp": "Plain elapsed time, business hours are not taken into account. The clock stops while a ticket waits for the customer.",
   "slaResolution": "Resolution",
+  "splitAction": "Split",
+  "splitFiles": "{count} file(s)",
+  "@splitFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "splitHelp": "Choose the messages that move to a new ticket for the same customer. Their files move with them. This cannot be undone (tickets can be merged again).",
+  "splitKeepOne": "At least one message must stay in this ticket.",
+  "splitSubjectOptional": "Subject of the new ticket (optional)",
+  "splitTicket": "Split ticket…",
   "stage": "Stage",
   "stageLead": "lead",
   "stageLost": "lost",
@@ -948,6 +1068,8 @@
   "statusRejected": "rejected",
   "statusSent": "sent",
   "statusSuperseded": "superseded",
+  "stopOnMatch": "Stop after this rule",
+  "stopOnMatchHelp": "When it matches, the rules after it are skipped.",
   "street": "Street",
   "streetAddress": "Street and number",
   "structureRevision": "Structure (revision {revision})",
@@ -960,6 +1082,7 @@
   },
   "subassembly": "subassembly",
   "subject": "Subject",
+  "subjectContains": "Subject contains",
   "subjectOptional": "Subject (optional)",
   "suggested": "Suggested: {value}",
   "@suggested": {
@@ -969,6 +1092,7 @@
       }
     }
   },
+  "tag": "Tag",
   "tags": "Tags",
   "takePhoto": "Take a photo",
   "tasks": "Tasks",
@@ -990,17 +1114,29 @@
   "teams": "Teams",
   "technicians": "Technicians",
   "text": "Text",
+  "ticket": "Ticket",
   "ticketClosed": "Closed",
   "ticketDetails": "Ticket details",
   "ticketInProgress": "In progress",
   "ticketMerged": "Tickets merged",
   "ticketOpened": "Ticket opened",
+  "ticketSplit": "Created ticket {number}",
+  "@ticketSplit": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "ticketStatusClosed": "closed",
   "ticketStatusNew": "new",
   "ticketStatusOpen": "open",
   "ticketStatusPendingCustomer": "waiting for customer",
   "ticketStatusPendingInternal": "waiting for colleague",
+  "ticketVolume": "Tickets created and closed",
   "ticketWaitingForYou": "Waiting for your reply",
+  "tickets": "Tickets",
+  "timeLogged": "Time logged",
   "timeNote": "Note",
   "timeTotal": "Total {total}, billable {billable}",
   "@timeTotal": {
@@ -1025,12 +1161,15 @@
     }
   },
   "timeTracking": "Time tracking",
+  "timeZone": "Time zone",
   "title": "Title",
   "titleCustomerValueRequired": "Title, customer and a valid value are required.",
   "titleMr": "Mr.",
   "titleMs": "Ms.",
   "titleNone": "Not specified",
   "to": "To",
+  "topCategories": "Top categories",
+  "topTags": "Top tags",
   "total": "Total",
   "totalChange": "Total excl. VAT: {from} → {to} ({difference})",
   "@totalChange": {
@@ -1101,6 +1240,13 @@
   "warrantyIn": "In warranty",
   "warrantyOut": "Out of warranty",
   "warrantyUnknown": "Unknown",
+  "weekdayFriday": "Friday",
+  "weekdayMonday": "Monday",
+  "weekdaySaturday": "Saturday",
+  "weekdaySunday": "Sunday",
+  "weekdayThursday": "Thursday",
+  "weekdayTuesday": "Tuesday",
+  "weekdayWednesday": "Wednesday",
   "weighted": "weighted {amount}",
   "@weighted": {
     "placeholders": {
@@ -1125,6 +1271,7 @@
       }
     }
   },
+  "yes": "Yes",
   "yourMessage": "Your message",
   "yourReference": "Your reference (RMA or order)",
   "zone": "Zone",

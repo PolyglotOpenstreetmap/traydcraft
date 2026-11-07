@@ -5,6 +5,8 @@
 
 pub mod answers;
 pub mod attachments;
+pub mod automation;
+pub mod calendar;
 pub mod classify;
 pub mod csat;
 pub mod email;
@@ -15,7 +17,9 @@ pub mod language;
 pub mod mailer;
 pub mod portal;
 pub mod render;
+pub mod reports;
 pub mod sla;
+pub mod split;
 pub mod teams;
 pub mod tickets;
 
@@ -23,5 +27,10 @@ use traydcraft_core::AppState;
 use utoipa_axum::router::OpenApiRouter;
 
 pub fn router() -> OpenApiRouter<AppState> {
-    tickets::router().merge(answers::router())
+    tickets::router()
+        .merge(answers::router())
+        .merge(calendar::router())
+        .merge(automation::router())
+        .merge(split::router())
+        .merge(reports::router())
 }

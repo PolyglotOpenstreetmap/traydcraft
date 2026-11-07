@@ -164,8 +164,8 @@ pub async fn open(
     let email = contact.primary_email().unwrap_or_default().to_string();
     sqlx::query(
         "INSERT INTO helpdesk.tickets (id, company_id, number, subject, category, language, customer_id,
-                                       contact_id, contact_name, contact_email)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+                                       contact_id, contact_name, contact_email, channel)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'portal')",
     )
     .bind(id)
     .bind(v.company_id)
@@ -182,6 +182,7 @@ pub async fn open(
     insert_message(conn, id, &contact, &email, subject.trim(), body).await?;
     crate::teams::assign_default_team(conn, v.company_id, id).await?;
     crate::sla::sync(conn, id).await?;
+    crate::automation::run(conn, v.company_id, id, "created").await?;
     audit::record_system(
         conn,
         v.company_id,
@@ -253,6 +254,7 @@ pub async fn add_message(
     .execute(&mut *conn)
     .await?;
     crate::sla::sync(conn, ticket_id).await?;
+    crate::automation::run(conn, v.company_id, ticket_id, "customer_replied").await?;
     audit::record_system(
         conn,
         v.company_id,

@@ -16,6 +16,7 @@ import '../kb/kb_suggestions.dart';
 import '../repairs/repairs_page.dart' show showNewRepairDialog;
 import 'call_dialogs.dart';
 import 'ticket_extras.dart';
+import 'ticket_split.dart';
 import 'tickets_page.dart';
 
 final teamsProvider = FutureProvider.autoDispose<List<Team>>(
@@ -306,6 +307,22 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     _apply(target);
     if (GoRouter.maybeOf(context) != null) {
       context.pushReplacement('/helpdesk/${target.ticket.id}');
+    }
+  }
+
+  Future<void> _split() async {
+    final l = context.l10n;
+    final d = await showSplitDialog(
+      context,
+      ticket: _d!.ticket,
+      articles: _d!.articles,
+    );
+    if (d == null || !mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(l.ticketSplit(d.ticket.number))));
+    await _load();
+    if (mounted && GoRouter.maybeOf(context) != null) {
+      context.push('/helpdesk/${d.ticket.id}');
     }
   }
 
@@ -994,6 +1011,13 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                 icon: const Icon(Icons.merge_type),
                 label: Text(l.mergeTicket),
                 onPressed: _busy ? null : _merge,
+              ),
+            if (canWrite && t.mergedIntoId == null && _d!.articles.length > 1)
+              OutlinedButton.icon(
+                key: const ValueKey('split-ticket'),
+                icon: const Icon(Icons.call_split),
+                label: Text(l.splitTicket),
+                onPressed: _busy ? null : _split,
               ),
             for (final r in _repairs)
               ActionChip(

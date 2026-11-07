@@ -6,12 +6,18 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/assignment_input.dart';
+import '../models/business_calendar.dart';
+import '../models/calendar_input.dart';
 import '../models/call_input.dart';
 import '../models/convert_ticket_input.dart';
 import '../models/csat_info.dart';
 import '../models/csat_input.dart';
+import '../models/dry_run.dart';
+import '../models/dry_run_input.dart';
 import '../models/file_info.dart';
 import '../models/helpdesk_settings.dart';
+import '../models/holiday.dart';
+import '../models/holiday_input.dart';
 import '../models/inbound_result.dart';
 import '../models/lead_input.dart';
 import '../models/merge_input.dart';
@@ -22,9 +28,14 @@ import '../models/prepared_answer_input.dart';
 import '../models/production_question_input.dart';
 import '../models/rendered_answer.dart';
 import '../models/reply_input.dart';
+import '../models/report.dart';
+import '../models/rule.dart';
+import '../models/rule_input.dart';
+import '../models/rule_order.dart';
 import '../models/settings_input.dart';
 import '../models/sla_policies_input.dart';
 import '../models/sla_policy.dart';
+import '../models/split_input.dart';
 import '../models/tag_count.dart';
 import '../models/tag_input.dart';
 import '../models/team.dart';
@@ -55,6 +66,58 @@ abstract class HelpdeskClient {
     @Body() required CsatInput body,
   });
 
+  /// Shows which rules would match the ticket for an event and what they would change, without.
+  /// changing anything.
+  @POST('/api/v1/helpdesk/automation/dry-run')
+  Future<DryRun> dryRun({
+    @Body() required DryRunInput body,
+  });
+
+  /// Sets the order in which rules run. The list must contain every rule of the company once.
+  @PUT('/api/v1/helpdesk/automation/order')
+  Future<List<Rule>> reorderRules({
+    @Body() required RuleOrder body,
+  });
+
+  @GET('/api/v1/helpdesk/automation/rules')
+  Future<List<Rule>> listRules();
+
+  @POST('/api/v1/helpdesk/automation/rules')
+  Future<Rule> createRule({
+    @Body() required RuleInput body,
+  });
+
+  @PUT('/api/v1/helpdesk/automation/rules/{id}')
+  Future<Rule> updateRule({
+    @Path('id') required String id,
+    @Body() required RuleInput body,
+  });
+
+  @DELETE('/api/v1/helpdesk/automation/rules/{id}')
+  Future<void> deleteRule({
+    @Path('id') required String id,
+  });
+
+  @GET('/api/v1/helpdesk/calendar')
+  Future<BusinessCalendar> getCalendar();
+
+  /// Sets the working week and time zone and switches the calendar on or off. Open tickets get new.
+  /// due times.
+  @PUT('/api/v1/helpdesk/calendar')
+  Future<BusinessCalendar> putCalendar({
+    @Body() required CalendarInput body,
+  });
+
+  @POST('/api/v1/helpdesk/calendar/holidays')
+  Future<Holiday> addHoliday({
+    @Body() required HolidayInput body,
+  });
+
+  @DELETE('/api/v1/helpdesk/calendar/holidays/{id}')
+  Future<void> deleteHoliday({
+    @Path('id') required String id,
+  });
+
   /// Logs a phone call. The caller is looked up by phone number; the call is added to the given.
   /// ticket, or a new ticket is opened for it.
   @POST('/api/v1/helpdesk/calls')
@@ -66,6 +129,39 @@ abstract class HelpdeskClient {
   @POST('/api/v1/helpdesk/inbound')
   Future<InboundResult> inbound({
     @Body() required String body,
+  });
+
+  /// The helpdesk report for a period. Response and resolution times are in business time when the.
+  /// company's calendar is on (see `basis`). Days are the company's local days.
+  ///
+  /// [from] - First day (inclusive), `YYYY-MM-DD`. Default: 29 days before `to`.
+  ///
+  /// [to] - Last day (inclusive). Default: today.
+  ///
+  /// [group] - `day` (default) or `week` (weeks start on Monday).
+  @GET('/api/v1/helpdesk/reports')
+  Future<Report> getReport({
+    @Query('from') DateTime? from,
+    @Query('to') DateTime? to,
+    @Query('team_id') String? teamId,
+    @Query('owner_id') String? ownerId,
+    @Query('category') String? category,
+    @Query('group') String? group,
+  });
+
+  /// One table of the report as a CSV file.
+  ///
+  /// [table] - volume | backlog_status | backlog_priority | backlog_team | backlog_owner | times | sla |.
+  /// breaches_by_team | top_categories | top_tags | time_by_user.
+  @GET('/api/v1/helpdesk/reports/export')
+  Future<String> exportReport({
+    @Query('table') required String table,
+    @Query('from') DateTime? from,
+    @Query('to') DateTime? to,
+    @Query('team_id') String? teamId,
+    @Query('owner_id') String? ownerId,
+    @Query('category') String? category,
+    @Query('group') String? group,
   });
 
   @GET('/api/v1/helpdesk/settings')
@@ -250,6 +346,16 @@ abstract class HelpdeskClient {
   Future<TicketDetail> reply({
     @Path('id') required String id,
     @Body() required ReplyInput body,
+  });
+
+  /// Moves the selected messages, with their attachments, into a new ticket for the same customer.
+  /// and contact. The new ticket starts open with its own service level clock, in the same team and.
+  /// with the same owner; both tickets get a note and an audit event. A split cannot be undone.
+  /// (merge can join tickets again). Returns the new ticket.
+  @POST('/api/v1/tickets/{id}/split')
+  Future<TicketDetail> splitTicket({
+    @Path('id') required String id,
+    @Body() required SplitInput body,
   });
 
   @POST('/api/v1/tickets/{id}/tags')
