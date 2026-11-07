@@ -12,7 +12,7 @@ Module overview: [ARCHITECTURE.md](ARCHITECTURE.md).
 | Order lifecycle (revisions, confirmation, priority) | Done, [ADR 0016](adr/0016-order-lifecycle.md) |
 | A1 Helpdesk SLA, teams, attachments, tags, merge, time, CSAT | Done, ADR 0017 (PR #2) |
 | A2 Knowledge base | Done, ADR 0018 (PR #2) |
-| A4 Helpdesk business hours, automation rules, split, reporting | Done, ADR 0021 |
+| Helpdesk follow-up: business hours, automation rules, split, reporting | Done, ADR 0021 |
 | A3 Field service completion | Open |
 | B1 Inventory foundation | Open |
 | B2 Purchasing | Open (needs B1) |
