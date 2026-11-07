@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -100,16 +101,50 @@ class _ProductStockScreenState extends ConsumerState<ProductStockScreen> {
       label: context.l10n.stockNote,
     );
     if (note == null || !mounted) return;
-    if (await runAction(
+    // The id is chosen once, so that sending the same reversal again is a retry, not a second one.
+    final id = newClientId();
+    Future<bool> send({required bool force}) => runAction(
       context,
       () => _api.inventory.reverse(
         id: m.id,
-        body: ReverseInput(id: newClientId(), note: note),
+        body: ReverseInput(id: id, note: note, force: force),
       ),
-    )) {
-      _changed = true;
-      await _load();
+    );
+    try {
+      await _api.inventory.reverse(
+        id: m.id,
+        body: ReverseInput(id: id, note: note),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      final blocked = e is DioException && e.response?.statusCode == 409;
+      if (!blocked) {
+        await runAction(context, () => throw e);
+        return;
+      }
+      // Stock that is reserved for orders: an administrator can still force the reversal.
+      final force = await showDialog<bool>(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: Text(context.l10n.stockReverseTitle),
+          content: Text(errorMessage(e)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(c, false),
+              child: Text(context.l10n.cancel),
+            ),
+            FilledButton(
+              key: const ValueKey('reverse-anyway'),
+              onPressed: () => Navigator.pop(c, true),
+              child: Text(context.l10n.stockReverseAnyway),
+            ),
+          ],
+        ),
+      );
+      if (force != true || !mounted || !await send(force: true)) return;
     }
+    _changed = true;
+    await _load();
   }
 
   @override
@@ -246,13 +281,19 @@ class _ProductStockScreenState extends ConsumerState<ProductStockScreen> {
               ListTile(
                 dense: true,
                 leading: const Icon(Icons.bookmark_outline),
-                title: Text('${r.orderNumber} · ${r.customerName}'),
+                title: Text(
+                  r.orderNumber == null
+                      ? '${r.referenceType} ${r.referenceId.substring(0, 8)}'
+                      : '${r.orderNumber} · ${r.customerName ?? ''}',
+                ),
                 subtitle: Text(
                   '${l.stockLocation}: ${r.location}'
                   '${r.lotNumber == null ? '' : ' · ${l.stockLot}: ${r.lotNumber}'}',
                 ),
                 trailing: Text(number(r.quantity)),
-                onTap: () => context.push('/orders/${r.orderId}'),
+                onTap: r.orderId == null
+                    ? null
+                    : () => context.push('/orders/${r.orderId}'),
               ),
           ],
           SectionTitle(l.stockMoves),

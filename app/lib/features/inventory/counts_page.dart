@@ -426,6 +426,29 @@ class _CountScreenState extends ConsumerState<CountScreen> {
           ),
           if (_error != null)
             Text(_error!, style: TextStyle(color: theme.colorScheme.error)),
+          if (open)
+            Card(
+              key: const ValueKey('count-warning'),
+              color: theme.colorScheme.errorContainer,
+              child: ListTile(
+                leading: Icon(
+                  Icons.warning_amber_outlined,
+                  color: theme.colorScheme.onErrorContainer,
+                ),
+                title: Text(
+                  l.countOverwriteWarning,
+                  style: TextStyle(color: theme.colorScheme.onErrorContainer),
+                ),
+              ),
+            ),
+          if (c.status == 'posted' && d.movedDuringCount > 0)
+            Card(
+              key: const ValueKey('count-moved'),
+              child: ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text(l.countMovedDuring(d.movedDuringCount)),
+              ),
+            ),
           if (open && canWrite)
             Wrap(
               spacing: 8,
@@ -533,10 +556,15 @@ class _CountScreenState extends ConsumerState<CountScreen> {
                   ),
                   SizedBox(
                     width: 80,
-                    child: Text(
-                      _difference(line),
-                      textAlign: TextAlign.end,
-                      style: TextStyle(color: _differenceColor(theme, line)),
+                    child: Tooltip(
+                      message: line.quantityAtPost == null
+                          ? ''
+                          : l.countStockAtPost(number(line.quantityAtPost)),
+                      child: Text(
+                        _difference(line),
+                        textAlign: TextAlign.end,
+                        style: TextStyle(color: _differenceColor(theme, line)),
+                      ),
                     ),
                   ),
                 ],

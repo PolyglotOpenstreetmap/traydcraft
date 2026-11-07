@@ -377,7 +377,11 @@ void main() {
     expect(body['kind'], 'warehouse');
   });
 
-  Map<String, Object?> count({String status = 'counting', int counted = 0}) => {
+  Map<String, Object?> count({
+    String status = 'counting',
+    int counted = 0,
+    int moved = 0,
+  }) => {
     'count': {
       'id': 'k1',
       'number': 'CNT-2026-00001',
@@ -408,8 +412,11 @@ void main() {
         'expected_quantity': '10.0000',
         'counted_quantity': counted == 0 ? null : '7.0000',
         'adjustment_move_id': null,
+        'quantity_at_post': status == 'posted' ? '9.0000' : null,
+        'difference_to_expected': counted == 0 ? null : '-3.0000',
       },
     ],
+    'moved_during_count': status == 'posted' ? moved : 0,
   };
 
   testWidgets('counting shows the difference and sends the quantities', (
@@ -436,6 +443,75 @@ void main() {
     expect(entry['line_id'], 'cl1');
     expect(entry['counted_quantity'], '7');
   });
+
+  testWidgets(
+    'an open count warns that movements during the count are overwritten',
+    (tester) async {
+      final http = _http(_write, {
+        'GET /api/v1/inventory/counts/k1': (_) => count(),
+      });
+      await _pump(tester, http, const CountScreen(id: 'k1'));
+      expect(find.byKey(const ValueKey('count-warning')), findsOneWidget);
+      expect(
+        find.textContaining('Movements made while you count are overwritten'),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets('a posted count says what moved while it was open', (
+    tester,
+  ) async {
+    final http = _http(_admin, {
+      'GET /api/v1/inventory/counts/k1': (_) =>
+          count(status: 'posted', counted: 1, moved: 2),
+    });
+    await _pump(tester, http, const CountScreen(id: 'k1'));
+    // No warning once it is closed; the lines that changed are reported.
+    expect(find.byKey(const ValueKey('count-warning')), findsNothing);
+    expect(find.byKey(const ValueKey('count-moved')), findsOneWidget);
+    expect(
+      find.textContaining('2 line(s) had stock movements'),
+      findsOneWidget,
+    );
+    expect(find.byTooltip('Stock when posted: 9'), findsOneWidget);
+  });
+
+  testWidgets(
+    'a reversal blocked by reservations can be forced by an administrator',
+    (tester) async {
+      final bodies = <Map<Object?, Object?>>[];
+      final http = _http(_admin, {
+        'POST /api/v1/inventory/moves/m1/reverse': (body) {
+          bodies.add(body as Map<Object?, Object?>);
+          return bodies.length == 1
+              ? const FakeStatus(409, {
+                  'error': 'conflict',
+                  'message': '4 of FRAME-A at WH1/MAIN is reserved for orders; only 1 can be taken',
+                })
+              : _move(id: 'm2', reason: 'reversal', reversedOf: 'm1');
+        },
+      });
+      await _pump(tester, http, const ProductStockScreen(id: 'p1'));
+      await tester.tap(find.byTooltip('Reverse'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, 'supplier error');
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      // The server's reason is shown and nothing was forced yet.
+      expect(find.textContaining('is reserved for orders'), findsOneWidget);
+      expect(bodies.single['force'], anyOf(isNull, false));
+      await tester.tap(find.byKey(const ValueKey('reverse-anyway')));
+      await tester.pumpAndSettle();
+      expect(bodies.length, 2);
+      expect(bodies[1]['force'], true);
+      expect(
+        bodies[1]['id'],
+        bodies[0]['id'],
+        reason: 'the same move id: a retry, not a second reversal',
+      );
+    },
+  );
 
   testWidgets('the admin posts a count after confirming', (tester) async {
     final http = _http(_admin, {

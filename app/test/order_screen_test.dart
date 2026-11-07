@@ -452,6 +452,7 @@ void main() {
         'ordered': '1.0000',
         'reserved': '0.0000',
         'on_hand': '3.0000',
+        'expired': '0.0000',
         'reserved_total': '1.0000',
         'available': '2.0000',
         'shortfall': '0.0000',
@@ -467,6 +468,7 @@ void main() {
         'ordered': '10.0000',
         'reserved': '4.0000',
         'on_hand': '4.0000',
+        'expired': '2.0000',
         'reserved_total': '4.0000',
         'available': '0.0000',
         'shortfall': '6.0000',
@@ -482,6 +484,7 @@ void main() {
         'ordered': '2.0000',
         'reserved': '0.0000',
         'on_hand': '0.0000',
+        'expired': '0.0000',
         'reserved_total': '0.0000',
         'available': '0.0000',
         'shortfall': '0.0000',
@@ -584,5 +587,48 @@ void main() {
     expect(find.text('Stock availability'), findsOneWidget);
     expect(find.text('Reserve'), findsNothing);
     expect(find.text('Release'), findsNothing);
+  });
+
+  testWidgets(
+    'an order line in a unit that does not convert shows the server message',
+    (tester) async {
+      await _screen(
+        tester,
+        'confirmed',
+        perms: const ['orders.read', 'inventory.read', 'inventory.write'],
+        extra: {
+          'GET /api/v1/inventory/orders/o1/availability': (_) =>
+              const FakeStatus(422, {
+                'error': 'validation',
+                'message': 'FRAME-A is kept in pcs and has no conversion from set: add how many pcs one set is to the units of the product',
+              }),
+        },
+      );
+      expect(find.textContaining('has no conversion from set'), findsOneWidget);
+      expect(find.text('Reserve'), findsNothing);
+    },
+  );
+
+  testWidgets('reserving an order line in an unknown unit shows the refusal', (
+    tester,
+  ) async {
+    await _screen(
+      tester,
+      'confirmed',
+      perms: const ['orders.read', 'inventory.read', 'inventory.write'],
+      extra: {
+        'GET /api/v1/inventory/orders/o1/availability': (_) => availability(),
+        'PUT /api/v1/inventory/order-lines/line1/reservation': (_) =>
+            const FakeStatus(422, {
+              'error': 'validation',
+              'message': 'UNIT-1 is kept in pcs and has no conversion from set',
+            }),
+      },
+    );
+    await tester.tap(find.text('Reserve').first);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('has no conversion from set'), findsOneWidget);
+    // Expired stock is called out next to the line.
+    expect(find.textContaining('2 expired'), findsOneWidget);
   });
 }

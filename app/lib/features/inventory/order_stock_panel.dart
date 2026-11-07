@@ -119,6 +119,7 @@ class _OrderStockPanelState extends ConsumerState<OrderStockPanel> {
               '${l.stockOnHand}: ${number(line.onHand)} · '
               '${l.stockReserved}: ${number(line.reservedTotal)} · '
               '${l.stockAvailable}: ${number(line.available)}'
+              '${_isZero(line.expired) ? '' : ' · ${l.stockExpiredQty(number(line.expired))}'}'
               '${_isZero(line.reserved) ? '' : ' · ${l.orderStockThisLine(number(line.reserved))}'}'
               '${_isZero(line.shortfall) ? '' : ' · ${l.stockShortBy(number(line.shortfall))}'}',
             ),

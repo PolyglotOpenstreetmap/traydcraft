@@ -397,6 +397,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Une quantité comptée n\'est pas un nombre.';
 
   @override
+  String countMovedDuring(int count) {
+    return '$count ligne(s) ont eu des mouvements pendant le comptage ; la quantité comptée les a remplacés.';
+  }
+
+  @override
   String get countNew => 'Nouvel inventaire';
 
   @override
@@ -406,6 +411,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get countOneProduct => 'Un seul produit (facultatif)';
+
+  @override
+  String get countOverwriteWarning =>
+      'Les mouvements effectués pendant le comptage sont écrasés : à la comptabilisation, la quantité comptée devient le stock.';
 
   @override
   String get countPost => 'Comptabiliser l\'inventaire';
@@ -425,6 +434,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get countStatusPosted => 'Comptabilisé';
+
+  @override
+  String countStockAtPost(String quantity) {
+    return 'Stock à la comptabilisation : $quantity';
+  }
 
   @override
   String get countWarehouseRequired => 'Choisissez un entrepôt.';
@@ -1854,6 +1868,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get stockCounts => 'Inventaires';
 
   @override
+  String stockExpiredQty(String quantity) {
+    return '$quantity périmé(s)';
+  }
+
+  @override
   String get stockExpiry => 'Date de péremption';
 
   @override
@@ -1987,6 +2006,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get stockReverse => 'Annuler';
+
+  @override
+  String get stockReverseAnyway => 'Annuler quand même';
 
   @override
   String get stockReverseTitle => 'Annuler ce mouvement';

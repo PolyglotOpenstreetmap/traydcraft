@@ -3,6 +3,14 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 
+/// A route answer with another status than 200, for example `FakeStatus(409, {'error': 'conflict',
+/// 'message': '...'})`.
+class FakeStatus {
+  const FakeStatus(this.status, this.body);
+  final int status;
+  final Object? body;
+}
+
 /// A fake server for widget tests: [routes] maps `"METHOD /path"` to a JSON body (or a function
 /// of the request body). Unknown routes answer 404. Requests are recorded.
 class FakeHttp implements HttpClientAdapter {
@@ -46,6 +54,15 @@ class FakeHttp implements HttpClientAdapter {
       );
     }
     final json = route(sent);
+    if (json is FakeStatus) {
+      return ResponseBody.fromString(
+        jsonEncode(json.body),
+        json.status,
+        headers: {
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        },
+      );
+    }
     if (json is Uint8List) {
       return ResponseBody.fromBytes(
         json,

@@ -397,6 +397,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get countInvalidQuantity => 'Eine gezählte Menge ist keine Zahl.';
 
   @override
+  String countMovedDuring(int count) {
+    return 'Bei $count Zeile(n) gab es Bewegungen während des Zählens; die gezählte Menge hat sie ersetzt.';
+  }
+
+  @override
   String get countNew => 'Neue Inventur';
 
   @override
@@ -406,6 +411,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get countOneProduct => 'Nur ein Artikel (optional)';
+
+  @override
+  String get countOverwriteWarning =>
+      'Bewegungen während des Zählens werden überschrieben: beim Buchen der Inventur wird die gezählte Menge zum Bestand.';
 
   @override
   String get countPost => 'Inventur buchen';
@@ -425,6 +434,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get countStatusPosted => 'Gebucht';
+
+  @override
+  String countStockAtPost(String quantity) {
+    return 'Bestand beim Buchen: $quantity';
+  }
 
   @override
   String get countWarehouseRequired => 'Wählen Sie ein Lager.';
@@ -1854,6 +1868,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get stockCounts => 'Inventuren';
 
   @override
+  String stockExpiredQty(String quantity) {
+    return '$quantity abgelaufen';
+  }
+
+  @override
   String get stockExpiry => 'Verfallsdatum';
 
   @override
@@ -1987,6 +2006,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get stockReverse => 'Stornieren';
+
+  @override
+  String get stockReverseAnyway => 'Trotzdem stornieren';
 
   @override
   String get stockReverseTitle => 'Diese Bewegung stornieren';

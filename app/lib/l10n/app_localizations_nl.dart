@@ -395,6 +395,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get countInvalidQuantity => 'Een getelde hoeveelheid is geen getal.';
 
   @override
+  String countMovedDuring(int count) {
+    return 'Bij $count lijn(en) waren er bewegingen tijdens het tellen; de getelde hoeveelheid heeft ze vervangen.';
+  }
+
+  @override
   String get countNew => 'Nieuwe inventarisatie';
 
   @override
@@ -404,6 +409,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get countOneProduct => 'Slechts één product (optioneel)';
+
+  @override
+  String get countOverwriteWarning =>
+      'Bewegingen tijdens het tellen worden overschreven: bij het boeken van de inventarisatie wordt de getelde hoeveelheid de voorraad.';
 
   @override
   String get countPost => 'Inventarisatie boeken';
@@ -423,6 +432,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get countStatusPosted => 'Geboekt';
+
+  @override
+  String countStockAtPost(String quantity) {
+    return 'Voorraad bij het boeken: $quantity';
+  }
 
   @override
   String get countWarehouseRequired => 'Kies een magazijn.';
@@ -1851,6 +1865,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get stockCounts => 'Inventarisaties';
 
   @override
+  String stockExpiredQty(String quantity) {
+    return '$quantity vervallen';
+  }
+
+  @override
   String get stockExpiry => 'Vervaldatum';
 
   @override
@@ -1984,6 +2003,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get stockReverse => 'Terugdraaien';
+
+  @override
+  String get stockReverseAnyway => 'Toch terugdraaien';
 
   @override
   String get stockReverseTitle => 'Deze beweging terugdraaien';

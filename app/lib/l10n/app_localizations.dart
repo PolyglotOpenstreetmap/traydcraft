@@ -824,6 +824,12 @@ abstract class AppLocalizations {
   /// **'A counted quantity is not a number.'**
   String get countInvalidQuantity;
 
+  /// No description provided for @countMovedDuring.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} line(s) had stock movements during the count; the counted quantity replaced them.'**
+  String countMovedDuring(int count);
+
   /// No description provided for @countNew.
   ///
   /// In en, this message translates to:
@@ -841,6 +847,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Only one product (optional)'**
   String get countOneProduct;
+
+  /// No description provided for @countOverwriteWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Movements made while you count are overwritten: when the count is posted, the counted quantity becomes the stock.'**
+  String get countOverwriteWarning;
 
   /// No description provided for @countPost.
   ///
@@ -877,6 +889,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Posted'**
   String get countStatusPosted;
+
+  /// No description provided for @countStockAtPost.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock when posted: {quantity}'**
+  String countStockAtPost(String quantity);
 
   /// No description provided for @countWarehouseRequired.
   ///
@@ -3494,6 +3512,12 @@ abstract class AppLocalizations {
   /// **'Stock counts'**
   String get stockCounts;
 
+  /// No description provided for @stockExpiredQty.
+  ///
+  /// In en, this message translates to:
+  /// **'{quantity} expired'**
+  String stockExpiredQty(String quantity);
+
   /// No description provided for @stockExpiry.
   ///
   /// In en, this message translates to:
@@ -3757,6 +3781,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reverse'**
   String get stockReverse;
+
+  /// No description provided for @stockReverseAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse anyway'**
+  String get stockReverseAnyway;
 
   /// No description provided for @stockReverseTitle.
   ///

@@ -185,6 +185,14 @@
   "countDifference": "Difference",
   "countExpected": "Expected",
   "countInvalidQuantity": "A counted quantity is not a number.",
+  "countMovedDuring": "{count} line(s) had stock movements during the count; the counted quantity replaced them.",
+  "@countMovedDuring": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "countNew": "New count",
   "countOf": "{count} of {total}",
   "@countOf": {
@@ -198,12 +206,21 @@
     }
   },
   "countOneProduct": "Only one product (optional)",
+  "countOverwriteWarning": "Movements made while you count are overwritten: when the count is posted, the counted quantity becomes the stock.",
   "countPost": "Post count",
   "countPostConfirm": "The differences are posted as stock adjustments. Lines without a counted quantity are left alone.",
   "countProgress": "Counted",
   "countStart": "Start count",
   "countStatusCounting": "Counting",
   "countStatusPosted": "Posted",
+  "countStockAtPost": "Stock when posted: {quantity}",
+  "@countStockAtPost": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
   "countWarehouseRequired": "Choose a warehouse.",
   "countWholeWarehouse": "Whole warehouse",
   "countedBy": "Started by",
@@ -988,6 +1005,14 @@
   "stockBelowReorder": "Below reorder level",
   "stockChangeBy": "Change by (+/−)",
   "stockCounts": "Stock counts",
+  "stockExpiredQty": "{quantity} expired",
+  "@stockExpiredQty": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
   "stockExpiry": "Expiry date",
   "stockFrom": "From",
   "stockInVans": "In vans",
@@ -1032,6 +1057,7 @@
   "stockReservations": "Reserved for orders",
   "stockReserved": "Reserved",
   "stockReverse": "Reverse",
+  "stockReverseAnyway": "Reverse anyway",
   "stockReverseTitle": "Reverse this movement",
   "stockReversed": "reversed",
   "stockShortBy": "Short by {quantity}",

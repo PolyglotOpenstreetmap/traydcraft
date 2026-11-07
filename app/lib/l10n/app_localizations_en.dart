@@ -394,6 +394,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countInvalidQuantity => 'A counted quantity is not a number.';
 
   @override
+  String countMovedDuring(int count) {
+    return '$count line(s) had stock movements during the count; the counted quantity replaced them.';
+  }
+
+  @override
   String get countNew => 'New count';
 
   @override
@@ -403,6 +408,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countOneProduct => 'Only one product (optional)';
+
+  @override
+  String get countOverwriteWarning =>
+      'Movements made while you count are overwritten: when the count is posted, the counted quantity becomes the stock.';
 
   @override
   String get countPost => 'Post count';
@@ -422,6 +431,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countStatusPosted => 'Posted';
+
+  @override
+  String countStockAtPost(String quantity) {
+    return 'Stock when posted: $quantity';
+  }
 
   @override
   String get countWarehouseRequired => 'Choose a warehouse.';
@@ -1850,6 +1864,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stockCounts => 'Stock counts';
 
   @override
+  String stockExpiredQty(String quantity) {
+    return '$quantity expired';
+  }
+
+  @override
   String get stockExpiry => 'Expiry date';
 
   @override
@@ -1983,6 +2002,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stockReverse => 'Reverse';
+
+  @override
+  String get stockReverseAnyway => 'Reverse anyway';
 
   @override
   String get stockReverseTitle => 'Reverse this movement';
