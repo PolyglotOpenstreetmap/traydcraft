@@ -4543,6 +4543,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Updated {date}'**
   String kbUpdatedOn(String date);
+
+  /// No description provided for @offlineWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 change waiting to sync} other{{count} changes waiting to sync}}'**
+  String offlineWaiting(int count);
+
+  /// No description provided for @offlineFailedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 needs your attention} other{{count} need your attention}}'**
+  String offlineFailedCount(int count);
+
+  /// No description provided for @offlineQueueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes waiting to sync'**
+  String get offlineQueueTitle;
+
+  /// No description provided for @offlineSyncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get offlineSyncNow;
+
+  /// No description provided for @offlineRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get offlineRetry;
+
+  /// No description provided for @offlineDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get offlineDiscard;
+
+  /// No description provided for @offlineDiscardQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this change? It will not be sent to the server.'**
+  String get offlineDiscardQuestion;
+
+  /// No description provided for @offlineAllSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is synced.'**
+  String get offlineAllSynced;
+
+  /// No description provided for @offlineAttempts.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempts: {count}'**
+  String offlineAttempts(int count);
+
+  /// No description provided for @offlineLastError.
+  ///
+  /// In en, this message translates to:
+  /// **'Last error: {message}'**
+  String offlineLastError(String message);
+
+  /// No description provided for @offlineRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The server refused this change. The job may have been reassigned, cancelled or changed in the meantime.'**
+  String get offlineRejected;
+
+  /// No description provided for @offlineDataFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline: data from {time}'**
+  String offlineDataFrom(String time);
+
+  /// No description provided for @offlinePendingSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting to sync'**
+  String get offlinePendingSync;
+
+  /// No description provided for @offlineQueuedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection: saved on this device, it will be sent when you are back online.'**
+  String get offlineQueuedMessage;
+
+  /// No description provided for @offlinePhotosWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo waiting to upload} other{{count} photos waiting to upload}}'**
+  String offlinePhotosWaiting(int count);
+
+  /// No description provided for @offlineTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Too large to keep offline. Connect to send it.'**
+  String get offlineTooLarge;
+
+  /// No description provided for @offlineReload.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get offlineReload;
+
+  /// No description provided for @offlineOpStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start job'**
+  String get offlineOpStart;
+
+  /// No description provided for @offlineOpTaskDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Task ticked'**
+  String get offlineOpTaskDone;
+
+  /// No description provided for @offlineOpTaskUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'Task unticked'**
+  String get offlineOpTaskUndone;
+
+  /// No description provided for @offlineOpTaskAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'New task'**
+  String get offlineOpTaskAdd;
+
+  /// No description provided for @offlineOpWorkLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Time entry'**
+  String get offlineOpWorkLog;
+
+  /// No description provided for @offlineOpPart.
+  ///
+  /// In en, this message translates to:
+  /// **'Part used'**
+  String get offlineOpPart;
+
+  /// No description provided for @offlineOpComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete job'**
+  String get offlineOpComplete;
+
+  /// No description provided for @offlineOpDecline.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer declined to sign'**
+  String get offlineOpDecline;
+
+  /// No description provided for @offlineOpSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer signature'**
+  String get offlineOpSignature;
+
+  /// No description provided for @offlineOpPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get offlineOpPhoto;
 }
 
 class _AppLocalizationsDelegate

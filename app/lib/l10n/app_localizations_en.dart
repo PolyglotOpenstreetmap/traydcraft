@@ -2426,4 +2426,119 @@ class AppLocalizationsEn extends AppLocalizations {
   String kbUpdatedOn(String date) {
     return 'Updated $date';
   }
+
+  @override
+  String offlineWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count changes waiting to sync',
+      one: '1 change waiting to sync',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String offlineFailedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count need your attention',
+      one: '1 needs your attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineQueueTitle => 'Changes waiting to sync';
+
+  @override
+  String get offlineSyncNow => 'Sync now';
+
+  @override
+  String get offlineRetry => 'Try again';
+
+  @override
+  String get offlineDiscard => 'Discard';
+
+  @override
+  String get offlineDiscardQuestion =>
+      'Discard this change? It will not be sent to the server.';
+
+  @override
+  String get offlineAllSynced => 'Everything is synced.';
+
+  @override
+  String offlineAttempts(int count) {
+    return 'Attempts: $count';
+  }
+
+  @override
+  String offlineLastError(String message) {
+    return 'Last error: $message';
+  }
+
+  @override
+  String get offlineRejected =>
+      'The server refused this change. The job may have been reassigned, cancelled or changed in the meantime.';
+
+  @override
+  String offlineDataFrom(String time) {
+    return 'Offline: data from $time';
+  }
+
+  @override
+  String get offlinePendingSync => 'Waiting to sync';
+
+  @override
+  String get offlineQueuedMessage =>
+      'No connection: saved on this device, it will be sent when you are back online.';
+
+  @override
+  String offlinePhotosWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos waiting to upload',
+      one: '1 photo waiting to upload',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineTooLarge =>
+      'Too large to keep offline. Connect to send it.';
+
+  @override
+  String get offlineReload => 'Reload';
+
+  @override
+  String get offlineOpStart => 'Start job';
+
+  @override
+  String get offlineOpTaskDone => 'Task ticked';
+
+  @override
+  String get offlineOpTaskUndone => 'Task unticked';
+
+  @override
+  String get offlineOpTaskAdd => 'New task';
+
+  @override
+  String get offlineOpWorkLog => 'Time entry';
+
+  @override
+  String get offlineOpPart => 'Part used';
+
+  @override
+  String get offlineOpComplete => 'Complete job';
+
+  @override
+  String get offlineOpDecline => 'Customer declined to sign';
+
+  @override
+  String get offlineOpSignature => 'Customer signature';
+
+  @override
+  String get offlineOpPhoto => 'Photo';
 }

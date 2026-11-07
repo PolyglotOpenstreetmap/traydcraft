@@ -39,7 +39,7 @@ String newClientId([Random? random]) {
 }
 
 /// Sends a photo: the request body is the image itself.
-Future<void> uploadPhoto(
+Future<Response<Object?>> uploadPhoto(
   Dio dio,
   String path,
   PickedPhoto photo, {

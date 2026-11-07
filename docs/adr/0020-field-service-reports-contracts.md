@@ -78,7 +78,6 @@ warranty), a document for the customer, and recurring maintenance that plans its
 * Photos in the report are not thumbnails; large phone photos are skipped, not shrunk.
 * Parts and warranty are not yet connected to quoting or invoicing (billable is a flag for later).
 
-**Not yet.** The client-side offline queue in the Flutter app (part 2 of A3; the server calls are
-idempotent), stock deduction and returns (after inventory), invoicing of billable parts and
+**Not yet.** (The client-side offline queue is [ADR 0022](0022-technician-offline-queue.md).) Stock deduction and returns (after inventory), invoicing of billable parts and
 hours, customer portal access to reports and equipment, contract pricing and renewals with
 price indexation, SLA breach tracking on contracts, and photo thumbnails in the report.

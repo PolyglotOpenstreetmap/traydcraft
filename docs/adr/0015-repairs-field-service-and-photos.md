@@ -33,7 +33,7 @@ go, what to do, and to report time, tick tasks and attach photos from a phone.
   ticks and time are closed but photos may still be uploaded (taken on site, sent when back online).
 * **Offline-friendly writes** (ADR 0006): ticking a task is idempotent, and work logs and photos
   accept a client-chosen id, so a retried upload returns the first one instead of duplicating it.
-  A client-side offline queue is not built yet; the server side is ready for it.
+  The client-side offline queue is described in [ADR 0022](0022-technician-offline-queue.md).
 * **Technicians are staff.** They sign in like other staff (OIDC) and use the "My jobs" section of
   the Flutter app, which shows only the tabs they have rights for. They do not use the customer
   portal, which is for the customer's own people.

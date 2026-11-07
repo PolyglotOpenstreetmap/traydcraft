@@ -1837,6 +1837,7 @@
         "tags": [
           "field"
         ],
+        "summary": "Completing a job that is already completed with the same text changes nothing (safe to retry);\nwith other text it is a 409.",
         "operationId": "complete_job",
         "parameters": [
           {
@@ -2675,6 +2676,16 @@
             }
           },
           "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
             "description": "",
             "content": {
               "application/json": {
@@ -17509,6 +17520,14 @@
           "description"
         ],
         "properties": {
+          "client_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Chosen by the client: sending the same id again returns the first task instead of adding a\nsecond one (offline retries). The same id with another description is a 409."
+          },
           "description": {
             "type": "string"
           }

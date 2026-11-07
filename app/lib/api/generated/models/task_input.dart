@@ -10,10 +10,15 @@ part 'task_input.g.dart';
 class TaskInput {
   const TaskInput({
     required this.description,
+    this.clientId,
   });
   
   factory TaskInput.fromJson(Map<String, Object?> json) => _$TaskInputFromJson(json);
   
+  /// Chosen by the client: sending the same id again returns the first task instead of adding a.
+  /// second one (offline retries). The same id with another description is a 409.
+  @JsonKey(includeIfNull: false,name: 'client_id')
+  final String? clientId;
   final String description;
 
   Map<String, Object?> toJson() => _$TaskInputToJson(this);

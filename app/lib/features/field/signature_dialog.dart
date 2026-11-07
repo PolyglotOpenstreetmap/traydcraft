@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/api.dart';
 import '../../l10n/l10n.dart';
 import '../../shared/photos.dart' show newClientId;
+import 'offline/offline_queue.dart';
+import 'offline/offline_ui.dart' show showQueuedSnack;
 
 /// The strokes drawn on a [SignaturePad], and the picture made of them.
 class SignatureController extends ChangeNotifier {
@@ -190,37 +192,61 @@ class _SignatureDialogState extends ConsumerState<SignatureDialog> {
       _error = null;
     });
     try {
-      final JobDetail d;
+      final queue = ref.read(offlineQueueProvider);
+      final label = '${widget.detail.job.number} ${widget.detail.job.title}';
+      final name = _name.text.trim();
+      final JobDetail? d;
       if (_declined) {
-        d = await ref
-            .read(apiProvider)
-            .field
-            .declineJobSignature(
-              id: id,
-              body: DeclinedInput(
-                reason: _reason.text.trim(),
-                signerName: _name.text.trim(),
+        final reason = _reason.text.trim();
+        d = await submitWrite(
+          queue,
+          type: OpType.decline,
+          jobId: id,
+          jobLabel: label,
+          id: _clientId,
+          payload: {'signer_name': name, 'reason': reason},
+          online: () => ref
+              .read(apiProvider)
+              .field
+              .declineJobSignature(
+                id: id,
+                body: DeclinedInput(reason: reason, signerName: name),
               ),
-            );
+        );
       } else {
         final png = await _pad.toPng(_size);
-        final res = await ref
-            .read(dioProvider)
-            .post<Map<String, dynamic>>(
-              '/api/v1/field/jobs/$id/signature',
-              data: png,
-              queryParameters: {
-                'signer_name': _name.text.trim(),
-                'client_id': _clientId,
-              },
-              options: Options(
-                contentType: 'image/png',
-                headers: {Headers.contentLengthHeader: png.length},
-              ),
-            );
-        d = JobDetail.fromJson(res.data!);
+        d = await submitWrite(
+          queue,
+          type: OpType.signature,
+          jobId: id,
+          jobLabel: label,
+          id: _clientId,
+          payload: {'signer_name': name},
+          data: png,
+          online: () async {
+            final res = await ref
+                .read(dioProvider)
+                .post<Map<String, dynamic>>(
+                  '/api/v1/field/jobs/$id/signature',
+                  data: png,
+                  queryParameters: {
+                    'signer_name': name,
+                    'client_id': _clientId,
+                  },
+                  options: Options(
+                    contentType: 'image/png',
+                    headers: {Headers.contentLengthHeader: png.length},
+                  ),
+                );
+            return JobDetail.fromJson(res.data!);
+          },
+        );
       }
-      if (mounted) Navigator.pop(context, d);
+      if (!mounted) return;
+      if (d == null) showQueuedSnack(context);
+      Navigator.pop(context, d);
+    } on QueueFullException {
+      if (mounted) setState(() => _error = context.l10n.offlineTooLarge);
     } catch (e) {
       if (mounted) setState(() => _error = errorMessage(e));
     } finally {

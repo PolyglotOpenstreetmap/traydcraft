@@ -2434,4 +2434,120 @@ class AppLocalizationsDe extends AppLocalizations {
   String kbUpdatedOn(String date) {
     return 'Aktualisiert am $date';
   }
+
+  @override
+  String offlineWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Änderungen warten auf die Synchronisierung',
+      one: '1 Änderung wartet auf die Synchronisierung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String offlineFailedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count brauchen Ihre Aufmerksamkeit',
+      one: '1 braucht Ihre Aufmerksamkeit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineQueueTitle =>
+      'Änderungen, die auf die Synchronisierung warten';
+
+  @override
+  String get offlineSyncNow => 'Jetzt synchronisieren';
+
+  @override
+  String get offlineRetry => 'Erneut versuchen';
+
+  @override
+  String get offlineDiscard => 'Verwerfen';
+
+  @override
+  String get offlineDiscardQuestion =>
+      'Diese Änderung verwerfen? Sie wird nicht an den Server gesendet.';
+
+  @override
+  String get offlineAllSynced => 'Alles ist synchronisiert.';
+
+  @override
+  String offlineAttempts(int count) {
+    return 'Versuche: $count';
+  }
+
+  @override
+  String offlineLastError(String message) {
+    return 'Letzter Fehler: $message';
+  }
+
+  @override
+  String get offlineRejected =>
+      'Der Server hat diese Änderung abgelehnt. Der Auftrag wurde möglicherweise inzwischen neu zugewiesen, storniert oder geändert.';
+
+  @override
+  String offlineDataFrom(String time) {
+    return 'Offline: Daten von $time';
+  }
+
+  @override
+  String get offlinePendingSync => 'Wartet auf Synchronisierung';
+
+  @override
+  String get offlineQueuedMessage =>
+      'Keine Verbindung: auf diesem Gerät gespeichert, wird gesendet, sobald Sie wieder online sind.';
+
+  @override
+  String offlinePhotosWaiting(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos warten auf das Hochladen',
+      one: '1 Foto wartet auf das Hochladen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get offlineTooLarge =>
+      'Zu groß, um offline gespeichert zu werden. Bitte verbinden Sie sich, um es zu senden.';
+
+  @override
+  String get offlineReload => 'Neu laden';
+
+  @override
+  String get offlineOpStart => 'Auftrag starten';
+
+  @override
+  String get offlineOpTaskDone => 'Aufgabe abgehakt';
+
+  @override
+  String get offlineOpTaskUndone => 'Aufgabe abgewählt';
+
+  @override
+  String get offlineOpTaskAdd => 'Neue Aufgabe';
+
+  @override
+  String get offlineOpWorkLog => 'Zeiteintrag';
+
+  @override
+  String get offlineOpPart => 'Verwendetes Teil';
+
+  @override
+  String get offlineOpComplete => 'Auftrag abschließen';
+
+  @override
+  String get offlineOpDecline => 'Kunde verweigert die Unterschrift';
+
+  @override
+  String get offlineOpSignature => 'Unterschrift des Kunden';
+
+  @override
+  String get offlineOpPhoto => 'Foto';
 }

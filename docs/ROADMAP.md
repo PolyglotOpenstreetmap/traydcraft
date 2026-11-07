@@ -12,7 +12,7 @@ Module overview: [ARCHITECTURE.md](ARCHITECTURE.md).
 | Order lifecycle (revisions, confirmation, priority) | Done, [ADR 0016](adr/0016-order-lifecycle.md) |
 | A1 Helpdesk SLA, teams, attachments, tags, merge, time, CSAT | Done, ADR 0017 (PR #2) |
 | A2 Knowledge base | Done, ADR 0018 (PR #2) |
-| A3 Field service completion | Part 1 done (offline queue open), ADR 0020 |
+| A3 Field service completion | Done, ADR 0020 and [ADR 0022](adr/0022-technician-offline-queue.md) |
 | B1 Inventory foundation | Open |
 | B2 Purchasing | Open (needs B1) |
 | B3 Delivery | Open (needs B1) |
@@ -34,7 +34,7 @@ client, Flutter screens, five-language strings, tests and an ADR.
 - Parts used: record-only first; deduction from stock follows B1.
 - Job to `engineering.serial_units` link (installed base) and a warranty flag.
 - Maintenance contracts: contract, visit template and recurrence that generates jobs; SLA on contracts.
-- Offline queue in the Flutter app (the server is already idempotent, [ADR 0006](adr/0006-offline-sync.md)).
+- Offline queue in the Flutter app ([ADR 0006](adr/0006-offline-sync.md), [ADR 0022](adr/0022-technician-offline-queue.md)). Done.
 
 Remaining helpdesk gaps (from ADR 0017): automation rules, ticket split, reporting, business hours.
 Remaining knowledge base gaps (ADR 0018): non-image attachments, analytics, semantic search, a public web page.

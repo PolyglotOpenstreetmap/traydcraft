@@ -140,6 +140,8 @@ abstract class FieldClient {
     @Body() required ReasonInput body,
   });
 
+  /// Completing a job that is already completed with the same text changes nothing (safe to retry);.
+  /// with other text it is a 409.
   @POST('/api/v1/field/jobs/{id}/complete')
   Future<JobDetail> completeJob({
     @Path('id') required String id,

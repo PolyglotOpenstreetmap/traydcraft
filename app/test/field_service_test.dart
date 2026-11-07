@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:traydcraft_app/app/api.dart';
+import 'package:traydcraft_app/features/field/offline/kv_store.dart';
 import 'package:traydcraft_app/features/field/contract_screen.dart';
 import 'package:traydcraft_app/features/field/job_screen.dart';
 import 'package:traydcraft_app/features/field/signature_dialog.dart';
@@ -17,7 +18,10 @@ Future<void> _pump(WidgetTester tester, FakeHttp http, Widget home) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [dioProvider.overrideWithValue(fakeDio(http))],
+      overrides: [
+        dioProvider.overrideWithValue(fakeDio(http)),
+        kvStoreProvider.overrideWithValue(MemoryKvStore()),
+      ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
