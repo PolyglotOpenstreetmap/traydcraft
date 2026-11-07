@@ -166,6 +166,7 @@ void main() {
             'updated_at': '2026-11-06T10:00:00Z',
             ...ticketExtras(),
           },
+          ...detailExtras(),
           'articles': <Object?>[],
         },
       });

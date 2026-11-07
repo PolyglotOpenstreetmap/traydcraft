@@ -233,6 +233,7 @@ void main() {
             tags: ['warranty'],
             csat: 'bad',
           ),
+          ...detailExtras(),
           'articles': [
             _article(files: [_file('f1', 'drawing.pdf', 'application/pdf')]),
           ],
@@ -263,16 +264,19 @@ void main() {
         },
         'POST /api/v1/tickets/t1/tags': (_) => {
           'ticket': _ticket(tags: ['urgent', 'warranty']),
+          ...detailExtras(),
           'articles': <Object?>[],
         },
         'POST /api/v1/tickets/t1/attachments': (_) =>
             _file('f2', 'plan.pdf', 'application/pdf'),
         'POST /api/v1/tickets/t1/replies': (_) => {
           'ticket': _ticket(),
+          ...detailExtras(),
           'articles': <Object?>[],
         },
         'PUT /api/v1/tickets/t1/assignment': (_) => {
           'ticket': _ticket(teamId: 'team1'),
+          ...detailExtras(),
           'articles': <Object?>[],
         },
         'GET /api/v1/tickets': (_) => {
@@ -284,6 +288,7 @@ void main() {
         },
         'POST /api/v1/tickets/t1/merge': (_) => {
           'ticket': _ticket(id: 't9', number: 'T2026-00009'),
+          ...detailExtras(),
           'articles': <Object?>[],
         },
       });

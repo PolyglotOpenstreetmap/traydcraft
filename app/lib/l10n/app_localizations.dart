@@ -4705,6 +4705,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photo'**
   String get offlineOpPhoto;
+
+  /// No description provided for @collabEscalate.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalate'**
+  String get collabEscalate;
+
+  /// No description provided for @collabEscalateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalate ticket'**
+  String get collabEscalateTitle;
+
+  /// No description provided for @collabDelegate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hand over'**
+  String get collabDelegate;
+
+  /// No description provided for @collabDelegateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hand over ticket'**
+  String get collabDelegateTitle;
+
+  /// No description provided for @collabEscalateTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalate to'**
+  String get collabEscalateTo;
+
+  /// No description provided for @collabNoTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Leads of the ticket\'s team'**
+  String get collabNoTarget;
+
+  /// No description provided for @collabPerson.
+  ///
+  /// In en, this message translates to:
+  /// **'Colleague'**
+  String get collabPerson;
+
+  /// No description provided for @collabTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Team'**
+  String get collabTeam;
+
+  /// No description provided for @collabHandOverTo.
+  ///
+  /// In en, this message translates to:
+  /// **'New owner'**
+  String get collabHandOverTo;
+
+  /// No description provided for @collabReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason (required)'**
+  String get collabReasonRequired;
+
+  /// No description provided for @collabRaisePriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Raise priority one step'**
+  String get collabRaisePriority;
+
+  /// No description provided for @collabCommentOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment for the new owner (optional)'**
+  String get collabCommentOptional;
+
+  /// No description provided for @collabInternalHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal: never sent to the customer.'**
+  String get collabInternalHint;
+
+  /// No description provided for @collabEscalated.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket escalated'**
+  String get collabEscalated;
+
+  /// No description provided for @collabHandedOver.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket handed over'**
+  String get collabHandedOver;
+
+  /// No description provided for @collabEscalatedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalated'**
+  String get collabEscalatedBadge;
+
+  /// No description provided for @collabEscalatedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalated by {name}'**
+  String collabEscalatedBy(String name);
+
+  /// No description provided for @collabWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch'**
+  String get collabWatch;
+
+  /// No description provided for @collabUnwatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop watching'**
+  String get collabUnwatch;
+
+  /// No description provided for @collabWatchers.
+  ///
+  /// In en, this message translates to:
+  /// **'Watchers'**
+  String get collabWatchers;
+
+  /// No description provided for @collabNoWatchers.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody follows this ticket'**
+  String get collabNoWatchers;
+
+  /// No description provided for @collabAddWatcher.
+  ///
+  /// In en, this message translates to:
+  /// **'Add watcher'**
+  String get collabAddWatcher;
+
+  /// No description provided for @collabActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity'**
+  String get collabActivity;
+
+  /// No description provided for @collabNoActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'No activity yet'**
+  String get collabNoActivity;
+
+  /// No description provided for @collabSeenBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen by {readers}'**
+  String collabSeenBy(String readers);
+
+  /// No description provided for @collabFilterUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get collabFilterUnread;
+
+  /// No description provided for @collabFilterWatching.
+  ///
+  /// In en, this message translates to:
+  /// **'Watching'**
+  String get collabFilterWatching;
+
+  /// No description provided for @collabFilterEscalated.
+  ///
+  /// In en, this message translates to:
+  /// **'Escalated'**
+  String get collabFilterEscalated;
+
+  /// No description provided for @collabUnreadTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get collabUnreadTooltip;
+
+  /// No description provided for @collabReplying.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{names} is replying} other{{names} are replying}} — coordinate before sending'**
+  String collabReplying(int count, String names);
+
+  /// No description provided for @collabViewing.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{names} is viewing this ticket} other{{names} are viewing this ticket}}'**
+  String collabViewing(int count, String names);
+
+  /// No description provided for @collabConfirmSend.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{names} is replying to this ticket right now.} other{{names} are replying to this ticket right now.}} Send anyway?'**
+  String collabConfirmSend(int count, String names);
+
+  /// No description provided for @collabSendAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Send anyway'**
+  String get collabSendAnyway;
+
+  /// No description provided for @collabSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get collabSystem;
+
+  /// No description provided for @collabEventCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} created the ticket'**
+  String collabEventCreated(String actor);
+
+  /// No description provided for @collabEventAssignedOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} assigned the ticket to {owner}'**
+  String collabEventAssignedOwner(String actor, String owner);
+
+  /// No description provided for @collabEventOwnerCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} removed the owner'**
+  String collabEventOwnerCleared(String actor);
+
+  /// No description provided for @collabEventTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} moved the ticket to team {team}'**
+  String collabEventTeam(String actor, String team);
+
+  /// No description provided for @collabEventTeamCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} removed the team'**
+  String collabEventTeamCleared(String actor);
+
+  /// No description provided for @collabEventDelegated.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} handed the ticket over to {owner}'**
+  String collabEventDelegated(String actor, String owner);
+
+  /// No description provided for @collabEventEscalated.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} escalated the ticket'**
+  String collabEventEscalated(String actor);
+
+  /// No description provided for @collabEventStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} changed the status from {before} to {after}'**
+  String collabEventStatus(String actor, String before, String after);
+
+  /// No description provided for @collabEventPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} changed the priority from {before} to {after}'**
+  String collabEventPriority(String actor, String before, String after);
+
+  /// No description provided for @collabEventMergedInto.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} merged this ticket into {number}'**
+  String collabEventMergedInto(String actor, String number);
+
+  /// No description provided for @collabEventMergedFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} merged {number} into this ticket'**
+  String collabEventMergedFrom(String actor, String number);
+
+  /// No description provided for @collabEventTagAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} added the tag {tag}'**
+  String collabEventTagAdded(String actor, String tag);
+
+  /// No description provided for @collabEventTagRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} removed the tag {tag}'**
+  String collabEventTagRemoved(String actor, String tag);
+
+  /// No description provided for @collabMsgCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} (customer) wrote'**
+  String collabMsgCustomer(String actor);
+
+  /// No description provided for @collabMsgReply.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} replied to the customer'**
+  String collabMsgReply(String actor);
+
+  /// No description provided for @collabMsgNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} added an internal note'**
+  String collabMsgNote(String actor);
+
+  /// No description provided for @collabMsgCall.
+  ///
+  /// In en, this message translates to:
+  /// **'{actor} logged a call'**
+  String collabMsgCall(String actor);
 }
 
 class _AppLocalizationsDelegate

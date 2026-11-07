@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +17,7 @@ import '../kb/kb_entry_screen.dart' show KbArticlePicker;
 import '../kb/kb_suggestions.dart';
 import '../repairs/repairs_page.dart' show showNewRepairDialog;
 import 'call_dialogs.dart';
+import 'ticket_collab.dart';
 import 'ticket_extras.dart';
 import 'tickets_page.dart';
 
@@ -29,8 +32,16 @@ final usersProvider = FutureProvider<List<CompanyUser>>(
 /// One ticket: the conversation, a composer for replies and internal notes (with prepared answers
 /// in the ticket's language), the ticket's properties and links, and the actions on it.
 class TicketScreen extends ConsumerStatefulWidget {
-  const TicketScreen({super.key, required this.id, this.pickFiles});
+  const TicketScreen({
+    super.key,
+    required this.id,
+    this.pickFiles,
+    this.presenceInterval = const Duration(seconds: 20),
+  });
   final String id;
+
+  /// How often "I am here" is sent while the screen is open.
+  final Duration presenceInterval;
   final AttachmentPicker? pickFiles;
 
   @override
@@ -82,16 +93,60 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
 
   TraydcraftApi get _api => ref.read(apiProvider);
 
+  // Presence: colleagues active on this ticket (advisory, polling).
+  Timer? _beatTimer;
+  List<PresenceEntry> _others = [];
+  String _beatMode = 'viewing';
+  bool _readMarked = false;
+
   @override
   void initState() {
     super.initState();
     _load();
+    _body.addListener(_bodyChanged);
+    _beat();
+    _beatTimer = Timer.periodic(widget.presenceInterval, (_) => _beat());
+  }
+
+  @override
+  void dispose() {
+    _beatTimer?.cancel();
+    _body.removeListener(_bodyChanged);
+    super.dispose();
+  }
+
+  String get _presenceMode =>
+      _replyChosen && _body.text.trim().isNotEmpty ? 'replying' : 'viewing';
+
+  /// Typing in the reply box tells the others at once instead of at the next beat.
+  void _bodyChanged() {
+    if (_presenceMode != _beatMode) _beat();
+  }
+
+  Future<void> _beat() async {
+    final mode = _presenceMode;
+    _beatMode = mode;
+    try {
+      final others = await _api.helpdesk.presenceBeat(
+        id: widget.id,
+        body: PresenceInput(mode: mode),
+      );
+      if (mounted) setState(() => _others = others);
+    } catch (_) {
+      // Presence is only a hint; a failed beat is not worth an error message.
+    }
   }
 
   Future<void> _load() async {
     try {
       final d = await _api.helpdesk.getTicket(id: widget.id);
       _apply(d);
+      if (!_readMarked) {
+        _readMarked = true;
+        unawaited(
+          _api.helpdesk.markRead(id: widget.id).then((_) {}, onError: (_) {}),
+        );
+      }
     } catch (e) {
       setState(() => _error = errorMessage(e));
     }
@@ -193,6 +248,18 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   Future<void> _send() async {
     final l = context.l10n;
     if (_body.text.trim().isEmpty) return;
+    if (_reply) {
+      // Nothing is locked, but sending over a colleague's answer needs a second thought.
+      final now = await _api.helpdesk
+          .presenceList(id: widget.id)
+          .then((p) => p, onError: (Object _) => <PresenceEntry>[]);
+      final replying = now.where((o) => o.mode == 'replying').toList();
+      if (replying.isNotEmpty) {
+        if (!mounted) return;
+        if (!await confirmSendWhileOthersReply(context, replying)) return;
+      }
+    }
+    if (!mounted) return;
     List<String> split(String s) =>
         s.split(RegExp(r'[,;\s]+')).where((e) => e.isNotEmpty).toList();
     await _run(
@@ -295,6 +362,28 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     ),
     success: context.l10n.saved,
   );
+
+  Future<void> _escalate() async {
+    final t = _d!.ticket;
+    final r = await showEscalateDialog(context, ticketId: t.id);
+    if (r == null || !mounted) return;
+    _apply(r);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(context.l10n.collabEscalated)));
+  }
+
+  Future<void> _delegate() async {
+    final t = _d!.ticket;
+    final r = await showDelegateDialog(
+      context,
+      ticketId: t.id,
+      currentOwnerId: t.ownerUserId,
+    );
+    if (r == null || !mounted) return;
+    _apply(r);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(context.l10n.collabHandedOver)));
+  }
 
   Future<void> _merge() async {
     final l = context.l10n;
@@ -469,6 +558,21 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                 Flexible(child: SlaBadge(sla: t.sla)),
                 const SizedBox(width: 8),
               ],
+              if (t.escalatedAt != null) ...[
+                Tooltip(
+                  message: l.collabEscalatedBy(t.escalatedByName ?? ''),
+                  child: Chip(
+                    key: const ValueKey('escalated-badge'),
+                    avatar: Icon(
+                      Icons.trending_up,
+                      size: 16,
+                      color: Colors.red.shade700,
+                    ),
+                    label: Text(l.collabEscalatedBadge),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
               Chip(label: Text(l.ticketStatus(t.status))),
               const SizedBox(width: 8),
               Chip(
@@ -495,6 +599,12 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                 child: Text(t.mergedIntoNumber ?? ''),
               ),
             ],
+          ),
+        PresenceBanner(others: _others),
+        if (d.readers.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+            child: SeenByLine(readers: d.readers),
           ),
         Expanded(
           child: ListView(
@@ -793,6 +903,20 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
           onChanged: canWrite && !_busy ? _assign : null,
         ),
         const Divider(height: 32),
+        WatchersSection(
+          ticketId: t.id,
+          watchers: d.watchers,
+          canWrite: canWrite,
+          onChanged: (w) => setState(
+            () => _d = TicketDetail(
+              ticket: d.ticket,
+              articles: d.articles,
+              watchers: w,
+              readers: d.readers,
+            ),
+          ),
+        ),
+        const Divider(height: 32),
         if (t.sla.state != 'none') ...[
           SlaSection(sla: t.sla),
           const Divider(height: 32),
@@ -805,6 +929,11 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         ),
         const Divider(height: 32),
         TimeSection(ticketId: t.id, canWrite: canWrite),
+        const Divider(height: 32),
+        ActivitySection(
+          ticketId: t.id,
+          version: '${t.updatedAt}-${d.articles.length}-${d.watchers.length}',
+        ),
         const Divider(height: 32),
         CsatSection(ticket: t),
         const Divider(height: 32),
@@ -985,6 +1114,20 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
                         }
                       },
               ),
+            if (canWrite && t.status != 'closed') ...[
+              OutlinedButton.icon(
+                key: const ValueKey('escalate-ticket'),
+                icon: const Icon(Icons.trending_up),
+                label: Text(l.collabEscalate),
+                onPressed: _busy ? null : _escalate,
+              ),
+              OutlinedButton.icon(
+                key: const ValueKey('delegate-ticket'),
+                icon: const Icon(Icons.swap_horiz),
+                label: Text(l.collabDelegate),
+                onPressed: _busy ? null : _delegate,
+              ),
+            ],
             if (canWrite &&
                 t.customerId != null &&
                 t.mergedIntoId == null &&

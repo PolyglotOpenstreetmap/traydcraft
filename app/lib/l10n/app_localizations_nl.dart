@@ -2544,4 +2544,221 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get offlineOpPhoto => 'Foto';
+
+  @override
+  String get collabEscalate => 'Escaleren';
+
+  @override
+  String get collabEscalateTitle => 'Ticket escaleren';
+
+  @override
+  String get collabDelegate => 'Overdragen';
+
+  @override
+  String get collabDelegateTitle => 'Ticket overdragen';
+
+  @override
+  String get collabEscalateTo => 'Escaleren naar';
+
+  @override
+  String get collabNoTarget => 'Teamleiders van het ticketteam';
+
+  @override
+  String get collabPerson => 'Collega';
+
+  @override
+  String get collabTeam => 'Team';
+
+  @override
+  String get collabHandOverTo => 'Nieuwe eigenaar';
+
+  @override
+  String get collabReasonRequired => 'Reden (verplicht)';
+
+  @override
+  String get collabRaisePriority => 'Prioriteit één stap verhogen';
+
+  @override
+  String get collabCommentOptional =>
+      'Opmerking voor de nieuwe eigenaar (optioneel)';
+
+  @override
+  String get collabInternalHint =>
+      'Intern: wordt nooit naar de klant gestuurd.';
+
+  @override
+  String get collabEscalated => 'Ticket geëscaleerd';
+
+  @override
+  String get collabHandedOver => 'Ticket overgedragen';
+
+  @override
+  String get collabEscalatedBadge => 'Geëscaleerd';
+
+  @override
+  String collabEscalatedBy(String name) {
+    return 'Geëscaleerd door $name';
+  }
+
+  @override
+  String get collabWatch => 'Volgen';
+
+  @override
+  String get collabUnwatch => 'Niet meer volgen';
+
+  @override
+  String get collabWatchers => 'Volgers';
+
+  @override
+  String get collabNoWatchers => 'Niemand volgt dit ticket';
+
+  @override
+  String get collabAddWatcher => 'Volger toevoegen';
+
+  @override
+  String get collabActivity => 'Activiteit';
+
+  @override
+  String get collabNoActivity => 'Nog geen activiteit';
+
+  @override
+  String collabSeenBy(String readers) {
+    return 'Gezien door $readers';
+  }
+
+  @override
+  String get collabFilterUnread => 'Ongelezen';
+
+  @override
+  String get collabFilterWatching => 'Gevolgd';
+
+  @override
+  String get collabFilterEscalated => 'Geëscaleerd';
+
+  @override
+  String get collabUnreadTooltip => 'Ongelezen';
+
+  @override
+  String collabReplying(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$names zijn aan het antwoorden',
+      one: '$names is aan het antwoorden',
+    );
+    return '$_temp0 — stem af voor je verstuurt';
+  }
+
+  @override
+  String collabViewing(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$names bekijken dit ticket',
+      one: '$names bekijkt dit ticket',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String collabConfirmSend(int count, String names) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$names zijn nu aan het antwoorden op dit ticket.',
+      one: '$names is nu aan het antwoorden op dit ticket.',
+    );
+    return '$_temp0 Toch versturen?';
+  }
+
+  @override
+  String get collabSendAnyway => 'Toch versturen';
+
+  @override
+  String get collabSystem => 'Systeem';
+
+  @override
+  String collabEventCreated(String actor) {
+    return '$actor heeft het ticket aangemaakt';
+  }
+
+  @override
+  String collabEventAssignedOwner(String actor, String owner) {
+    return '$actor wees het ticket toe aan $owner';
+  }
+
+  @override
+  String collabEventOwnerCleared(String actor) {
+    return '$actor verwijderde de eigenaar';
+  }
+
+  @override
+  String collabEventTeam(String actor, String team) {
+    return '$actor verplaatste het ticket naar team $team';
+  }
+
+  @override
+  String collabEventTeamCleared(String actor) {
+    return '$actor verwijderde het team';
+  }
+
+  @override
+  String collabEventDelegated(String actor, String owner) {
+    return '$actor droeg het ticket over aan $owner';
+  }
+
+  @override
+  String collabEventEscalated(String actor) {
+    return '$actor escaleerde het ticket';
+  }
+
+  @override
+  String collabEventStatus(String actor, String before, String after) {
+    return '$actor wijzigde de status van $before naar $after';
+  }
+
+  @override
+  String collabEventPriority(String actor, String before, String after) {
+    return '$actor wijzigde de prioriteit van $before naar $after';
+  }
+
+  @override
+  String collabEventMergedInto(String actor, String number) {
+    return '$actor voegde dit ticket samen met $number';
+  }
+
+  @override
+  String collabEventMergedFrom(String actor, String number) {
+    return '$actor voegde $number samen met dit ticket';
+  }
+
+  @override
+  String collabEventTagAdded(String actor, String tag) {
+    return '$actor voegde de tag $tag toe';
+  }
+
+  @override
+  String collabEventTagRemoved(String actor, String tag) {
+    return '$actor verwijderde de tag $tag';
+  }
+
+  @override
+  String collabMsgCustomer(String actor) {
+    return '$actor (klant) schreef';
+  }
+
+  @override
+  String collabMsgReply(String actor) {
+    return '$actor antwoordde de klant';
+  }
+
+  @override
+  String collabMsgNote(String actor) {
+    return '$actor voegde een interne notitie toe';
+  }
+
+  @override
+  String collabMsgCall(String actor) {
+    return '$actor registreerde een gesprek';
+  }
 }
