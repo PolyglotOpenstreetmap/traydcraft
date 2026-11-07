@@ -47,6 +47,14 @@ tables below are explicit. The crate is `crates/inventory`, schema `inventory`, 
 * One row per `(company, product, location, lot)` (lot may be `NULL`, unique through an expression
   index), `quantity`, `allow_negative`. It is written **in the same transaction** as each move
   (`INSERT ... ON CONFLICT DO UPDATE`, rows touched in a fixed order to avoid deadlocks).
+* **Locking** (**decision**). Every writer takes row locks on balances in the order
+  `(location_id, lot)`: `post_move` (source and destination sorted by location id), reservations
+  (`set_reserved` locks all balance rows of the product in that order first). A place without a
+  balance row is locked by inserting the zero row first (`ledger::lock_balance`), which `adjust` with
+  `new_quantity` and `post_count` use: two concurrent "set to 5" calls queue up and the second one
+  finds 5. `rebuild_balances` takes `LOCK TABLE ... IN SHARE ROW EXCLUSIVE MODE` on
+  `stock_balances` and `serial_stock` inside its transaction, which waits for running moves and
+  blocks new ones until it commits.
 * It is a projection: `inventory::rebuild_balances` recomputes it from the ledger and
   `inventory::check_balances` reports differences. Both are exposed to the inventory admin.
 * Serial-tracked units: a balance of 1 at the unit's location plus a row in
@@ -54,8 +62,11 @@ tables below are explicit. The crate is `crates/inventory`, schema `inventory`, 
 
 ### Idempotency
 The move `id` is chosen by the client (like the work-log ids in field service). A retry with the
-same id and the same content returns the existing move with `200`; the same id with different
-content is a `409`. Reversals take their own client id.
+same id and the same content (product, quantity, locations, lot, serial unit, kind, reason, note,
+reference, entered quantity and unit, and the cost when one was given) returns the existing move with
+`200`; the same id with different content is a `409` naming the id. A concurrent retry that loses the
+race (`INSERT ... ON CONFLICT (id) DO NOTHING`) re-reads the winner and takes the same path. Reversals
+take their own client id.
 
 ### Units of measure
 * `inventory.uoms` (master data, no company): `code`, `name`, `category`
@@ -139,9 +150,13 @@ orders are not included until B2 and C1 exist.
   product. Creating it snapshots the expected quantity per product, location and lot; users enter
   counted quantities (and may add lines for stock that was not expected). `status`:
   `counting → posted | cancelled`.
-* **Posting** compares the counted quantity with the balance *at that moment* (movements during the
-  count do not matter) and creates one adjustment move per difference against the `adjustment`
-  virtual location, with reference to the count. Lines that were not counted are left alone.
+* **Posting** compares the counted quantity with the balance *at that moment* (it locks the place
+  first) and creates one adjustment move per difference against the `adjustment` virtual location,
+  with reference to the count. Lines that were not counted are left alone. **Movements made during the
+  count are therefore overwritten by what was counted** (the count is the truth at posting time): the
+  line records `quantity_at_post`, the response reports `difference_to_expected` (counted minus what
+  was expected when the count started) per line and `moved_during_count` (lines where the stock
+  changed since), and the screen warns before posting.
 * A single quick **adjustment** (`POST /inventory/adjustments`, a new quantity or a delta with a
   reason) creates the same kind of move.
 

@@ -255,6 +255,9 @@ CREATE TABLE inventory.count_lines (
     lot_id              uuid REFERENCES inventory.lots(id),
     expected_quantity   numeric(18,4) NOT NULL,
     counted_quantity    numeric(18,4) CHECK (counted_quantity >= 0),
+    -- The balance at the moment the count was posted: the adjustment is counted - this, so moves made
+    -- during the count are not overwritten silently; the difference to expected_quantity shows them.
+    quantity_at_post    numeric(18,4),
     adjustment_move_id  uuid REFERENCES inventory.stock_moves(id)
 );
 CREATE UNIQUE INDEX count_lines_key_idx ON inventory.count_lines

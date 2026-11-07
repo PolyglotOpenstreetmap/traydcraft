@@ -16,7 +16,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
-use crate::ledger::{get_or_create_lot, post_move, virtual_location, NewMove};
+use crate::ledger::{get_or_create_lot, lock_balance, post_move, virtual_location, NewMove};
 
 type ErrorBody = traydcraft_core::error::ErrorBody;
 
@@ -58,12 +58,22 @@ pub struct CountLine {
     pub counted_quantity: Option<Decimal>,
     /// The adjustment posted for this line.
     pub adjustment_move_id: Option<Uuid>,
+    /// The stock at the moment the count was posted (the adjustment is counted minus this).
+    #[schema(value_type = Option<String>)]
+    pub quantity_at_post: Option<Decimal>,
+    /// Counted minus expected: what the count found against what the system expected when it
+    /// started. Differs from the adjustment when stock moved during the count.
+    #[schema(value_type = Option<String>)]
+    pub difference_to_expected: Option<Decimal>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct CountDetail {
     pub count: Count,
     pub lines: Vec<CountLine>,
+    /// Posted lines where the stock at posting differed from what was expected when the count
+    /// started: movements made during the count, which the count overwrote with what was counted.
+    pub moved_during_count: i64,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -128,10 +138,12 @@ async fn load_count(conn: &mut PgConnection, company_id: Uuid, id: Uuid) -> AppR
 
 async fn detail(conn: &mut PgConnection, company_id: Uuid, id: Uuid) -> AppResult<CountDetail> {
     let count = load_count(conn, company_id, id).await?;
-    let lines = sqlx::query_as(
+    let lines: Vec<CountLine> = sqlx::query_as(
         "SELECT cl.id, cl.product_id, p.code AS product_code, p.name AS product_name, p.unit, cl.location_id,
                 w.code || '/' || l.code AS location, cl.lot_id, lot.lot_number, cl.expected_quantity,
-                cl.counted_quantity, cl.adjustment_move_id
+                cl.counted_quantity, cl.adjustment_move_id, cl.quantity_at_post,
+                CASE WHEN cl.counted_quantity IS NULL THEN NULL ELSE cl.counted_quantity - cl.expected_quantity END
+                    AS difference_to_expected
          FROM inventory.count_lines cl
          JOIN products.products p ON p.id = cl.product_id
          JOIN inventory.locations l ON l.id = cl.location_id
@@ -144,7 +156,15 @@ async fn detail(conn: &mut PgConnection, company_id: Uuid, id: Uuid) -> AppResul
     .bind(company_id)
     .fetch_all(conn)
     .await?;
-    Ok(CountDetail { count, lines })
+    let moved_during_count = lines
+        .iter()
+        .filter(|l| l.quantity_at_post.is_some_and(|q| q != l.expected_quantity))
+        .count() as i64;
+    Ok(CountDetail {
+        count,
+        lines,
+        moved_during_count,
+    })
 }
 
 #[utoipa::path(get, path = "/inventory/counts", tag = "inventory", params(CountParams),
@@ -428,18 +448,13 @@ async fn post_count(
     let adj = virtual_location(&mut tx, user.company_id, "adjustment").await?;
     let mut posted = 0;
     for (line_id, product_id, location_id, lot_id, counted) in lines {
-        let have: Decimal = sqlx::query_scalar(
-            "SELECT quantity FROM inventory.stock_balances
-             WHERE company_id = $1 AND product_id = $2 AND location_id = $3 AND lot_id IS NOT DISTINCT FROM $4
-             FOR UPDATE",
-        )
-        .bind(user.company_id)
-        .bind(product_id)
-        .bind(location_id)
-        .bind(lot_id)
-        .fetch_optional(&mut *tx)
-        .await?
-        .unwrap_or(Decimal::ZERO);
+        // Lock the place (creating its balance row when there is none) before reading it.
+        let have = lock_balance(&mut tx, user.company_id, product_id, location_id, lot_id).await?;
+        sqlx::query("UPDATE inventory.count_lines SET quantity_at_post = $2 WHERE id = $1")
+            .bind(line_id)
+            .bind(have)
+            .execute(&mut *tx)
+            .await?;
         let delta = counted - have;
         if delta.is_zero() {
             continue;

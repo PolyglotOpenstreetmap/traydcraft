@@ -16,8 +16,8 @@ use utoipa_axum::routes;
 use uuid::Uuid;
 
 use crate::ledger::{
-    get_or_create_lot, load_move, post_move, reverse_move, to_stock_quantity, virtual_location,
-    NewMove, Posted, SerialEffect, StockMove, SELECT_MOVE,
+    get_or_create_lot, load_move, lock_balance, post_move, require_internal_location, reverse_move,
+    to_stock_quantity, virtual_location, NewMove, Posted, SerialEffect, StockMove, SELECT_MOVE,
 };
 use crate::reservations::SALES_ORDER_LINE;
 
@@ -442,18 +442,17 @@ async fn adjust(
                     "new_quantity cannot be negative".into(),
                 ));
             }
-            let have: Decimal = sqlx::query_scalar(
-                "SELECT quantity FROM inventory.stock_balances
-                 WHERE company_id = $1 AND product_id = $2 AND location_id = $3 AND lot_id IS NOT DISTINCT FROM $4
-                 FOR UPDATE",
+            // Lock the place first (creating its balance row when there is none), so two calls that
+            // set the same quantity cannot both add it.
+            require_internal_location(&mut tx, user.company_id, input.location_id).await?;
+            let have = lock_balance(
+                &mut tx,
+                user.company_id,
+                product.id,
+                input.location_id,
+                lot_id,
             )
-            .bind(user.company_id)
-            .bind(product.id)
-            .bind(input.location_id)
-            .bind(lot_id)
-            .fetch_optional(&mut *tx)
-            .await?
-            .unwrap_or(Decimal::ZERO);
+            .await?;
             q - have
         }
         (None, Some(d)) => d,

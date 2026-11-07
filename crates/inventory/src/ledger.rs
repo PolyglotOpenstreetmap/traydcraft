@@ -319,23 +319,8 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
         )));
     }
 
-    let existing: Option<Existing> = sqlx::query_as(
-        "SELECT company_id, product_id, quantity, from_location_id, to_location_id, lot_id, serial_unit_id,
-                kind, reason, reversed_of, note, reference_type, reference_id, entered_quantity, entered_uom,
-                unit_cost
-         FROM inventory.stock_moves WHERE id = $1",
-    )
-    .bind(m.id)
-    .fetch_optional(&mut *conn)
-    .await?;
-    if let Some(e) = existing {
-        if same_move(&e, m) {
-            return Ok(Posted::Replayed(load_move(conn, m.company_id, m.id).await?));
-        }
-        return Err(AppError::Conflict(format!(
-            "the move id {} was already used for a different move; choose a new id for a new move",
-            m.id
-        )));
+    if let Some(posted) = replay(conn, m).await? {
+        return Ok(posted);
     }
 
     let product = get_product(&mut *conn, m.product_id).await?;
@@ -374,11 +359,12 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
     }
 
     let cost = move_cost(conn, m, &product).await?;
-    sqlx::query(
+    let inserted = sqlx::query(
         "INSERT INTO inventory.stock_moves (id, company_id, product_id, quantity, from_location_id, to_location_id,
              lot_id, serial_unit_id, kind, reason, reference_type, reference_id, note, entered_quantity,
              entered_uom, unit_cost, currency, reversed_of, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+         ON CONFLICT (id) DO NOTHING",
     )
     .bind(m.id)
     .bind(m.company_id)
@@ -401,6 +387,12 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
     .bind(m.user_id)
     .execute(&mut *conn)
     .await?;
+    // A concurrent retry with this id committed between the check above and the insert: replay it.
+    if inserted.rows_affected() == 0 {
+        return replay(conn, m).await?.ok_or_else(|| {
+            AppError::Conflict(format!("the move id {} could not be posted", m.id))
+        });
+    }
 
     // Balances: always in the order of the location ids, so concurrent moves cannot deadlock.
     let mut sides = [
@@ -466,6 +458,30 @@ async fn move_cost(
         ));
     }
     Ok(Some((cost, currency)))
+}
+
+/// A move with this id that already exists: the same content is a retry and returns that move,
+/// different content is a conflict. `None` when the id is free.
+async fn replay(conn: &mut PgConnection, m: &NewMove) -> AppResult<Option<Posted>> {
+    let existing: Option<Existing> = sqlx::query_as(
+        "SELECT company_id, product_id, quantity, from_location_id, to_location_id, lot_id, serial_unit_id,
+                kind, reason, reversed_of, note, reference_type, reference_id, entered_quantity, entered_uom,
+                unit_cost
+         FROM inventory.stock_moves WHERE id = $1",
+    )
+    .bind(m.id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match existing {
+        None => Ok(None),
+        Some(e) if same_move(&e, m) => Ok(Some(Posted::Replayed(
+            load_move(conn, m.company_id, m.id).await?,
+        ))),
+        Some(_) => Err(AppError::Conflict(format!(
+            "the move id {} was already used for a different move; choose a new id for a new move",
+            m.id
+        ))),
+    }
 }
 
 async fn check_tracking(conn: &mut PgConnection, m: &NewMove, product: &Product) -> AppResult<()> {
@@ -550,18 +566,7 @@ async fn apply_balance(
     check_reserved: bool,
 ) -> AppResult<()> {
     if delta < Decimal::ZERO && internal {
-        let have: Decimal = sqlx::query_scalar(
-            "SELECT quantity FROM inventory.stock_balances
-             WHERE company_id = $1 AND product_id = $2 AND location_id = $3 AND lot_id IS NOT DISTINCT FROM $4
-             FOR UPDATE",
-        )
-        .bind(m.company_id)
-        .bind(m.product_id)
-        .bind(location_id)
-        .bind(m.lot_id)
-        .fetch_optional(&mut *conn)
-        .await?
-        .unwrap_or(Decimal::ZERO);
+        let have = lock_balance(conn, m.company_id, m.product_id, location_id, m.lot_id).await?;
         if have + delta < Decimal::ZERO {
             return Err(AppError::Conflict(format!(
                 "not enough stock of {} at {label}: {} on hand, {} needed",
@@ -641,6 +646,57 @@ async fn apply_balance(
         .bind(!internal)
         .execute(conn)
         .await?;
+    }
+    Ok(())
+}
+
+/// Locks the balance of a product at an internal location and lot and returns its quantity. The
+/// row is created (with 0) when it does not exist yet, so that two transactions that both want to
+/// set or count the stock of a place that has none queue up instead of both reading 0.
+pub async fn lock_balance(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    product_id: Uuid,
+    location_id: Uuid,
+    lot_id: Option<Uuid>,
+) -> AppResult<Decimal> {
+    sqlx::query(
+        "INSERT INTO inventory.stock_balances (company_id, product_id, location_id, lot_id, quantity, allow_negative)
+         VALUES ($1, $2, $3, $4, 0, false)
+         ON CONFLICT (company_id, product_id, location_id, (COALESCE(lot_id, '00000000-0000-0000-0000-000000000000'::uuid)))
+         DO NOTHING",
+    )
+    .bind(company_id)
+    .bind(product_id)
+    .bind(location_id)
+    .bind(lot_id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(sqlx::query_scalar(
+        "SELECT quantity FROM inventory.stock_balances
+         WHERE company_id = $1 AND product_id = $2 AND location_id = $3 AND lot_id IS NOT DISTINCT FROM $4
+         FOR UPDATE",
+    )
+    .bind(company_id)
+    .bind(product_id)
+    .bind(location_id)
+    .bind(lot_id)
+    .fetch_one(conn)
+    .await?)
+}
+
+/// An internal location of the company that may hold stock (not a virtual one).
+pub async fn require_internal_location(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    location_id: Uuid,
+) -> AppResult<()> {
+    let l = load_location(conn, company_id, location_id).await?;
+    if l.kind != "internal" {
+        return Err(AppError::Validation(format!(
+            "{} is not a stock location",
+            l.label
+        )));
     }
     Ok(())
 }
@@ -992,10 +1048,13 @@ pub async fn check_balances(
 /// Recomputes the balance table and the serial locations from the ledger. Returns the number of
 /// balance rows.
 pub async fn rebuild_balances(conn: &mut PgConnection, company_id: Uuid) -> AppResult<u64> {
-    sqlx::query("SELECT pg_advisory_xact_lock(hashtext('inventory.rebuild:' || $1::text))")
-        .bind(company_id)
-        .execute(&mut *conn)
-        .await?;
+    // No move may run between the delete and the insert: every move writes the balances, and this
+    // lock conflicts with the row exclusive lock of those writes (and waits for running moves).
+    sqlx::query(
+        "LOCK TABLE inventory.stock_balances, inventory.serial_stock IN SHARE ROW EXCLUSIVE MODE",
+    )
+    .execute(&mut *conn)
+    .await?;
     sqlx::query("DELETE FROM inventory.stock_balances WHERE company_id = $1")
         .bind(company_id)
         .execute(&mut *conn)
