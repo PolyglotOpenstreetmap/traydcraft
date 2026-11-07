@@ -97,19 +97,36 @@ product has moves (trigger). Services are not stocked.
   with reason `scrap`.
 
 ### Reservations: `inventory.reservations`
-* One row is one **allocation** of a sales order line to `(location, lot)`: `order_line_id`
-  (`sales.order_lines`), `product_id`, `location_id`, `lot_id`, `quantity`, `status`
-  (`active | released | consumed`), who and when. `consumed` is for delivery (B3).
-* The API is idempotent by design: `PUT /inventory/order-lines/{id}/reservation {quantity}` sets the
-  wanted reserved quantity for the line. More allocates from available stock (optionally pinned to
-  a warehouse, location or lot; otherwise FEFO, then location code, normal warehouses only), less
-  releases the newest allocations first, `0` releases all.
+* **Generic reference** (**decision**). A row holds stock for `(reference_type, reference_id)`:
+  `sales_order_line` today, `production_component` for C1; the CHECK lists the allowed types and a new
+  one widens it. There is no foreign key (the owning module checks that the reference exists and
+  releases when it goes away): sales checks `sales.order_lines` and calls `release_for_order` on
+  cancel, production will call `release_reference`.
+* **Shape.** A row is the allocation of one reference and product to one `(location, lot)`:
+  `quantity` is what is **still held** while the row is `active`, `consumed_quantity` what was already
+  shipped or consumed from it, `status` is `active | released | consumed`, with `closed_at`,
+  `closed_by` and `closed_move_id` (the last consuming move). A partial unique index allows **one
+  active row per reference, product, location and lot**: more stock at the same place adds to the
+  row. Other modules use `reservations::set_reserved(reference, product, quantity, pin)` (all or
+  nothing, in their transaction); sales exposes
+  `PUT /inventory/order-lines/{id}/reservation {quantity}`, which is idempotent: more allocates from
+  available stock (optionally pinned to a warehouse, location or lot; otherwise FEFO, then location
+  code, normal warehouses only), less releases the newest allocations first, `0` releases all.
+* **Consuming** (**decision**). `NewMove.consume_reservation` (HTTP: `consume_reservation_line` on
+  `/inventory/issues`) names the reservation a move ships or consumes. For such a move only that
+  reservation's quantity at the source location and lot is exempt from the "reserved for orders" check,
+  it may take **at most** what the reservation holds there (more is a 409 naming both quantities),
+  and in the same transaction the row's `quantity` shrinks and `consumed_quantity` grows, or the row
+  closes as `consumed` when nothing is left. The move gets the reservation as its reference. A reversal
+  does **not** recreate the reservation (the stock is free again; reserve again if wanted). Delivery
+  (B3) ships with `consume_reservation_line`; without it an issue still cannot touch reserved stock.
 * Only lines of **confirmed** orders (status `confirmed` up to `ready_for_shipping`, the confirmed
-  revision) of stocked products can be reserved, at most the line quantity. Cancelling an order
-  releases its reservations in the same transaction (`inventory::release_for_order`, called from
-  `sales`). The order lifecycle states are unchanged.
+  revision) of stocked products can be reserved, at most the line quantity (in the stock unit; an
+  order line whose unit does not convert is a 422). Cancelling an order releases its reservations in
+  the same transaction (`inventory::release_for_order`, called from `sales`). The order lifecycle
+  states are unchanged.
 * Reserved stock is protected: an issue or transfer cannot take stock that is reserved. Adjustments,
-  counts and reversals can (physical reality wins); the line then shows a negative available quantity.
+  counts can (physical reality wins); the line then shows a negative available quantity.
 
 ### Availability
 For a product: `on_hand` = sum of balances in internal locations, `reserved` = active

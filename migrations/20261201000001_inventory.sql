@@ -191,24 +191,36 @@ CREATE TRIGGER products_guard_stock_setup BEFORE UPDATE OF tracking, unit ON pro
     FOR EACH ROW EXECUTE FUNCTION inventory.guard_product_stock_setup();
 
 -- ---------------------------------------------------------------------------------------------
--- Reservations: one row is one allocation of an order line to a location and lot.
+-- Reservations: stock held for a reference (a sales order line today, a production component
+-- later). A row is the allocation of one reference and product to one location and lot; while it
+-- is active, `quantity` is what is still held. Shipping or consuming the reserved stock reduces
+-- `quantity` (and adds to `consumed_quantity`) and closes the row as 'consumed' when nothing is
+-- left; releasing closes it as 'released'. There is no foreign key to the referenced table: the
+-- owning module checks the reference when it reserves and releases when it goes away.
 -- ---------------------------------------------------------------------------------------------
 CREATE TABLE inventory.reservations (
-    id             uuid PRIMARY KEY,
-    company_id     uuid NOT NULL REFERENCES core.companies(id),
-    order_line_id  uuid NOT NULL REFERENCES sales.order_lines(id),
-    product_id     uuid NOT NULL REFERENCES products.products(id),
-    location_id    uuid NOT NULL REFERENCES inventory.locations(id),
-    lot_id         uuid REFERENCES inventory.lots(id),
-    quantity       numeric(18,4) NOT NULL CHECK (quantity > 0),
-    status         text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'released', 'consumed')),
-    created_by     uuid REFERENCES core.users(id),
-    created_at     timestamptz NOT NULL DEFAULT now(),
-    closed_at      timestamptz,
-    closed_by      uuid REFERENCES core.users(id),
-    closed_move_id uuid REFERENCES inventory.stock_moves(id)
+    id                 uuid PRIMARY KEY,
+    company_id         uuid NOT NULL REFERENCES core.companies(id),
+    reference_type     text NOT NULL CHECK (reference_type IN ('sales_order_line', 'production_component')),
+    reference_id       uuid NOT NULL,
+    product_id         uuid NOT NULL REFERENCES products.products(id),
+    location_id        uuid NOT NULL REFERENCES inventory.locations(id),
+    lot_id             uuid REFERENCES inventory.lots(id),
+    quantity           numeric(18,4) NOT NULL CHECK (quantity > 0),
+    consumed_quantity  numeric(18,4) NOT NULL DEFAULT 0 CHECK (consumed_quantity >= 0),
+    status             text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'released', 'consumed')),
+    created_by         uuid REFERENCES core.users(id),
+    created_at         timestamptz NOT NULL DEFAULT now(),
+    closed_at          timestamptz,
+    closed_by          uuid REFERENCES core.users(id),
+    closed_move_id     uuid REFERENCES inventory.stock_moves(id)
 );
-CREATE INDEX reservations_line_idx ON inventory.reservations (order_line_id) WHERE status = 'active';
+-- At most one active row per reference, product, location and lot: more stock at the same place
+-- adds to the row instead of making a second one.
+CREATE UNIQUE INDEX reservations_active_key ON inventory.reservations
+    (reference_type, reference_id, product_id, location_id, (COALESCE(lot_id, '00000000-0000-0000-0000-000000000000'::uuid)))
+    WHERE status = 'active';
+CREATE INDEX reservations_reference_idx ON inventory.reservations (reference_type, reference_id) WHERE status = 'active';
 CREATE INDEX reservations_stock_idx ON inventory.reservations (company_id, product_id, location_id) WHERE status = 'active';
 
 -- ---------------------------------------------------------------------------------------------

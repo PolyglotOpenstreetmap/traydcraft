@@ -136,6 +136,11 @@ pub struct NewMove {
     pub reversed_of: Option<Uuid>,
     /// Issues and transfers may not take stock that is reserved for orders.
     pub respect_reservations: bool,
+    /// The reservation (`reference_type`, `reference_id`) this move ships or consumes. Only that
+    /// reservation's quantity at the source location and lot is exempt from the reservation
+    /// check, the move may not take more than it holds, and its quantity is reduced (closed as
+    /// consumed when nothing is left) in the same transaction.
+    pub consume_reservation: Option<(String, Uuid)>,
     pub serial_effect: SerialEffect,
 }
 
@@ -168,6 +173,7 @@ impl NewMove {
             entered: None,
             reversed_of: None,
             respect_reservations: false,
+            consume_reservation: None,
             serial_effect: SerialEffect::None,
         }
     }
@@ -325,6 +331,11 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
             "a {} cannot go from {} to {}",
             m.kind, from.label, to.label
         )));
+    }
+    if m.consume_reservation.is_some() && !from_internal {
+        return Err(AppError::Validation(
+            "only a move out of stock can consume a reservation".into(),
+        ));
     }
     if to_internal && !(to.active && to.warehouse_active.unwrap_or(false)) {
         return Err(AppError::Validation(format!(
@@ -488,15 +499,44 @@ async fn apply_balance(
                 (-delta).normalize()
             )));
         }
+        // Shipping a reservation's own stock: it may take what that reservation holds, no more.
+        let mut exempt = Decimal::ZERO;
+        if let Some((reference_type, reference_id)) = &m.consume_reservation {
+            let held = sqlx::query_scalar::<_, Decimal>(
+                "SELECT quantity FROM inventory.reservations
+                 WHERE company_id = $1 AND reference_type = $2 AND reference_id = $3 AND product_id = $4
+                   AND location_id = $5 AND lot_id IS NOT DISTINCT FROM $6 AND status = 'active'
+                 FOR UPDATE",
+            )
+            .bind(m.company_id)
+            .bind(reference_type)
+            .bind(reference_id)
+            .bind(m.product_id)
+            .bind(location_id)
+            .bind(m.lot_id)
+            .fetch_optional(&mut *conn)
+            .await?
+            .unwrap_or(Decimal::ZERO);
+            if -delta > held {
+                return Err(AppError::Conflict(format!(
+                    "{} {} of {} asked from the reservation at {label}, which holds {}",
+                    (-delta).normalize(),
+                    product.unit,
+                    product.code,
+                    held.normalize()
+                )));
+            }
+            exempt = held;
+        }
         if check_reserved {
             let reserved =
                 reserved_at(conn, m.company_id, m.product_id, location_id, m.lot_id).await?;
-            if have + delta < reserved {
+            if have + delta < reserved - exempt {
                 return Err(AppError::Conflict(format!(
                     "{} of {} at {label} is reserved for orders; only {} can be taken",
                     reserved.normalize(),
                     product.code,
-                    (have - reserved).max(Decimal::ZERO).normalize()
+                    (have - reserved + exempt).max(Decimal::ZERO).normalize()
                 )));
             }
         }
@@ -509,8 +549,12 @@ async fn apply_balance(
         .bind(location_id)
         .bind(m.lot_id)
         .bind(delta)
-        .execute(conn)
+        .execute(&mut *conn)
         .await?;
+        if let Some((reference_type, reference_id)) = &m.consume_reservation {
+            consume_reservation(conn, m, reference_type, *reference_id, location_id, -delta)
+                .await?;
+        }
     } else {
         sqlx::query(
             "INSERT INTO inventory.stock_balances (company_id, product_id, location_id, lot_id, quantity, allow_negative)
@@ -527,6 +571,41 @@ async fn apply_balance(
         .execute(conn)
         .await?;
     }
+    Ok(())
+}
+
+/// Takes `quantity` out of the reservation a move ships: the row shrinks, and is closed as
+/// consumed when nothing is left. The move is recorded on the row.
+async fn consume_reservation(
+    conn: &mut PgConnection,
+    m: &NewMove,
+    reference_type: &str,
+    reference_id: Uuid,
+    location_id: Uuid,
+    quantity: Decimal,
+) -> AppResult<()> {
+    sqlx::query(
+        "UPDATE inventory.reservations SET
+            consumed_quantity = consumed_quantity + $7,
+            closed_move_id = $8,
+            status = CASE WHEN quantity <= $7 THEN 'consumed' ELSE status END,
+            closed_at = CASE WHEN quantity <= $7 THEN now() ELSE closed_at END,
+            closed_by = CASE WHEN quantity <= $7 THEN $9 ELSE closed_by END,
+            quantity = CASE WHEN quantity <= $7 THEN quantity ELSE quantity - $7 END
+         WHERE company_id = $1 AND reference_type = $2 AND reference_id = $3 AND product_id = $4
+           AND location_id = $5 AND lot_id IS NOT DISTINCT FROM $6 AND status = 'active'",
+    )
+    .bind(m.company_id)
+    .bind(reference_type)
+    .bind(reference_id)
+    .bind(m.product_id)
+    .bind(location_id)
+    .bind(m.lot_id)
+    .bind(quantity)
+    .bind(m.id)
+    .bind(m.user_id)
+    .execute(conn)
+    .await?;
     Ok(())
 }
 

@@ -19,6 +19,7 @@ use crate::ledger::{
     get_or_create_lot, load_move, post_move, reverse_move, to_stock_quantity, virtual_location,
     NewMove, Posted, SerialEffect, StockMove, SELECT_MOVE,
 };
+use crate::reservations::SALES_ORDER_LINE;
 
 type ErrorBody = traydcraft_core::error::ErrorBody;
 
@@ -60,6 +61,10 @@ pub struct IssueInput {
     pub reason: Option<String>,
     /// Serial units shipped: the customer (unless the unit has one).
     pub customer_id: Option<Uuid>,
+    /// Ship or consume the stock reserved for this sales order line: only that reservation is
+    /// exempt from the "reserved for orders" check, at most its quantity can be taken, and it
+    /// shrinks (or closes as consumed) in the same transaction.
+    pub consume_reservation_line: Option<Uuid>,
     #[serde(default)]
     pub note: String,
 }
@@ -303,6 +308,10 @@ async fn issue(
     m.entered = entered;
     m.note = input.note;
     m.respect_reservations = true;
+    if let Some(line) = input.consume_reservation_line {
+        m.consume_reservation = Some((SALES_ORDER_LINE.to_string(), line));
+        m.reference = Some((SALES_ORDER_LINE.to_string(), line));
+    }
     m.serial_effect = if product.tracking == "serial" {
         effect
     } else {

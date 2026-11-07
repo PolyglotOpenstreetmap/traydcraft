@@ -96,10 +96,19 @@ async fn load_line(
     .ok_or(AppError::NotFound("order line"))
 }
 
-async fn allocations(
+/// The reference type of a sales order line.
+pub const SALES_ORDER_LINE: &str = "sales_order_line";
+/// The reference type of a component a production order needs.
+pub const PRODUCTION_COMPONENT: &str = "production_component";
+/// The references a reservation can be for. A new type needs the CHECK in the migration widened.
+pub const REFERENCE_TYPES: [&str; 2] = [SALES_ORDER_LINE, PRODUCTION_COMPONENT];
+
+/// The active allocations held for a reference.
+pub async fn allocations_for(
     conn: &mut PgConnection,
     company_id: Uuid,
-    line_id: Uuid,
+    reference_type: &str,
+    reference_id: Uuid,
 ) -> AppResult<Vec<Allocation>> {
     Ok(sqlx::query_as(
         "SELECT r.id, r.location_id, w.code || '/' || l.code AS location, r.lot_id, lot.lot_number, r.quantity, r.created_at
@@ -107,11 +116,12 @@ async fn allocations(
          JOIN inventory.locations l ON l.id = r.location_id
          JOIN inventory.warehouses w ON w.id = l.warehouse_id
          LEFT JOIN inventory.lots lot ON lot.id = r.lot_id
-         WHERE r.company_id = $1 AND r.order_line_id = $2 AND r.status = 'active'
+         WHERE r.company_id = $1 AND r.reference_type = $2 AND r.reference_id = $3 AND r.status = 'active'
          ORDER BY r.created_at, r.id",
     )
     .bind(company_id)
-    .bind(line_id)
+    .bind(reference_type)
+    .bind(reference_id)
     .fetch_all(conn)
     .await?)
 }
@@ -127,7 +137,7 @@ async fn line_reservation(
         .ok_or_else(|| AppError::Validation("this order line has no product".into()))?;
     let product = get_product(&mut *conn, product_id).await?;
     let ordered = ordered_in_stock_unit(conn, &product, &line).await?;
-    let allocations = allocations(conn, company_id, line_id).await?;
+    let allocations = allocations_for(conn, company_id, SALES_ORDER_LINE, line_id).await?;
     Ok(LineReservation {
         order_line_id: line_id,
         product_id,
@@ -145,9 +155,11 @@ async fn ordered_in_stock_unit(
     product: &traydcraft_products::Product,
     line: &LineInfo,
 ) -> AppResult<Decimal> {
-    Ok(to_stock_quantity(conn, product, line.quantity, Some(&line.unit))
-        .await?
-        .0)
+    Ok(
+        to_stock_quantity(conn, product, line.quantity, Some(&line.unit))
+            .await?
+            .0,
+    )
 }
 
 #[utoipa::path(get, path = "/inventory/order-lines/{id}/reservation", tag = "inventory", params(("id" = Uuid, Path)),
@@ -194,36 +206,36 @@ async fn set_reservation(
         )));
     }
     let ordered = ordered_in_stock_unit(&mut tx, &product, &line).await?;
-
-    // Serialise reservations and moves on this product.
-    sqlx::query("SELECT id FROM inventory.stock_balances WHERE company_id = $1 AND product_id = $2 ORDER BY id FOR UPDATE")
-        .bind(user.company_id)
-        .bind(product_id)
-        .execute(&mut *tx)
-        .await?;
-
-    let current: Vec<Allocation> = allocations(&mut tx, user.company_id, line_id).await?;
-    let have: Decimal = current.iter().map(|a| a.quantity).sum();
-    let want = input.quantity;
-    if want > have {
+    let target = ReserveTarget {
+        reference_type: SALES_ORDER_LINE,
+        reference_id: line_id,
+        product_id,
+    };
+    let pin = ReservePin {
+        warehouse_id: input.warehouse_id,
+        location_id: input.location_id,
+        lot_id: input.lot_id,
+    };
+    // Raising a reservation needs a confirmed order and at most the ordered quantity; lowering or
+    // releasing is always possible.
+    if input.quantity > held_by(&mut tx, user.company_id, &target).await? {
         if !RESERVABLE.contains(&line.order_status.as_str()) || !line.is_current {
             return Err(AppError::Conflict(format!(
                 "order {} is {}; stock can be reserved once the customer has confirmed it",
                 line.order_number, line.order_status
             )));
         }
-        if want > ordered {
+        if input.quantity > ordered {
             return Err(AppError::Validation(format!(
                 "the line asks for {} {}; cannot reserve {}",
                 ordered.normalize(),
                 product.unit,
-                want.normalize()
+                input.quantity.normalize()
             )));
         }
-        allocate(&mut tx, &user, line_id, product_id, want - have, &input).await?;
-    } else if want < have {
-        release_newest(&mut tx, &user, line_id, have - want).await?;
     }
+    let have = set_reserved(&mut tx, &user, &target, input.quantity, &pin).await?;
+    let want = input.quantity;
     audit::record(
         &mut tx,
         &user,
@@ -238,6 +250,83 @@ async fn set_reservation(
     Ok(Json(result))
 }
 
+/// What a reservation is for.
+#[derive(Debug, Clone, Copy)]
+pub struct ReserveTarget<'a> {
+    /// One of [`REFERENCE_TYPES`].
+    pub reference_type: &'a str,
+    pub reference_id: Uuid,
+    pub product_id: Uuid,
+}
+
+/// Where additional stock may come from; without a pin: normal warehouses, earliest expiry first.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct ReservePin {
+    pub warehouse_id: Option<Uuid>,
+    pub location_id: Option<Uuid>,
+    pub lot_id: Option<Uuid>,
+}
+
+/// The quantity currently held for the reference and product.
+pub async fn held_by(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    t: &ReserveTarget<'_>,
+) -> AppResult<Decimal> {
+    Ok(sqlx::query_scalar(
+        "SELECT COALESCE(sum(quantity), 0) FROM inventory.reservations
+         WHERE company_id = $1 AND reference_type = $2 AND reference_id = $3 AND product_id = $4
+           AND status = 'active'",
+    )
+    .bind(company_id)
+    .bind(t.reference_type)
+    .bind(t.reference_id)
+    .bind(t.product_id)
+    .fetch_one(conn)
+    .await?)
+}
+
+/// Sets how much of a product is held for a reference, in the caller's transaction: more
+/// allocates from free stock (all or nothing), less releases the newest allocations first, 0
+/// releases everything. Returns the quantity that was held before. The owning module checks that
+/// the reference exists and may be reserved for; this function checks the type and the stock.
+pub async fn set_reserved(
+    conn: &mut PgConnection,
+    user: &CurrentUser,
+    t: &ReserveTarget<'_>,
+    want: Decimal,
+    pin: &ReservePin,
+) -> AppResult<Decimal> {
+    if !REFERENCE_TYPES.contains(&t.reference_type) {
+        return Err(AppError::Validation(format!(
+            "reference_type must be one of {}",
+            REFERENCE_TYPES.join(", ")
+        )));
+    }
+    if want < Decimal::ZERO || want.round_dp(4) != want {
+        return Err(AppError::Validation(
+            "quantity must be 0 or more, with at most 4 decimals".into(),
+        ));
+    }
+    // Serialise reservations and moves on this product, locking balance rows in the same order
+    // (location, lot) as `post_move` does.
+    sqlx::query(
+        "SELECT id FROM inventory.stock_balances WHERE company_id = $1 AND product_id = $2
+         ORDER BY location_id, COALESCE(lot_id, '00000000-0000-0000-0000-000000000000'::uuid) FOR UPDATE",
+    )
+    .bind(user.company_id)
+    .bind(t.product_id)
+    .execute(&mut *conn)
+    .await?;
+    let have = held_by(conn, user.company_id, t).await?;
+    if want > have {
+        allocate(conn, user, t, want - have, pin).await?;
+    } else if want < have {
+        release_newest(conn, user, t, have - want).await?;
+    }
+    Ok(have)
+}
+
 #[derive(FromRow)]
 struct Candidate {
     location_id: Uuid,
@@ -248,10 +337,9 @@ struct Candidate {
 async fn allocate(
     conn: &mut PgConnection,
     user: &CurrentUser,
-    line_id: Uuid,
-    product_id: Uuid,
+    t: &ReserveTarget<'_>,
     mut needed: Decimal,
-    input: &ReserveInput,
+    pin: &ReservePin,
 ) -> AppResult<()> {
     let candidates: Vec<Candidate> = sqlx::query_as(
         "SELECT b.location_id, b.lot_id, b.quantity - COALESCE(res.q, 0) AS free
@@ -272,10 +360,10 @@ async fn allocate(
          FOR UPDATE OF b",
     )
     .bind(user.company_id)
-    .bind(product_id)
-    .bind(input.warehouse_id)
-    .bind(input.location_id)
-    .bind(input.lot_id)
+    .bind(t.product_id)
+    .bind(pin.warehouse_id)
+    .bind(pin.location_id)
+    .bind(pin.lot_id)
     .fetch_all(&mut *conn)
     .await?;
     let free_total: Decimal = candidates.iter().map(|c| c.free).sum();
@@ -291,14 +379,20 @@ async fn allocate(
             break;
         }
         let take = c.free.min(needed);
+        // More at a place that already holds stock for this reference adds to that row.
         sqlx::query(
-            "INSERT INTO inventory.reservations (id, company_id, order_line_id, product_id, location_id, lot_id, quantity, created_by)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            "INSERT INTO inventory.reservations (id, company_id, reference_type, reference_id, product_id, location_id,
+                                                  lot_id, quantity, created_by)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+             ON CONFLICT (reference_type, reference_id, product_id, location_id,
+                          (COALESCE(lot_id, '00000000-0000-0000-0000-000000000000'::uuid))) WHERE status = 'active'
+             DO UPDATE SET quantity = inventory.reservations.quantity + EXCLUDED.quantity",
         )
         .bind(new_id())
         .bind(user.company_id)
-        .bind(line_id)
-        .bind(product_id)
+        .bind(t.reference_type)
+        .bind(t.reference_id)
+        .bind(t.product_id)
         .bind(c.location_id)
         .bind(c.lot_id)
         .bind(take)
@@ -313,16 +407,18 @@ async fn allocate(
 async fn release_newest(
     conn: &mut PgConnection,
     user: &CurrentUser,
-    line_id: Uuid,
+    t: &ReserveTarget<'_>,
     mut to_release: Decimal,
 ) -> AppResult<()> {
     let rows: Vec<(Uuid, Decimal)> = sqlx::query_as(
         "SELECT id, quantity FROM inventory.reservations
-         WHERE company_id = $1 AND order_line_id = $2 AND status = 'active'
+         WHERE company_id = $1 AND reference_type = $2 AND reference_id = $3 AND product_id = $4 AND status = 'active'
          ORDER BY created_at DESC, id DESC FOR UPDATE",
     )
     .bind(user.company_id)
-    .bind(line_id)
+    .bind(t.reference_type)
+    .bind(t.reference_id)
+    .bind(t.product_id)
     .fetch_all(&mut *conn)
     .await?;
     for (id, quantity) in rows {
@@ -348,6 +444,28 @@ async fn release_newest(
     Ok(())
 }
 
+/// Releases everything held for a reference (for example the components of a cancelled
+/// production order). Returns the number of allocations released.
+pub async fn release_reference(
+    conn: &mut PgConnection,
+    company_id: Uuid,
+    reference_type: &str,
+    reference_id: Uuid,
+    user_id: Option<Uuid>,
+) -> Result<u64, sqlx::Error> {
+    let done = sqlx::query(
+        "UPDATE inventory.reservations SET status = 'released', closed_at = now(), closed_by = $4
+         WHERE company_id = $1 AND reference_type = $2 AND reference_id = $3 AND status = 'active'",
+    )
+    .bind(company_id)
+    .bind(reference_type)
+    .bind(reference_id)
+    .bind(user_id)
+    .execute(conn)
+    .await?;
+    Ok(done.rows_affected())
+}
+
 /// Releases every active reservation of an order, for example when it is cancelled. Runs in the
 /// caller's transaction; returns the number of allocations released.
 pub async fn release_for_order(
@@ -359,7 +477,8 @@ pub async fn release_for_order(
     let done = sqlx::query(
         "UPDATE inventory.reservations r SET status = 'released', closed_at = now(), closed_by = $3
          FROM sales.order_lines ol
-         WHERE ol.id = r.order_line_id AND ol.order_id = $2 AND r.company_id = $1 AND r.status = 'active'",
+         WHERE r.reference_type = 'sales_order_line' AND ol.id = r.reference_id AND ol.order_id = $2
+           AND r.company_id = $1 AND r.status = 'active'",
     )
     .bind(company_id)
     .bind(order_id)
@@ -376,17 +495,25 @@ pub async fn release_for_order(
 #[derive(Debug, Serialize, FromRow, ToSchema)]
 pub struct ReservationRow {
     pub id: Uuid,
-    pub order_id: Uuid,
-    pub order_number: String,
-    pub customer_name: String,
-    pub order_line_id: Uuid,
-    pub position: i32,
+    /// sales_order_line | production_component
+    pub reference_type: String,
+    pub reference_id: Uuid,
+    /// The order, for a sales order line.
+    pub order_id: Option<Uuid>,
+    pub order_number: Option<String>,
+    pub customer_name: Option<String>,
+    pub order_line_id: Option<Uuid>,
+    pub position: Option<i32>,
     pub product_id: Uuid,
     pub product_code: String,
     pub location: String,
     pub lot_number: Option<String>,
+    /// Still held.
     #[schema(value_type = String)]
     pub quantity: Decimal,
+    /// Already shipped or consumed from this allocation.
+    #[schema(value_type = String)]
+    pub consumed_quantity: Decimal,
     pub created_at: DateTime<Utc>,
 }
 
@@ -407,20 +534,21 @@ async fn list_reservations(
     user.require(Permission::InventoryRead)?;
     Ok(Json(
         sqlx::query_as(
-            "SELECT r.id, o.id AS order_id, o.number AS order_number, c.name AS customer_name, r.order_line_id,
+            "SELECT r.id, r.reference_type, r.reference_id, o.id AS order_id, o.number AS order_number,
+                    c.name AS customer_name, ol.id AS order_line_id,
                     ol.position, r.product_id, pr.code AS product_code, w.code || '/' || l.code AS location,
-                    lot.lot_number, r.quantity, r.created_at
+                    lot.lot_number, r.quantity, r.consumed_quantity, r.created_at
              FROM inventory.reservations r
-             JOIN sales.order_lines ol ON ol.id = r.order_line_id
-             JOIN sales.orders o ON o.id = ol.order_id
-             JOIN crm.customers c ON c.id = o.customer_id
+             LEFT JOIN sales.order_lines ol ON r.reference_type = 'sales_order_line' AND ol.id = r.reference_id
+             LEFT JOIN sales.orders o ON o.id = ol.order_id AND o.company_id = r.company_id
+             LEFT JOIN crm.customers c ON c.id = o.customer_id
              JOIN products.products pr ON pr.id = r.product_id
              JOIN inventory.locations l ON l.id = r.location_id
              JOIN inventory.warehouses w ON w.id = l.warehouse_id
              LEFT JOIN inventory.lots lot ON lot.id = r.lot_id
              WHERE r.company_id = $1 AND r.status = 'active'
                AND ($2::uuid IS NULL OR r.product_id = $2) AND ($3::uuid IS NULL OR o.id = $3)
-             ORDER BY o.number, ol.position, r.created_at LIMIT 500",
+             ORDER BY o.number NULLS LAST, ol.position, r.created_at LIMIT 500",
         )
         .bind(user.company_id)
         .bind(p.product_id)
@@ -537,9 +665,10 @@ async fn order_availability(
     .into_iter()
     .collect();
     let own: HashMap<Uuid, Decimal> = sqlx::query_as::<_, (Uuid, Decimal)>(
-        "SELECT r.order_line_id, sum(r.quantity) FROM inventory.reservations r
-         JOIN sales.order_lines ol ON ol.id = r.order_line_id
-         WHERE r.company_id = $1 AND r.status = 'active' AND ol.order_id = $2 GROUP BY r.order_line_id",
+        "SELECT r.reference_id, sum(r.quantity) FROM inventory.reservations r
+         JOIN sales.order_lines ol ON ol.id = r.reference_id
+         WHERE r.company_id = $1 AND r.reference_type = 'sales_order_line' AND r.status = 'active' AND ol.order_id = $2
+         GROUP BY r.reference_id",
     )
     .bind(user.company_id)
     .bind(order_id)
