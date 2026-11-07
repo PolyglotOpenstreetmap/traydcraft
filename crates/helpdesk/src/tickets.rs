@@ -108,8 +108,9 @@ pub struct Ticket {
 }
 
 impl Ticket {
-    fn with_sla(mut self) -> Self {
-        self.sla = sla::evaluate(
+    fn with_sla(mut self, cal: Option<&sla::Calendar>) -> Self {
+        self.sla = sla::evaluate_in(
+            cal,
             &SlaInput {
                 first_response_due_at: self.sla_first_response_due_at,
                 resolution_due_at: self.sla_resolution_due_at,
@@ -347,13 +348,15 @@ const SELECT: &str = "SELECT t.id, t.number, t.subject, t.status, t.priority, t.
      LEFT JOIN sales.orders o ON o.id = t.order_id";
 
 pub async fn load_ticket(conn: &mut PgConnection, company_id: Uuid, id: Uuid) -> AppResult<Ticket> {
-    sqlx::query_as::<_, Ticket>(&format!("{SELECT} WHERE t.id = $1 AND t.company_id = $2"))
-        .bind(id)
-        .bind(company_id)
-        .fetch_optional(conn)
-        .await?
-        .map(Ticket::with_sla)
-        .ok_or(AppError::NotFound("ticket"))
+    let ticket =
+        sqlx::query_as::<_, Ticket>(&format!("{SELECT} WHERE t.id = $1 AND t.company_id = $2"))
+            .bind(id)
+            .bind(company_id)
+            .fetch_optional(&mut *conn)
+            .await?
+            .ok_or(AppError::NotFound("ticket"))?;
+    let cal = crate::calendar::load_calendar(conn, company_id).await?;
+    Ok(ticket.with_sla(cal.as_ref()))
 }
 
 pub async fn load_detail(
@@ -552,7 +555,14 @@ async fn list_tickets(
     .bind(p.offset.unwrap_or(0).max(0))
     .fetch_all(&state.db)
     .await?;
-    let items = items.into_iter().map(Ticket::with_sla).collect();
+    let cal = {
+        let mut conn = state.db.acquire().await?;
+        crate::calendar::load_calendar(&mut conn, user.company_id).await?
+    };
+    let items = items
+        .into_iter()
+        .map(|t| t.with_sla(cal.as_ref()))
+        .collect();
     let total = sqlx::query_scalar(&format!(
         "SELECT count(*) FROM helpdesk.tickets t LEFT JOIN crm.customers c ON c.id = t.customer_id {filter}"
     ))
@@ -658,6 +668,7 @@ async fn create_ticket(
     add_note(&mut tx, &user, id, &input.body).await?;
     crate::teams::assign_default_team(&mut tx, user.company_id, id).await?;
     sla::sync(&mut tx, id).await?;
+    crate::automation::run(&mut tx, user.company_id, id, "created").await?;
     audit::record(
         &mut tx,
         &user,
@@ -770,6 +781,7 @@ async fn update_ticket(
     .execute(&mut *tx)
     .await?;
     set_status(&mut tx, id, &input.status).await?;
+    crate::automation::run(&mut tx, user.company_id, id, "updated").await?;
     audit::record(
         &mut tx,
         &user,
@@ -802,7 +814,10 @@ async fn add_note_handler(
     let note_id = add_note(&mut tx, &user, id, &input.body).await?;
     crate::attachments::link(&mut tx, id, note_id, &input.attachment_ids, None).await?;
     match &input.status {
-        Some(s) => set_status(&mut tx, id, s).await?,
+        Some(s) => {
+            set_status(&mut tx, id, s).await?;
+            crate::automation::run(&mut tx, user.company_id, id, "updated").await?;
+        }
         None => {
             sqlx::query("UPDATE helpdesk.tickets SET updated_at = now() WHERE id = $1")
                 .bind(id)
@@ -937,6 +952,7 @@ async fn reply(
         input.status.as_deref().unwrap_or("pending_customer"),
     )
     .await?;
+    crate::automation::run(&mut tx, user.company_id, id, "updated").await?;
     audit::record(
         &mut tx,
         &user,
@@ -1103,8 +1119,8 @@ async fn production_question(
     let id = new_id();
     sqlx::query(
         "INSERT INTO helpdesk.tickets (id, company_id, number, subject, status, priority, category, language, customer_id,
-                                       contact_email, owner_user_id, quotation_id, order_id, internal, created_by)
-         VALUES ($1, $2, $3, $4, 'open', 'high', 'production_question', $5, $6, $7, $8, $9, $10, true, $11)",
+                                       contact_email, owner_user_id, quotation_id, order_id, internal, created_by, channel)
+         VALUES ($1, $2, $3, $4, 'open', 'high', 'production_question', $5, $6, $7, $8, $9, $10, true, $11, 'internal')",
     )
     .bind(id)
     .bind(user.company_id)
@@ -1120,6 +1136,8 @@ async fn production_question(
     .execute(&mut *tx)
     .await?;
     add_note(&mut tx, &user, id, &input.body).await?;
+    sla::sync(&mut tx, id).await?;
+    crate::automation::run(&mut tx, user.company_id, id, "created").await?;
     audit::record(
         &mut tx,
         &user,
@@ -1189,6 +1207,7 @@ async fn log_call(
         None => None,
     };
 
+    let new_ticket = input.ticket_id.is_none();
     let ticket_id = match input.ticket_id {
         Some(t) => {
             let ticket = load_ticket(&mut tx, user.company_id, t).await?;
@@ -1244,8 +1263,8 @@ async fn log_call(
             let id = new_id();
             sqlx::query(
                 "INSERT INTO helpdesk.tickets (id, company_id, number, subject, status, category, language, customer_id,
-                                               contact_id, contact_name, contact_email, owner_user_id, created_by)
-                 VALUES ($1, $2, $3, $4, 'open', $5, $6, $7, $8, $9, $10, $11, $11)",
+                                               contact_id, contact_name, contact_email, owner_user_id, created_by, channel)
+                 VALUES ($1, $2, $3, $4, 'open', $5, $6, $7, $8, $9, $10, $11, $11, 'phone')",
             )
             .bind(id)
             .bind(user.company_id)
@@ -1299,6 +1318,12 @@ async fn log_call(
     .execute(&mut *tx)
     .await?;
     sla::sync(&mut tx, ticket_id).await?;
+    let trigger = match (new_ticket, kind) {
+        (true, _) => "created",
+        (false, "call_in") => "customer_replied",
+        _ => "updated",
+    };
+    crate::automation::run(&mut tx, user.company_id, ticket_id, trigger).await?;
     audit::record(
         &mut tx,
         &user,

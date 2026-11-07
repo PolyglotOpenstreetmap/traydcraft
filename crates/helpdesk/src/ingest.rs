@@ -248,8 +248,8 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
             let id = traydcraft_core::new_id();
             sqlx::query(
                 "INSERT INTO helpdesk.tickets (id, company_id, number, subject, category, suggested_category, language,
-                                               customer_id, contact_name, contact_email, owner_user_id, quotation_id, contact_id)
-                 VALUES ($1, $2, $3, $4, $5, $5, $6, $7, $8, $9, $10, $11, $12)",
+                                               customer_id, contact_name, contact_email, owner_user_id, quotation_id, contact_id, channel)
+                 VALUES ($1, $2, $3, $4, $5, $5, $6, $7, $8, $9, $10, $11, $12, 'email')",
             )
             .bind(id)
             .bind(company_id)
@@ -299,6 +299,17 @@ pub async fn ingest(db: &PgPool, company_id: Uuid, raw: &[u8]) -> anyhow::Result
     .execute(&mut *tx)
     .await?;
     store_attachments(&mut tx, company_id, ticket_id, article_id, &mail).await?;
+    crate::automation::run(
+        &mut tx,
+        company_id,
+        ticket_id,
+        if new_ticket {
+            "created"
+        } else {
+            "customer_replied"
+        },
+    )
+    .await?;
     tx.commit().await?;
     Ok(IngestResult {
         ticket_id,
