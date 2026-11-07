@@ -578,7 +578,10 @@ pub struct LineAvailability {
     /// Reserved for all orders.
     #[schema(value_type = String)]
     pub reserved_total: Decimal,
-    /// Available to promise: on hand minus everything reserved.
+    /// Of the on hand quantity: in lots that are past their expiry date (not available).
+    #[schema(value_type = String)]
+    pub expired: Decimal,
+    /// Available to promise: on hand minus expired stock minus what is reserved in good lots.
     #[schema(value_type = String)]
     pub available: Decimal,
     /// What neither the reservation nor free stock covers.
@@ -640,30 +643,42 @@ async fn order_availability(
     .fetch_all(&mut *conn)
     .await?;
     let ids: Vec<Uuid> = lines.iter().filter_map(|l| l.product_id).collect();
-    let on_hand: HashMap<Uuid, Decimal> = sqlx::query_as::<_, (Uuid, Decimal)>(
-        "SELECT b.product_id, sum(b.quantity) FROM inventory.stock_balances b
-         JOIN inventory.locations l ON l.id = b.location_id AND l.kind = 'internal'
-         JOIN inventory.warehouses w ON w.id = l.warehouse_id AND w.kind = 'warehouse'
-         WHERE b.company_id = $1 AND b.product_id = ANY($2) GROUP BY b.product_id",
+    // (on hand, of which in expired lots) per product: expired stock stays in the on hand figure
+    // but is not available.
+    let on_hand: HashMap<Uuid, (Decimal, Decimal)> = sqlx::query_as::<_, (Uuid, Decimal, Decimal)>(
+        "SELECT b.product_id, sum(b.quantity),
+                    COALESCE(sum(b.quantity) FILTER (WHERE lot.expiry_date < current_date), 0)
+             FROM inventory.stock_balances b
+             JOIN inventory.locations l ON l.id = b.location_id AND l.kind = 'internal'
+             JOIN inventory.warehouses w ON w.id = l.warehouse_id AND w.kind = 'warehouse'
+             LEFT JOIN inventory.lots lot ON lot.id = b.lot_id
+             WHERE b.company_id = $1 AND b.product_id = ANY($2) GROUP BY b.product_id",
     )
     .bind(user.company_id)
     .bind(&ids)
     .fetch_all(&mut *conn)
     .await?
     .into_iter()
+    .map(|(p, q, e)| (p, (q, e)))
     .collect();
-    let reserved: HashMap<Uuid, Decimal> = sqlx::query_as::<_, (Uuid, Decimal)>(
-        "SELECT r.product_id, sum(r.quantity) FROM inventory.reservations r
-         JOIN inventory.locations l ON l.id = r.location_id
-         JOIN inventory.warehouses w ON w.id = l.warehouse_id AND w.kind = 'warehouse'
-         WHERE r.company_id = $1 AND r.status = 'active' AND r.product_id = ANY($2) GROUP BY r.product_id",
-    )
-    .bind(user.company_id)
-    .bind(&ids)
-    .fetch_all(&mut *conn)
-    .await?
-    .into_iter()
-    .collect();
+    // (reserved, of which in expired lots) per product.
+    let reserved: HashMap<Uuid, (Decimal, Decimal)> =
+        sqlx::query_as::<_, (Uuid, Decimal, Decimal)>(
+            "SELECT r.product_id, sum(r.quantity),
+                    COALESCE(sum(r.quantity) FILTER (WHERE lot.expiry_date < current_date), 0)
+             FROM inventory.reservations r
+             JOIN inventory.locations l ON l.id = r.location_id
+             JOIN inventory.warehouses w ON w.id = l.warehouse_id AND w.kind = 'warehouse'
+             LEFT JOIN inventory.lots lot ON lot.id = r.lot_id
+             WHERE r.company_id = $1 AND r.status = 'active' AND r.product_id = ANY($2) GROUP BY r.product_id",
+        )
+        .bind(user.company_id)
+        .bind(&ids)
+        .fetch_all(&mut *conn)
+        .await?
+        .into_iter()
+        .map(|(p, q, e)| (p, (q, e)))
+        .collect();
     let own: HashMap<Uuid, Decimal> = sqlx::query_as::<_, (Uuid, Decimal)>(
         "SELECT r.reference_id, sum(r.quantity) FROM inventory.reservations r
          JOIN sales.order_lines ol ON ol.id = r.reference_id
@@ -692,6 +707,7 @@ async fn order_availability(
             reserved: Decimal::ZERO,
             on_hand: Decimal::ZERO,
             reserved_total: Decimal::ZERO,
+            expired: Decimal::ZERO,
             available: Decimal::ZERO,
             shortfall: Decimal::ZERO,
             state: "not_stocked".into(),
@@ -701,9 +717,14 @@ async fn order_availability(
             let product = get_product(&mut *conn, pid).await?;
             let (needed, _) =
                 to_stock_quantity(&mut conn, &product, l.quantity, Some(&l.unit)).await?;
-            item.on_hand = on_hand.get(&pid).copied().unwrap_or_default();
-            item.reserved_total = reserved.get(&pid).copied().unwrap_or_default();
-            item.available = item.on_hand - item.reserved_total;
+            let (on, expired) = on_hand.get(&pid).copied().unwrap_or_default();
+            let (held, held_expired) = reserved.get(&pid).copied().unwrap_or_default();
+            item.on_hand = on;
+            item.expired = expired;
+            item.reserved_total = held;
+            // Expired stock cannot be promised; what was reserved in expired lots no longer
+            // reduces the good stock.
+            item.available = on - expired - (held - held_expired);
             item.reserved = own.get(&l.id).copied().unwrap_or_default();
             let open = (needed - item.reserved).max(Decimal::ZERO);
             let free = item.available.max(Decimal::ZERO);

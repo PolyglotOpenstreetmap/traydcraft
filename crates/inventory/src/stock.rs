@@ -76,10 +76,24 @@ const STOCK_ROWS: &str = "SELECT * FROM (
       AND ($3::uuid IS NULL OR w.id = $3)
       AND ($4::uuid IS NULL OR l.id = $4)
       AND ($5::uuid IS NULL OR b.lot_id = $5)
-      AND ($6::text IS NULL OR lower(p.code) LIKE $6 OR lower(p.name) LIKE $6 OR lower(COALESCE(p.barcode, '')) LIKE $6
-           OR lower(COALESCE(lot.lot_number, '')) LIKE $6)
+      AND ($6::text IS NULL OR lower(p.code) LIKE $6 ESCAPE '\\' OR lower(p.name) LIKE $6 ESCAPE '\\'
+           OR lower(COALESCE(p.barcode, '')) LIKE $6 ESCAPE '\\'
+           OR lower(COALESCE(lot.lot_number, '')) LIKE $6 ESCAPE '\\')
       AND ($7 OR b.quantity <> 0)
 ) s";
+
+/// `%q%` for a LIKE with `ESCAPE '\\'`: the user's `%`, `_` and `\\` are taken literally.
+fn like_pattern(q: &str) -> String {
+    let mut out = String::from("%");
+    for c in q.trim().to_lowercase().chars() {
+        if matches!(c, '%' | '_' | '\\') {
+            out.push('\\');
+        }
+        out.push(c);
+    }
+    out.push('%');
+    out
+}
 
 #[utoipa::path(get, path = "/inventory/stock", tag = "inventory", params(StockParams),
     responses((status = 200, body = StockRowPage)))]
@@ -196,7 +210,8 @@ const PRODUCT_STOCK: &str = "SELECT * FROM (
     ) r ON r.product_id = p.id
     WHERE p.product_type <> 'service' AND p.active
       AND ($2::uuid IS NULL OR p.id = $2)
-      AND ($4::text IS NULL OR lower(p.code) LIKE $4 OR lower(p.name) LIKE $4 OR lower(COALESCE(p.barcode, '')) LIKE $4)
+      AND ($4::text IS NULL OR lower(p.code) LIKE $4 ESCAPE '\\' OR lower(p.name) LIKE $4 ESCAPE '\\'
+           OR lower(COALESCE(p.barcode, '')) LIKE $4 ESCAPE '\\')
 ) t
 WHERE ($5::boolean IS NOT TRUE OR on_hand <> 0 OR in_vans <> 0) AND ($6::boolean IS NOT TRUE OR below_reorder)";
 
@@ -232,6 +247,18 @@ async fn list_product_stock(
         .fetch_one(&state.db)
         .await?;
     Ok(Json(ProductStockPage { items, total }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::like_pattern;
+
+    #[test]
+    fn search_text_is_taken_literally() {
+        assert_eq!(like_pattern("  Bolt "), "%bolt%");
+        assert_eq!(like_pattern("50%_x"), "%50\\%\\_x%");
+        assert_eq!(like_pattern("a\\b"), "%a\\\\b%");
+    }
 }
 
 #[derive(Debug, Serialize, ToSchema)]
