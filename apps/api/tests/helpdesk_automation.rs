@@ -1593,6 +1593,21 @@ async fn the_report_numbers_match_a_known_fixture(db: PgPool) {
     .await;
     assert_eq!(r["sla"]["tickets"], 0);
     assert_eq!(r["sla"]["compliance_percent"], Value::Null);
+    // The generated client sends dates as date-times.
+    let (status, dt) = get(
+        &app,
+        SUPPORT,
+        &format!(
+            "/helpdesk/reports?from={}T00:00:00.000&to={}T00:00:00.000",
+            f.day(-1),
+            f.day(5)
+        ),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK, "{dt}");
+    let (_, plain) = get(&app, SUPPORT, &format!("/helpdesk/reports?{}", f.range())).await;
+    assert_eq!(dt["volume"], plain["volume"]);
+    assert_eq!(dt["sla"], plain["sla"]);
     // A period without tickets is empty, not an error.
     let (status, r) = get(
         &app,

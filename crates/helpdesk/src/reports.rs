@@ -27,8 +27,10 @@ pub const MAX_DAYS: i64 = 731;
 #[derive(Debug, Clone, Deserialize, IntoParams)]
 pub struct ReportParams {
     /// First day (inclusive), `YYYY-MM-DD`. Default: 29 days before `to`.
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub from: Option<NaiveDate>,
     /// Last day (inclusive). Default: today.
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub to: Option<NaiveDate>,
     pub team_id: Option<Uuid>,
     pub owner_id: Option<Uuid>,
@@ -671,7 +673,9 @@ pub struct ExportParams {
     /// volume | backlog_status | backlog_priority | backlog_team | backlog_owner | times | sla |
     /// breaches_by_team | top_categories | top_tags | time_by_user
     pub table: String,
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub from: Option<NaiveDate>,
+    #[serde(default, deserialize_with = "traydcraft_core::serde_util::opt_date")]
     pub to: Option<NaiveDate>,
     pub team_id: Option<Uuid>,
     pub owner_id: Option<Uuid>,
