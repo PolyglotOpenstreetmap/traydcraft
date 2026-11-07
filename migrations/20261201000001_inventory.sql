@@ -25,7 +25,10 @@ CREATE TABLE inventory.uoms (
     code      text PRIMARY KEY,
     name      text NOT NULL,
     category  text NOT NULL CHECK (category IN ('unit', 'weight', 'length', 'area', 'volume', 'time')),
-    -- Size of this unit in the base unit of its category (kg = 1, g = 0.001).
+    -- Size of this unit in the base unit of its category (kg = 1, g = 0.001). Only the measurable
+    -- categories convert by factor; units of the category 'unit' (pieces, sets, boxes, every unit
+    -- taken over from a product) convert only through inventory.product_uoms, so their factor is 1
+    -- and means nothing.
     factor    numeric(24,12) NOT NULL CHECK (factor > 0),
     active    boolean NOT NULL DEFAULT true
 );

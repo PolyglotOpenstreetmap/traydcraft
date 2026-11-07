@@ -126,7 +126,7 @@ async fn line_reservation(
         .product_id
         .ok_or_else(|| AppError::Validation("this order line has no product".into()))?;
     let product = get_product(&mut *conn, product_id).await?;
-    let ordered = ordered_in_stock_unit(conn, &product, &line).await;
+    let ordered = ordered_in_stock_unit(conn, &product, &line).await?;
     let allocations = allocations(conn, company_id, line_id).await?;
     Ok(LineReservation {
         order_line_id: line_id,
@@ -138,15 +138,16 @@ async fn line_reservation(
     })
 }
 
+/// The ordered quantity in the stock unit of the product. A line in a unit that does not convert
+/// is an error, never a guess.
 async fn ordered_in_stock_unit(
     conn: &mut PgConnection,
     product: &traydcraft_products::Product,
     line: &LineInfo,
-) -> Decimal {
-    to_stock_quantity(conn, product, line.quantity, Some(&line.unit))
-        .await
-        .map(|(q, _)| q)
-        .unwrap_or(line.quantity)
+) -> AppResult<Decimal> {
+    Ok(to_stock_quantity(conn, product, line.quantity, Some(&line.unit))
+        .await?
+        .0)
 }
 
 #[utoipa::path(get, path = "/inventory/order-lines/{id}/reservation", tag = "inventory", params(("id" = Uuid, Path)),
@@ -192,7 +193,7 @@ async fn set_reservation(
             product.code
         )));
     }
-    let ordered = ordered_in_stock_unit(&mut tx, &product, &line).await;
+    let ordered = ordered_in_stock_unit(&mut tx, &product, &line).await?;
 
     // Serialise reservations and moves on this product.
     sqlx::query("SELECT id FROM inventory.stock_balances WHERE company_id = $1 AND product_id = $2 ORDER BY id FOR UPDATE")
@@ -569,10 +570,8 @@ async fn order_availability(
         if stocked {
             let pid = l.product_id.unwrap();
             let product = get_product(&mut *conn, pid).await?;
-            let needed = to_stock_quantity(&mut conn, &product, l.quantity, Some(&l.unit))
-                .await
-                .map(|(q, _)| q)
-                .unwrap_or(l.quantity);
+            let (needed, _) =
+                to_stock_quantity(&mut conn, &product, l.quantity, Some(&l.unit)).await?;
             item.on_hand = on_hand.get(&pid).copied().unwrap_or_default();
             item.reserved_total = reserved.get(&pid).copied().unwrap_or_default();
             item.available = item.on_hand - item.reserved_total;

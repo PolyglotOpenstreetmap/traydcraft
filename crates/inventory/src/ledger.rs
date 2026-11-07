@@ -672,8 +672,15 @@ pub fn scale_quantity(quantity: Decimal, numerator: Decimal, denominator: Decima
         .round_dp_with_strategy(QUANTITY_SCALE, RoundingStrategy::MidpointAwayFromZero)
 }
 
-/// Converts a quantity entered in `uom` to the stock unit of the product. The product's own
-/// conversions win; otherwise units of the same category are converted through their factors.
+/// Converts a quantity entered in `uom` to the stock unit of the product.
+///
+/// * The product's own conversions (`product_uoms`) win.
+/// * Otherwise units of the same measurable category (weight, length, area, volume, time) convert
+///   through their factors.
+/// * Units of the category `unit` (pieces, sets, boxes, every unit that was only ever typed into a
+///   product) never convert by themselves: "5 set" on a product kept in pieces is refused unless the
+///   product says how many pieces a set is.
+///
 /// Returns the stock quantity and, when the unit differs, what was entered.
 pub async fn to_stock_quantity(
     conn: &mut PgConnection,
@@ -712,14 +719,15 @@ pub async fn to_stock_quantity(
         let entered = rows.iter().find(|r| r.code == uom);
         let base = rows.iter().find(|r| r.code == product.unit);
         match (entered, base) {
-            (Some(e), Some(b)) if e.category == b.category => {
+            (Some(e), Some(b)) if e.category == b.category && e.category != "unit" => {
                 scale_quantity(quantity, e.factor, b.factor)
             }
             (None, _) => return Err(AppError::Validation(format!("unknown unit {uom}"))),
             _ => {
                 return Err(AppError::Validation(format!(
-                    "{} has no conversion from {uom} to {}",
-                    product.code, product.unit
+                    "{} is kept in {} and has no conversion from {uom}: add how many {} one {uom} is to the \
+                     units of the product",
+                    product.code, product.unit, product.unit
                 )))
             }
         }

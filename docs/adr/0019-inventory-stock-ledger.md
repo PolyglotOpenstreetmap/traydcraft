@@ -65,8 +65,14 @@ content is a `409`. Reversals take their own client id.
   `unit` (the **stock unit**).
 * `inventory.product_uoms (product_id, uom_code, factor)` holds product-specific units (a box of
   12 pcs: factor 12). A move may be *entered* in another unit; it is converted to the stock unit
-  (product-specific factor first, else the same-category factor ratio, else a 422) and stored in
-  the stock unit with the entered amount kept for display. The stock unit of a product cannot be
+  and stored in the stock unit with the entered amount kept for display. Conversion rule
+  (**decision**): the product-specific factor first; else, for the measurable categories (`weight`,
+  `length`, `area`, `volume`, `time`), the ratio of the two `factor`s; units of the category `unit`
+  (`pcs`, `set`, and every unit taken over from existing products, such as `box` or `Stk`) **never**
+  convert by themselves, because their `factor` of 1 means nothing. "5 set" on a product kept in
+  pieces is a 422 that names both units, unless the product has a `product_uoms` entry for `set`. The
+  same rule and the same error apply to order availability and to reservations (an order line in
+  a unit that does not convert is an error, never a guess). The stock unit of a product cannot be
   changed once it has moves (database trigger).
 
 ### Tracking
