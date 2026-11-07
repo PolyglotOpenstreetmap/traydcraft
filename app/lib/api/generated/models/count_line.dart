@@ -19,8 +19,10 @@ class CountLine {
     required this.unit,
     this.adjustmentMoveId,
     this.countedQuantity,
+    this.differenceToExpected,
     this.lotId,
     this.lotNumber,
+    this.quantityAtPost,
   });
   
   factory CountLine.fromJson(Map<String, Object?> json) => _$CountLineFromJson(json);
@@ -30,6 +32,11 @@ class CountLine {
   final String? adjustmentMoveId;
   @JsonKey(includeIfNull: false,name: 'counted_quantity')
   final String? countedQuantity;
+
+  /// Counted minus expected: what the count found against what the system expected when it.
+  /// started. Differs from the adjustment when stock moved during the count.
+  @JsonKey(includeIfNull: false,name: 'difference_to_expected')
+  final String? differenceToExpected;
 
   /// What the system expected when the count was created.
   @JsonKey(name: 'expected_quantity')
@@ -48,6 +55,10 @@ class CountLine {
   final String productId;
   @JsonKey(name: 'product_name')
   final String productName;
+
+  /// The stock at the moment the count was posted (the adjustment is counted minus this).
+  @JsonKey(includeIfNull: false,name: 'quantity_at_post')
+  final String? quantityAtPost;
   final String unit;
 
   Map<String, Object?> toJson() => _$CountLineToJson(this);

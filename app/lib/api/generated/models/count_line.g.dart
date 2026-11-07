@@ -17,13 +17,16 @@ CountLine _$CountLineFromJson(Map<String, dynamic> json) => CountLine(
   unit: json['unit'] as String,
   adjustmentMoveId: json['adjustment_move_id'] as String?,
   countedQuantity: json['counted_quantity'] as String?,
+  differenceToExpected: json['difference_to_expected'] as String?,
   lotId: json['lot_id'] as String?,
   lotNumber: json['lot_number'] as String?,
+  quantityAtPost: json['quantity_at_post'] as String?,
 );
 
 Map<String, dynamic> _$CountLineToJson(CountLine instance) => <String, dynamic>{
   'adjustment_move_id': ?instance.adjustmentMoveId,
   'counted_quantity': ?instance.countedQuantity,
+  'difference_to_expected': ?instance.differenceToExpected,
   'expected_quantity': instance.expectedQuantity,
   'id': instance.id,
   'location': instance.location,
@@ -33,5 +36,6 @@ Map<String, dynamic> _$CountLineToJson(CountLine instance) => <String, dynamic>{
   'product_code': instance.productCode,
   'product_id': instance.productId,
   'product_name': instance.productName,
+  'quantity_at_post': ?instance.quantityAtPost,
   'unit': instance.unit,
 };

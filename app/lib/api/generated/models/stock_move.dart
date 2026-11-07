@@ -27,6 +27,7 @@ class StockMove {
     required this.toLocation,
     required this.toLocationId,
     required this.unit,
+    this.currency,
     this.enteredQuantity,
     this.enteredUom,
     this.lotId,
@@ -46,6 +47,10 @@ class StockMove {
   final DateTime createdAt;
   @JsonKey(name: 'created_by_name')
   final String createdByName;
+
+  /// Currency of `unit_cost`. Only with `inventory.cost`.
+  @JsonKey(includeIfNull: false)
+  final String? currency;
 
   /// What the user typed, when it was in another unit than the stock unit.
   @JsonKey(includeIfNull: false,name: 'entered_quantity')
@@ -102,7 +107,8 @@ class StockMove {
   /// The stock unit the quantity is in.
   final String unit;
 
-  /// Standard cost per stock unit at the time of the move. Only with `inventory.cost`.
+  /// Cost per stock unit: what the posting module booked, else the standard cost of the product.
+  /// at the time of the move. Only with `inventory.cost`.
   @JsonKey(includeIfNull: false,name: 'unit_cost')
   final String? unitCost;
 

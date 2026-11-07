@@ -2660,7 +2660,7 @@
         "tags": [
           "inventory"
         ],
-        "summary": "Takes stock out of a location. The reason decides where it goes: a customer (`shipment`),\nproduction (`consumption`, `repair_use`) or scrap.",
+        "summary": "Takes stock out of a location. The reason decides where it goes: a customer (`shipment`),\nproduction consumption (`consumption`, `repair_use`) or scrap.",
         "operationId": "issue",
         "requestBody": {
           "content": {
@@ -12757,7 +12757,8 @@
         "type": "object",
         "required": [
           "count",
-          "lines"
+          "lines",
+          "moved_during_count"
         ],
         "properties": {
           "count": {
@@ -12768,6 +12769,11 @@
             "items": {
               "$ref": "#/components/schemas/CountLine"
             }
+          },
+          "moved_during_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Posted lines where the stock at posting differed from what was expected when the count\nstarted: movements made during the count, which the count overwrote with what was counted."
           }
         }
       },
@@ -12899,6 +12905,13 @@
               "null"
             ]
           },
+          "difference_to_expected": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Counted minus expected: what the count found against what the system expected when it\nstarted. Differs from the adjustment when stock moved during the count."
+          },
           "expected_quantity": {
             "type": "string",
             "description": "What the system expected when the count was created."
@@ -12936,6 +12949,13 @@
           },
           "product_name": {
             "type": "string"
+          },
+          "quantity_at_post": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The stock at the moment the count was posted (the adjustment is counted minus this)."
           },
           "unit": {
             "type": "string"
@@ -13940,6 +13960,14 @@
           "quantity"
         ],
         "properties": {
+          "consume_reservation_line": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Ship or consume the stock reserved for this sales order line: only that reservation is\nexempt from the \"reserved for orders\" check, at most its quantity can be taken, and it\nshrinks (or closes as consumed) in the same transaction."
+          },
           "customer_id": {
             "type": [
               "string",
@@ -14397,6 +14425,7 @@
           "reserved",
           "on_hand",
           "reserved_total",
+          "expired",
           "available",
           "shortfall",
           "state"
@@ -14404,10 +14433,14 @@
         "properties": {
           "available": {
             "type": "string",
-            "description": "Available to promise: on hand minus everything reserved."
+            "description": "Available to promise: on hand minus expired stock minus what is reserved in good lots."
           },
           "description": {
             "type": "string"
+          },
+          "expired": {
+            "type": "string",
+            "description": "Of the on hand quantity: in lots that are past their expiry date (not available)."
           },
           "on_hand": {
             "type": "string",
@@ -17504,6 +17537,13 @@
           "quantity"
         ],
         "properties": {
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Currency of `unit_cost` (default: the currency of the company)."
+          },
           "expiry_date": {
             "type": [
               "string",
@@ -17559,6 +17599,14 @@
             ],
             "format": "uuid",
             "description": "Serial-tracked products: an existing unit that is in stock without a location..."
+          },
+          "unit_cost": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What one stock unit cost (needs `inventory.cost`); default: the standard cost.",
+            "example": "12.5"
           },
           "uom": {
             "type": [
@@ -18153,24 +18201,29 @@
         "type": "object",
         "required": [
           "id",
-          "order_id",
-          "order_number",
-          "customer_name",
-          "order_line_id",
-          "position",
+          "reference_type",
+          "reference_id",
           "product_id",
           "product_code",
           "location",
           "quantity",
+          "consumed_quantity",
           "created_at"
         ],
         "properties": {
+          "consumed_quantity": {
+            "type": "string",
+            "description": "Already shipped or consumed from this allocation."
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
           },
           "customer_name": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "id": {
             "type": "string",
@@ -18186,18 +18239,31 @@
             ]
           },
           "order_id": {
-            "type": "string",
-            "format": "uuid"
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "The order, for a sales order line."
           },
           "order_line_id": {
-            "type": "string",
+            "type": [
+              "string",
+              "null"
+            ],
             "format": "uuid"
           },
           "order_number": {
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "position": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32"
           },
           "product_code": {
@@ -18208,7 +18274,16 @@
             "format": "uuid"
           },
           "quantity": {
-            "type": "string"
+            "type": "string",
+            "description": "Still held."
+          },
+          "reference_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference_type": {
+            "type": "string",
+            "description": "sales_order_line | production_component"
           }
         }
       },
@@ -18255,6 +18330,10 @@
           "id"
         ],
         "properties": {
+          "force": {
+            "type": "boolean",
+            "description": "Reverse even when that takes stock that is reserved for orders (they then lack stock).\nInventory administrators only, which this endpoint already requires."
+          },
           "id": {
             "type": "string",
             "format": "uuid",
@@ -18683,6 +18762,13 @@
           "created_by_name": {
             "type": "string"
           },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Currency of `unit_cost`. Only with `inventory.cost`."
+          },
           "entered_quantity": {
             "type": [
               "string",
@@ -18811,7 +18897,7 @@
               "string",
               "null"
             ],
-            "description": "Standard cost per stock unit at the time of the move. Only with `inventory.cost`."
+            "description": "Cost per stock unit: what the posting module booked, else the standard cost of the product\nat the time of the move. Only with `inventory.cost`."
           }
         }
       },

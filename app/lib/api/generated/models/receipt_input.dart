@@ -13,17 +13,22 @@ class ReceiptInput {
     required this.locationId,
     required this.productId,
     required this.quantity,
+    this.currency,
     this.expiryDate,
     this.lotNumber,
     this.note,
     this.reason,
     this.serialNumber,
     this.serialUnitId,
+    this.unitCost,
     this.uom,
   });
   
   factory ReceiptInput.fromJson(Map<String, Object?> json) => _$ReceiptInputFromJson(json);
   
+  /// Currency of `unit_cost` (default: the currency of the company).
+  @JsonKey(includeIfNull: false)
+  final String? currency;
   @JsonKey(includeIfNull: false,name: 'expiry_date')
   final DateTime? expiryDate;
 
@@ -52,6 +57,10 @@ class ReceiptInput {
   /// Serial-tracked products: an existing unit that is in stock without a location...
   @JsonKey(includeIfNull: false,name: 'serial_unit_id')
   final String? serialUnitId;
+
+  /// What one stock unit cost (needs `inventory.cost`); default: the standard cost.
+  @JsonKey(includeIfNull: false,name: 'unit_cost')
+  final String? unitCost;
 
   /// Unit the quantity is entered in; default the stock unit of the product.
   @JsonKey(includeIfNull: false)

@@ -94,7 +94,7 @@ abstract class InventoryClient {
   Future<Integrity> integrity();
 
   /// Takes stock out of a location. The reason decides where it goes: a customer (`shipment`),.
-  /// production (`consumption`, `repair_use`) or scrap.
+  /// production consumption (`consumption`, `repair_use`) or scrap.
   @POST('/api/v1/inventory/issues')
   Future<StockMove> issue({
     @Body() required IssueInput body,

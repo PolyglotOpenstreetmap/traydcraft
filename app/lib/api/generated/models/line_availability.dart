@@ -11,6 +11,7 @@ class LineAvailability {
   const LineAvailability({
     required this.available,
     required this.description,
+    required this.expired,
     required this.onHand,
     required this.orderLineId,
     required this.ordered,
@@ -26,9 +27,12 @@ class LineAvailability {
   
   factory LineAvailability.fromJson(Map<String, Object?> json) => _$LineAvailabilityFromJson(json);
   
-  /// Available to promise: on hand minus everything reserved.
+  /// Available to promise: on hand minus expired stock minus what is reserved in good lots.
   final String available;
   final String description;
+
+  /// Of the on hand quantity: in lots that are past their expiry date (not available).
+  final String expired;
 
   /// In the warehouses.
   @JsonKey(name: 'on_hand')

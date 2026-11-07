@@ -24,6 +24,7 @@ StockMove _$StockMoveFromJson(Map<String, dynamic> json) => StockMove(
   toLocation: json['to_location'] as String,
   toLocationId: json['to_location_id'] as String,
   unit: json['unit'] as String,
+  currency: json['currency'] as String?,
   enteredQuantity: json['entered_quantity'] as String?,
   enteredUom: json['entered_uom'] as String?,
   lotId: json['lot_id'] as String?,
@@ -40,6 +41,7 @@ StockMove _$StockMoveFromJson(Map<String, dynamic> json) => StockMove(
 Map<String, dynamic> _$StockMoveToJson(StockMove instance) => <String, dynamic>{
   'created_at': instance.createdAt.toIso8601String(),
   'created_by_name': instance.createdByName,
+  'currency': ?instance.currency,
   'entered_quantity': ?instance.enteredQuantity,
   'entered_uom': ?instance.enteredUom,
   'from_location': instance.fromLocation,

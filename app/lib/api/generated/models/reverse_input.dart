@@ -10,11 +10,17 @@ part 'reverse_input.g.dart';
 class ReverseInput {
   const ReverseInput({
     required this.id,
+    this.force,
     this.note,
   });
   
   factory ReverseInput.fromJson(Map<String, Object?> json) => _$ReverseInputFromJson(json);
   
+  /// Reverse even when that takes stock that is reserved for orders (they then lack stock).
+  /// Inventory administrators only, which this endpoint already requires.
+  @JsonKey(includeIfNull: false)
+  final bool? force;
+
   /// Chosen by the client for the reversal move.
   final String id;
   @JsonKey(includeIfNull: false)

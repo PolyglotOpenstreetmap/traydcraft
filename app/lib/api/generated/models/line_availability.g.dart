@@ -10,6 +10,7 @@ LineAvailability _$LineAvailabilityFromJson(Map<String, dynamic> json) =>
     LineAvailability(
       available: json['available'] as String,
       description: json['description'] as String,
+      expired: json['expired'] as String,
       onHand: json['on_hand'] as String,
       orderLineId: json['order_line_id'] as String,
       ordered: json['ordered'] as String,
@@ -27,6 +28,7 @@ Map<String, dynamic> _$LineAvailabilityToJson(LineAvailability instance) =>
     <String, dynamic>{
       'available': instance.available,
       'description': instance.description,
+      'expired': instance.expired,
       'on_hand': instance.onHand,
       'order_line_id': instance.orderLineId,
       'ordered': instance.ordered,

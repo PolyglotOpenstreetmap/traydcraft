@@ -11,6 +11,7 @@ IssueInput _$IssueInputFromJson(Map<String, dynamic> json) => IssueInput(
   locationId: json['location_id'] as String,
   productId: json['product_id'] as String,
   quantity: json['quantity'] as String,
+  consumeReservationLine: json['consume_reservation_line'] as String?,
   customerId: json['customer_id'] as String?,
   lotId: json['lot_id'] as String?,
   note: json['note'] as String?,
@@ -21,6 +22,7 @@ IssueInput _$IssueInputFromJson(Map<String, dynamic> json) => IssueInput(
 
 Map<String, dynamic> _$IssueInputToJson(IssueInput instance) =>
     <String, dynamic>{
+      'consume_reservation_line': ?instance.consumeReservationLine,
       'customer_id': ?instance.customerId,
       'id': instance.id,
       'location_id': instance.locationId,
