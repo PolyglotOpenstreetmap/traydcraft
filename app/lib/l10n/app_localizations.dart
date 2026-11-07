@@ -122,6 +122,48 @@ abstract class AppLocalizations {
   /// **'Account'**
   String get account;
 
+  /// No description provided for @action.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get action;
+
+  /// No description provided for @actionAddTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get actionAddTag;
+
+  /// No description provided for @actionSetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Set category'**
+  String get actionSetCategory;
+
+  /// No description provided for @actionSetInternal.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as internal'**
+  String get actionSetInternal;
+
+  /// No description provided for @actionSetOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Set owner'**
+  String get actionSetOwner;
+
+  /// No description provided for @actionSetPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Set priority'**
+  String get actionSetPriority;
+
+  /// No description provided for @actionSetTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Set team'**
+  String get actionSetTeam;
+
   /// No description provided for @actions.
   ///
   /// In en, this message translates to:
@@ -145,6 +187,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Active since {date}. Changes go through a new revision.'**
   String activeSince(String date);
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @addAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add action'**
+  String get addAction;
 
   /// No description provided for @addComponent.
   ///
@@ -248,6 +302,18 @@ abstract class AppLocalizations {
   /// **'All'**
   String get all;
 
+  /// No description provided for @allCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'All categories'**
+  String get allCategories;
+
+  /// No description provided for @allOwners.
+  ///
+  /// In en, this message translates to:
+  /// **'All owners'**
+  String get allOwners;
+
   /// No description provided for @allProducts.
   ///
   /// In en, this message translates to:
@@ -302,6 +368,12 @@ abstract class AppLocalizations {
   /// **'No {ticketLanguage} text yet: the {usedLanguage} text was used. Translate it before sending.'**
   String answerFallback(String ticketLanguage, String usedLanguage);
 
+  /// No description provided for @anyValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get anyValue;
+
   /// No description provided for @appLanguage.
   ///
   /// In en, this message translates to:
@@ -350,6 +422,18 @@ abstract class AppLocalizations {
   /// **'Automatic'**
   String get automatic;
 
+  /// No description provided for @automationHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules run in this order when a ticket is created, changed or answered by the customer. A rule applies when all its conditions match. Rules change tickets only; they send no e-mail.'**
+  String get automationHelp;
+
+  /// No description provided for @automationRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Automation rules'**
+  String get automationRules;
+
   /// No description provided for @backIntoWork.
   ///
   /// In en, this message translates to:
@@ -361,6 +445,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to current revision'**
   String get backToCurrentRevision;
+
+  /// No description provided for @backlogByOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Open tickets by owner'**
+  String get backlogByOwner;
+
+  /// No description provided for @backlogByPriority.
+  ///
+  /// In en, this message translates to:
+  /// **'Open tickets by priority'**
+  String get backlogByPriority;
+
+  /// No description provided for @backlogByStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Open tickets by status'**
+  String get backlogByStatus;
+
+  /// No description provided for @backlogByTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Open tickets by team'**
+  String get backlogByTeam;
+
+  /// No description provided for @basisBusiness.
+  ///
+  /// In en, this message translates to:
+  /// **'business hours'**
+  String get basisBusiness;
+
+  /// No description provided for @basisElapsed.
+  ///
+  /// In en, this message translates to:
+  /// **'elapsed time'**
+  String get basisElapsed;
 
   /// No description provided for @billOfMaterials.
   ///
@@ -398,6 +518,18 @@ abstract class AppLocalizations {
   /// **'BOM revision'**
   String get bomRevision;
 
+  /// No description provided for @breached.
+  ///
+  /// In en, this message translates to:
+  /// **'Breached'**
+  String get breached;
+
+  /// No description provided for @breachesByTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA breaches by team'**
+  String get breachesByTeam;
+
   /// No description provided for @builtInto.
   ///
   /// In en, this message translates to:
@@ -415,6 +547,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bulk price change'**
   String get bulkPriceChange;
+
+  /// No description provided for @businessHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Business hours'**
+  String get businessHours;
+
+  /// No description provided for @businessHoursEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Count business hours only'**
+  String get businessHoursEnabled;
+
+  /// No description provided for @businessHoursHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Service level times count only the hours below, on days that are not holidays. Switched off, they run around the clock.'**
+  String get businessHoursHelp;
+
+  /// No description provided for @businessHoursInvalidTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter times as HH:MM.'**
+  String get businessHoursInvalidTime;
+
+  /// No description provided for @businessHoursRecompute.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving recalculates the due times of all open tickets.'**
+  String get businessHoursRecompute;
+
+  /// No description provided for @businessHoursSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Open tickets were recalculated.'**
+  String get businessHoursSaved;
 
   /// No description provided for @byStage.
   ///
@@ -590,6 +758,42 @@ abstract class AppLocalizations {
   /// **'Change priority'**
   String get changePriority;
 
+  /// No description provided for @channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Channel'**
+  String get channel;
+
+  /// No description provided for @channelEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'E-mail'**
+  String get channelEmail;
+
+  /// No description provided for @channelInternal.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal question'**
+  String get channelInternal;
+
+  /// No description provided for @channelManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Entered by hand'**
+  String get channelManual;
+
+  /// No description provided for @channelPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get channelPhone;
+
+  /// No description provided for @channelPortal.
+  ///
+  /// In en, this message translates to:
+  /// **'Portal'**
+  String get channelPortal;
+
   /// No description provided for @chooseCustomerAndLine.
   ///
   /// In en, this message translates to:
@@ -625,6 +829,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @closedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'closed'**
+  String get closedLabel;
+
+  /// No description provided for @closes.
+  ///
+  /// In en, this message translates to:
+  /// **'Closes'**
+  String get closes;
 
   /// No description provided for @code.
   ///
@@ -812,11 +1028,23 @@ abstract class AppLocalizations {
   /// **'Create repair'**
   String get createRepair;
 
+  /// No description provided for @created.
+  ///
+  /// In en, this message translates to:
+  /// **'created'**
+  String get created;
+
   /// No description provided for @csatAlready.
   ///
   /// In en, this message translates to:
   /// **'This survey was already answered.'**
   String get csatAlready;
+
+  /// No description provided for @csatAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer satisfaction'**
+  String get csatAverage;
 
   /// No description provided for @csatBad.
   ///
@@ -860,6 +1088,12 @@ abstract class AppLocalizations {
   /// **'How satisfied are you with the handling of ticket {number}?'**
   String csatQuestion(String number);
 
+  /// No description provided for @csatResponses.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} responses'**
+  String csatResponses(int count);
+
   /// No description provided for @csatThanks.
   ///
   /// In en, this message translates to:
@@ -871,6 +1105,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Customer satisfaction'**
   String get csatTitle;
+
+  /// No description provided for @csvCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV copied to the clipboard'**
+  String get csvCopied;
 
   /// No description provided for @current.
   ///
@@ -931,6 +1171,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Default team for new tickets'**
   String get defaultTeam;
+
+  /// No description provided for @deleteRuleConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this rule? Tickets that it changed keep their changes.'**
+  String get deleteRuleConfirm;
 
   /// No description provided for @deliveryFailed.
   ///
@@ -1028,6 +1274,24 @@ abstract class AppLocalizations {
   /// **'Draft saved'**
   String get draftSaved;
 
+  /// No description provided for @dryRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Try on a ticket'**
+  String get dryRun;
+
+  /// No description provided for @dryRunHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Shows which rules would apply to a ticket and what they would change. Nothing is changed.'**
+  String get dryRunHelp;
+
+  /// No description provided for @dryRunRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Run test'**
+  String get dryRunRun;
+
   /// No description provided for @edit.
   ///
   /// In en, this message translates to:
@@ -1112,6 +1376,12 @@ abstract class AppLocalizations {
   /// **'Explode'**
   String get explode;
 
+  /// No description provided for @exportCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy as CSV'**
+  String get exportCsv;
+
   /// No description provided for @families.
   ///
   /// In en, this message translates to:
@@ -1147,6 +1417,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'First response (min)'**
   String get firstResponseMinutes;
+
+  /// No description provided for @firstResponseTime.
+  ///
+  /// In en, this message translates to:
+  /// **'First response'**
+  String get firstResponseTime;
 
   /// No description provided for @from.
   ///
@@ -1184,6 +1460,12 @@ abstract class AppLocalizations {
   /// **'Helpdesk'**
   String get helpdesk;
 
+  /// No description provided for @helpdeskReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get helpdeskReports;
+
   /// No description provided for @helpdeskSettings.
   ///
   /// In en, this message translates to:
@@ -1195,6 +1477,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'History'**
   String get history;
+
+  /// No description provided for @holidayDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get holidayDate;
+
+  /// No description provided for @holidayInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a date (YYYY-MM-DD) and a name.'**
+  String get holidayInvalid;
+
+  /// No description provided for @holidays.
+  ///
+  /// In en, this message translates to:
+  /// **'Holidays'**
+  String get holidays;
+
+  /// No description provided for @holidaysHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Days on which the helpdesk is closed.'**
+  String get holidaysHelp;
 
   /// No description provided for @inactive.
   ///
@@ -1345,6 +1651,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Same as company ({language})'**
   String languageSameAsCustomer(String language);
+
+  /// No description provided for @lastDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Last {days} days'**
+  String lastDays(int days);
 
   /// No description provided for @lastName.
   ///
@@ -1526,6 +1838,18 @@ abstract class AppLocalizations {
   /// **'{minutes} min'**
   String minutesShort(String minutes);
 
+  /// No description provided for @moveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get moveDown;
+
+  /// No description provided for @moveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get moveUp;
+
   /// No description provided for @myJobs.
   ///
   /// In en, this message translates to:
@@ -1676,6 +2000,12 @@ abstract class AppLocalizations {
   /// **'New revision of {number}'**
   String newRevisionOf(String number);
 
+  /// No description provided for @newRule.
+  ///
+  /// In en, this message translates to:
+  /// **'New rule'**
+  String get newRule;
+
   /// No description provided for @newTeam.
   ///
   /// In en, this message translates to:
@@ -1687,6 +2017,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New ticket'**
   String get newTicket;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
 
   /// No description provided for @noAccess.
   ///
@@ -1802,6 +2138,12 @@ abstract class AppLocalizations {
   /// **'You have no repairs yet.'**
   String get noRepairsYet;
 
+  /// No description provided for @noRules.
+  ///
+  /// In en, this message translates to:
+  /// **'No rules yet.'**
+  String get noRules;
+
   /// No description provided for @noSerialComponents.
   ///
   /// In en, this message translates to:
@@ -1837,6 +2179,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nobody found with this number.'**
   String get nobodyFound;
+
+  /// No description provided for @nonBillable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not billable'**
+  String get nonBillable;
 
   /// No description provided for @none.
   ///
@@ -1952,6 +2300,12 @@ abstract class AppLocalizations {
   /// **'{count} open'**
   String openRepairsCount(String count);
 
+  /// No description provided for @opens.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens'**
+  String get opens;
+
   /// No description provided for @opportunities.
   ///
   /// In en, this message translates to:
@@ -2054,6 +2408,24 @@ abstract class AppLocalizations {
   /// **'Owner'**
   String get owner;
 
+  /// No description provided for @ownerEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nobody'**
+  String get ownerEmpty;
+
+  /// No description provided for @ownerSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Somebody'**
+  String get ownerSet;
+
+  /// No description provided for @p90.
+  ///
+  /// In en, this message translates to:
+  /// **'90% within'**
+  String get p90;
+
   /// No description provided for @paymentDays.
   ///
   /// In en, this message translates to:
@@ -2065,6 +2437,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PDF'**
   String get pdf;
+
+  /// No description provided for @perDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Per day'**
+  String get perDay;
+
+  /// No description provided for @perWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Per week'**
+  String get perWeek;
 
   /// No description provided for @personTitle.
   ///
@@ -2792,6 +3176,18 @@ abstract class AppLocalizations {
   /// **'Resolution (min)'**
   String get resolutionMinutes;
 
+  /// No description provided for @resolutionTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolution'**
+  String get resolutionTime;
+
+  /// No description provided for @responseTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Response and resolution times'**
+  String get responseTimes;
+
   /// No description provided for @retry.
   ///
   /// In en, this message translates to:
@@ -2906,6 +3302,84 @@ abstract class AppLocalizations {
   /// **'Route to department'**
   String get routeRepair;
 
+  /// No description provided for @ruleActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get ruleActions;
+
+  /// No description provided for @ruleConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Conditions (all must match)'**
+  String get ruleConditions;
+
+  /// No description provided for @ruleConditionsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick any number of values per line; a ticket needs one of them. Empty lines are ignored.'**
+  String get ruleConditionsHelp;
+
+  /// No description provided for @ruleNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'A rule needs a name.'**
+  String get ruleNameRequired;
+
+  /// No description provided for @ruleResultAfterStop.
+  ///
+  /// In en, this message translates to:
+  /// **'skipped (stopped)'**
+  String get ruleResultAfterStop;
+
+  /// No description provided for @ruleResultInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'off'**
+  String get ruleResultInactive;
+
+  /// No description provided for @ruleResultMatched.
+  ///
+  /// In en, this message translates to:
+  /// **'applies'**
+  String get ruleResultMatched;
+
+  /// No description provided for @ruleResultNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'no match'**
+  String get ruleResultNoMatch;
+
+  /// No description provided for @ruleResultOtherTrigger.
+  ///
+  /// In en, this message translates to:
+  /// **'other event'**
+  String get ruleResultOtherTrigger;
+
+  /// No description provided for @ruleTrigger.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get ruleTrigger;
+
+  /// No description provided for @ruleTriggerCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'A ticket is created'**
+  String get ruleTriggerCreated;
+
+  /// No description provided for @ruleTriggerCustomerReplied.
+  ///
+  /// In en, this message translates to:
+  /// **'The customer replies'**
+  String get ruleTriggerCustomerReplied;
+
+  /// No description provided for @ruleTriggerUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'A ticket is updated by staff'**
+  String get ruleTriggerUpdated;
+
   /// No description provided for @salesperson.
   ///
   /// In en, this message translates to:
@@ -2995,6 +3469,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The order confirmation is e-mailed to the customer as a PDF. The revision can no longer be edited afterwards.'**
   String get sendOrderConfirmationHelp;
+
+  /// No description provided for @senderDomain.
+  ///
+  /// In en, this message translates to:
+  /// **'Sender domain'**
+  String get senderDomain;
 
   /// No description provided for @serial.
   ///
@@ -3116,6 +3596,12 @@ abstract class AppLocalizations {
   /// **'SLA'**
   String get sla;
 
+  /// No description provided for @slaAndSatisfaction.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA and satisfaction'**
+  String get slaAndSatisfaction;
+
   /// No description provided for @slaAtRisk.
   ///
   /// In en, this message translates to:
@@ -3127,6 +3613,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Breached'**
   String get slaBreached;
+
+  /// No description provided for @slaCompliance.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA compliance'**
+  String get slaCompliance;
+
+  /// No description provided for @slaComplianceDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'{breached} of {total} breached'**
+  String slaComplianceDetail(int breached, int total);
 
   /// No description provided for @slaDue.
   ///
@@ -3199,6 +3697,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resolution'**
   String get slaResolution;
+
+  /// No description provided for @splitAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Split'**
+  String get splitAction;
+
+  /// No description provided for @splitFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} file(s)'**
+  String splitFiles(int count);
+
+  /// No description provided for @splitHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the messages that move to a new ticket for the same customer. Their files move with them. This cannot be undone (tickets can be merged again).'**
+  String get splitHelp;
+
+  /// No description provided for @splitKeepOne.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one message must stay in this ticket.'**
+  String get splitKeepOne;
+
+  /// No description provided for @splitSubjectOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject of the new ticket (optional)'**
+  String get splitSubjectOptional;
+
+  /// No description provided for @splitTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Split ticket…'**
+  String get splitTicket;
 
   /// No description provided for @stage.
   ///
@@ -3296,6 +3830,18 @@ abstract class AppLocalizations {
   /// **'superseded'**
   String get statusSuperseded;
 
+  /// No description provided for @stopOnMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop after this rule'**
+  String get stopOnMatch;
+
+  /// No description provided for @stopOnMatchHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'When it matches, the rules after it are skipped.'**
+  String get stopOnMatchHelp;
+
   /// No description provided for @street.
   ///
   /// In en, this message translates to:
@@ -3326,6 +3872,12 @@ abstract class AppLocalizations {
   /// **'Subject'**
   String get subject;
 
+  /// No description provided for @subjectContains.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject contains'**
+  String get subjectContains;
+
   /// No description provided for @subjectOptional.
   ///
   /// In en, this message translates to:
@@ -3337,6 +3889,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suggested: {value}'**
   String suggested(String value);
+
+  /// No description provided for @tag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get tag;
 
   /// No description provided for @tags.
   ///
@@ -3404,6 +3962,12 @@ abstract class AppLocalizations {
   /// **'Text'**
   String get text;
 
+  /// No description provided for @ticket.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket'**
+  String get ticket;
+
   /// No description provided for @ticketClosed.
   ///
   /// In en, this message translates to:
@@ -3433,6 +3997,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Ticket opened'**
   String get ticketOpened;
+
+  /// No description provided for @ticketSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Created ticket {number}'**
+  String ticketSplit(String number);
 
   /// No description provided for @ticketStatusClosed.
   ///
@@ -3464,11 +4034,29 @@ abstract class AppLocalizations {
   /// **'waiting for colleague'**
   String get ticketStatusPendingInternal;
 
+  /// No description provided for @ticketVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Tickets created and closed'**
+  String get ticketVolume;
+
   /// No description provided for @ticketWaitingForYou.
   ///
   /// In en, this message translates to:
   /// **'Waiting for your reply'**
   String get ticketWaitingForYou;
+
+  /// No description provided for @tickets.
+  ///
+  /// In en, this message translates to:
+  /// **'Tickets'**
+  String get tickets;
+
+  /// No description provided for @timeLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Time logged'**
+  String get timeLogged;
 
   /// No description provided for @timeNote.
   ///
@@ -3493,6 +4081,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time tracking'**
   String get timeTracking;
+
+  /// No description provided for @timeZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone'**
+  String get timeZone;
 
   /// No description provided for @title.
   ///
@@ -3529,6 +4123,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To'**
   String get to;
+
+  /// No description provided for @topCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Top categories'**
+  String get topCategories;
+
+  /// No description provided for @topTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Top tags'**
+  String get topTags;
 
   /// No description provided for @total.
   ///
@@ -3728,6 +4334,48 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get warrantyUnknown;
 
+  /// No description provided for @weekdayFriday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get weekdayFriday;
+
+  /// No description provided for @weekdayMonday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get weekdayMonday;
+
+  /// No description provided for @weekdaySaturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get weekdaySaturday;
+
+  /// No description provided for @weekdaySunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get weekdaySunday;
+
+  /// No description provided for @weekdayThursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get weekdayThursday;
+
+  /// No description provided for @weekdayTuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get weekdayTuesday;
+
+  /// No description provided for @weekdayWednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get weekdayWednesday;
+
   /// No description provided for @weighted.
   ///
   /// In en, this message translates to:
@@ -3787,6 +4435,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Write in {language}'**
   String writeIn(String language);
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
 
   /// No description provided for @yourMessage.
   ///

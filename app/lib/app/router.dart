@@ -4,7 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../features/customers/customers_page.dart';
 import '../features/helpdesk/answers_page.dart';
+import '../features/helpdesk/automation_page.dart';
+import '../features/helpdesk/calendar_page.dart';
 import '../features/helpdesk/helpdesk_settings_page.dart';
+import '../features/helpdesk/reports_page.dart';
 import '../features/helpdesk/ticket_screen.dart';
 import '../features/helpdesk/tickets_page.dart';
 import '../features/field/job_screen.dart';
@@ -69,6 +72,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/helpdesk/settings',
             builder: (_, _) => const HelpdeskSettingsPage(),
+          ),
+          GoRoute(
+            path: '/helpdesk/calendar',
+            builder: (_, _) => const CalendarPage(),
+          ),
+          GoRoute(
+            path: '/helpdesk/automation',
+            builder: (_, _) => const AutomationPage(),
+          ),
+          GoRoute(
+            path: '/helpdesk/reports',
+            builder: (_, _) => const ReportsPage(),
           ),
           GoRoute(
             path: '/helpdesk/:id',

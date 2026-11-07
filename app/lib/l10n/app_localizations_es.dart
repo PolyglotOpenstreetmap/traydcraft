@@ -19,6 +19,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String get account => 'Cuenta';
 
   @override
+  String get action => 'Acción';
+
+  @override
+  String get actionAddTag => 'Añadir etiqueta';
+
+  @override
+  String get actionSetCategory => 'Asignar categoría';
+
+  @override
+  String get actionSetInternal => 'Marcar como interno';
+
+  @override
+  String get actionSetOwner => 'Asignar responsable';
+
+  @override
+  String get actionSetPriority => 'Asignar prioridad';
+
+  @override
+  String get actionSetTeam => 'Asignar equipo';
+
+  @override
   String get actions => 'Acciones';
 
   @override
@@ -31,6 +52,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String activeSince(String date) {
     return 'Activa desde el $date. Los cambios se hacen con una nueva revisión.';
   }
+
+  @override
+  String get add => 'Añadir';
+
+  @override
+  String get addAction => 'Añadir acción';
 
   @override
   String get addComponent => 'Añadir componente';
@@ -87,6 +114,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get all => 'Todos';
 
   @override
+  String get allCategories => 'Todas las categorías';
+
+  @override
+  String get allOwners => 'Todos los responsables';
+
+  @override
   String get allProducts => 'Todos los productos';
 
   @override
@@ -118,6 +151,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get anyValue => 'Cualquiera';
+
+  @override
   String get appLanguage => 'Idioma';
 
   @override
@@ -142,10 +178,35 @@ class AppLocalizationsEs extends AppLocalizations {
   String get automatic => 'Automático';
 
   @override
+  String get automationHelp =>
+      'Las reglas se ejecutan en este orden cuando se crea o modifica un ticket o responde el cliente. Una regla se aplica si se cumplen todas sus condiciones. Las reglas solo modifican tickets; no envían correo.';
+
+  @override
+  String get automationRules => 'Reglas de automatización';
+
+  @override
   String get backIntoWork => 'Volver a trabajar';
 
   @override
   String get backToCurrentRevision => 'Volver a la revisión actual';
+
+  @override
+  String get backlogByOwner => 'Tickets abiertos por responsable';
+
+  @override
+  String get backlogByPriority => 'Tickets abiertos por prioridad';
+
+  @override
+  String get backlogByStatus => 'Tickets abiertos por estado';
+
+  @override
+  String get backlogByTeam => 'Tickets abiertos por equipo';
+
+  @override
+  String get basisBusiness => 'horario laboral';
+
+  @override
+  String get basisElapsed => 'tiempo transcurrido';
 
   @override
   String get billOfMaterials => 'Lista de materiales';
@@ -166,6 +227,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get bomRevision => 'Revisión de la LdM';
 
   @override
+  String get breached => 'Incumplidos';
+
+  @override
+  String get breachesByTeam => 'Incumplimientos del SLA por equipo';
+
+  @override
   String get builtInto => 'Montado en';
 
   @override
@@ -174,6 +241,27 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get bulkPriceChange => 'Cambio de precios en bloque';
+
+  @override
+  String get businessHours => 'Horario laboral';
+
+  @override
+  String get businessHoursEnabled => 'Contar solo el horario laboral';
+
+  @override
+  String get businessHoursHelp =>
+      'Los plazos de servicio solo cuentan las horas indicadas, en días no festivos. Desactivado, corren las 24 horas.';
+
+  @override
+  String get businessHoursInvalidTime => 'Introduzca las horas como HH:MM.';
+
+  @override
+  String get businessHoursRecompute =>
+      'Al guardar se recalculan los plazos de todos los tickets abiertos.';
+
+  @override
+  String get businessHoursSaved =>
+      'Guardado. Se recalcularon los tickets abiertos.';
 
   @override
   String get byStage => 'según la fase';
@@ -268,6 +356,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get changePriority => 'Cambiar prioridad';
 
   @override
+  String get channel => 'Canal';
+
+  @override
+  String get channelEmail => 'Correo';
+
+  @override
+  String get channelInternal => 'Pregunta interna';
+
+  @override
+  String get channelManual => 'Introducido a mano';
+
+  @override
+  String get channelPhone => 'Teléfono';
+
+  @override
+  String get channelPortal => 'Portal';
+
+  @override
   String get chooseCustomerAndLine =>
       'Elija un cliente y añada al menos una línea válida.';
 
@@ -286,6 +392,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get close => 'Cerrar';
+
+  @override
+  String get closedLabel => 'cerrados';
+
+  @override
+  String get closes => 'Cierra';
 
   @override
   String get code => 'Código';
@@ -391,7 +503,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get createRepair => 'Crear reparación';
 
   @override
+  String get created => 'creados';
+
+  @override
   String get csatAlready => 'Esta encuesta ya fue respondida.';
+
+  @override
+  String get csatAverage => 'Satisfacción del cliente';
 
   @override
   String get csatBad => 'No satisfecho';
@@ -418,10 +536,18 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String csatResponses(int count) {
+    return '$count respuestas';
+  }
+
+  @override
   String get csatThanks => '¡Gracias por sus comentarios!';
 
   @override
   String get csatTitle => 'Satisfacción del cliente';
+
+  @override
+  String get csvCopied => 'CSV copiado al portapapeles';
 
   @override
   String get current => 'Actual';
@@ -456,6 +582,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get defaultTeam => 'Equipo predeterminado para tickets nuevos';
+
+  @override
+  String get deleteRuleConfirm =>
+      '¿Eliminar esta regla? Los tickets que modificó conservan sus cambios.';
 
   @override
   String get deliveryFailed => 'no enviado';
@@ -507,6 +637,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get draftSaved => 'Borrador guardado';
 
   @override
+  String get dryRun => 'Probar en un ticket';
+
+  @override
+  String get dryRunHelp =>
+      'Muestra qué reglas se aplicarían a un ticket y qué cambiarían. No se modifica nada.';
+
+  @override
+  String get dryRunRun => 'Ejecutar prueba';
+
+  @override
   String get edit => 'Editar';
 
   @override
@@ -554,6 +694,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get explode => 'Desglosar';
 
   @override
+  String get exportCsv => 'Copiar como CSV';
+
+  @override
   String get families => 'Familias';
 
   @override
@@ -572,6 +715,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get firstResponseMinutes => 'Primera respuesta (min)';
+
+  @override
+  String get firstResponseTime => 'Primera respuesta';
 
   @override
   String get from => 'Desde';
@@ -596,10 +742,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpdesk => 'Atención al cliente';
 
   @override
+  String get helpdeskReports => 'Informes';
+
+  @override
   String get helpdeskSettings => 'Ajustes del helpdesk';
 
   @override
   String get history => 'Historial';
+
+  @override
+  String get holidayDate => 'Fecha';
+
+  @override
+  String get holidayInvalid => 'Introduzca una fecha (AAAA-MM-DD) y un nombre.';
+
+  @override
+  String get holidays => 'Festivos';
+
+  @override
+  String get holidaysHelp => 'Días en los que el helpdesk está cerrado.';
 
   @override
   String get inactive => 'inactivo';
@@ -683,6 +844,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String languageSameAsCustomer(String language) {
     return 'Igual que la empresa ($language)';
+  }
+
+  @override
+  String lastDays(int days) {
+    return 'Últimos $days días';
   }
 
   @override
@@ -784,6 +950,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get moveDown => 'Bajar';
+
+  @override
+  String get moveUp => 'Subir';
+
+  @override
   String get myJobs => 'Mis trabajos';
 
   @override
@@ -863,10 +1035,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get newRule => 'Nueva regla';
+
+  @override
   String get newTeam => 'Nuevo equipo';
 
   @override
   String get newTicket => 'Nuevo ticket';
+
+  @override
+  String get no => 'No';
 
   @override
   String get noAccess =>
@@ -927,6 +1105,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get noRepairsYet => 'Aún no tiene reparaciones.';
 
   @override
+  String get noRules => 'Aún no hay reglas.';
+
+  @override
   String get noSerialComponents => 'Sin componentes con número de serie.';
 
   @override
@@ -943,6 +1124,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get nobodyFound => 'No se encontró a nadie con este número.';
+
+  @override
+  String get nonBillable => 'No facturable';
 
   @override
   String get none => 'Ninguno';
@@ -1012,6 +1196,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get opens => 'Abre';
+
+  @override
   String get opportunities => 'Oportunidades';
 
   @override
@@ -1066,10 +1253,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get owner => 'Responsable';
 
   @override
+  String get ownerEmpty => 'Nadie';
+
+  @override
+  String get ownerSet => 'Alguien';
+
+  @override
+  String get p90 => '90 % dentro de';
+
+  @override
   String get paymentDays => 'Plazo de pago (días)';
 
   @override
   String get pdf => 'PDF';
+
+  @override
+  String get perDay => 'Por día';
+
+  @override
+  String get perWeek => 'Por semana';
 
   @override
   String get personTitle => 'Tratamiento';
@@ -1474,6 +1676,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get resolutionMinutes => 'Resolución (min)';
 
   @override
+  String get resolutionTime => 'Resolución';
+
+  @override
+  String get responseTimes => 'Tiempos de respuesta y resolución';
+
+  @override
   String get retry => 'Reintentar';
 
   @override
@@ -1539,6 +1747,46 @@ class AppLocalizationsEs extends AppLocalizations {
   String get routeRepair => 'Enviar a departamento';
 
   @override
+  String get ruleActions => 'Acciones';
+
+  @override
+  String get ruleConditions => 'Condiciones (deben cumplirse todas)';
+
+  @override
+  String get ruleConditionsHelp =>
+      'Elija los valores que quiera por línea; el ticket necesita uno. Las líneas vacías se ignoran.';
+
+  @override
+  String get ruleNameRequired => 'Una regla necesita un nombre.';
+
+  @override
+  String get ruleResultAfterStop => 'omitida (detenida)';
+
+  @override
+  String get ruleResultInactive => 'desactivada';
+
+  @override
+  String get ruleResultMatched => 'se aplica';
+
+  @override
+  String get ruleResultNoMatch => 'no coincide';
+
+  @override
+  String get ruleResultOtherTrigger => 'otro evento';
+
+  @override
+  String get ruleTrigger => 'Cuándo';
+
+  @override
+  String get ruleTriggerCreated => 'Se crea un ticket';
+
+  @override
+  String get ruleTriggerCustomerReplied => 'El cliente responde';
+
+  @override
+  String get ruleTriggerUpdated => 'El personal actualiza un ticket';
+
+  @override
   String get salesperson => 'Comercial';
 
   @override
@@ -1585,6 +1833,9 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get sendOrderConfirmationHelp =>
       'La confirmación de pedido se envía al cliente por correo electrónico en PDF. Después ya no se podrá editar la revisión.';
+
+  @override
+  String get senderDomain => 'Dominio del remitente';
 
   @override
   String get serial => 'n.º de serie';
@@ -1652,10 +1903,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sla => 'SLA';
 
   @override
+  String get slaAndSatisfaction => 'SLA y satisfacción';
+
+  @override
   String get slaAtRisk => 'En riesgo';
 
   @override
   String get slaBreached => 'Incumplido';
+
+  @override
+  String get slaCompliance => 'Cumplimiento del SLA';
+
+  @override
+  String slaComplianceDetail(int breached, int total) {
+    return '$breached de $total incumplidos';
+  }
 
   @override
   String slaDue(String date) {
@@ -1699,6 +1961,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get slaResolution => 'Resolución';
+
+  @override
+  String get splitAction => 'Dividir';
+
+  @override
+  String splitFiles(int count) {
+    return '$count archivo(s)';
+  }
+
+  @override
+  String get splitHelp =>
+      'Elija los mensajes que pasan a un ticket nuevo del mismo cliente. Sus archivos los acompañan. No se puede deshacer (los tickets se pueden volver a fusionar).';
+
+  @override
+  String get splitKeepOne =>
+      'Al menos un mensaje debe quedarse en este ticket.';
+
+  @override
+  String get splitSubjectOptional => 'Asunto del ticket nuevo (opcional)';
+
+  @override
+  String get splitTicket => 'Dividir ticket…';
 
   @override
   String get stage => 'Fase';
@@ -1749,6 +2033,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get statusSuperseded => 'sustituido';
 
   @override
+  String get stopOnMatch => 'Parar tras esta regla';
+
+  @override
+  String get stopOnMatchHelp =>
+      'Si se cumple, se omiten las reglas siguientes.';
+
+  @override
   String get street => 'Calle';
 
   @override
@@ -1766,12 +2057,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get subject => 'Asunto';
 
   @override
+  String get subjectContains => 'El asunto contiene';
+
+  @override
   String get subjectOptional => 'Asunto (opcional)';
 
   @override
   String suggested(String value) {
     return 'Sugerencia: $value';
   }
+
+  @override
+  String get tag => 'Etiqueta';
 
   @override
   String get tags => 'Etiquetas';
@@ -1809,6 +2106,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get text => 'Texto';
 
   @override
+  String get ticket => 'Ticket';
+
+  @override
   String get ticketClosed => 'Cerrado';
 
   @override
@@ -1822,6 +2122,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ticketOpened => 'Ticket creado';
+
+  @override
+  String ticketSplit(String number) {
+    return 'Ticket $number creado';
+  }
 
   @override
   String get ticketStatusClosed => 'cerrado';
@@ -1839,7 +2144,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get ticketStatusPendingInternal => 'esperando a un compañero';
 
   @override
+  String get ticketVolume => 'Tickets creados y cerrados';
+
+  @override
   String get ticketWaitingForYou => 'Esperando su respuesta';
+
+  @override
+  String get tickets => 'Tickets';
+
+  @override
+  String get timeLogged => 'Tiempo registrado';
 
   @override
   String get timeNote => 'Nota';
@@ -1856,6 +2170,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get timeTracking => 'Registro de tiempo';
+
+  @override
+  String get timeZone => 'Zona horaria';
 
   @override
   String get title => 'Título';
@@ -1875,6 +2192,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get to => 'Para';
+
+  @override
+  String get topCategories => 'Categorías principales';
+
+  @override
+  String get topTags => 'Etiquetas principales';
 
   @override
   String get total => 'Total';
@@ -1984,6 +2307,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String get warrantyUnknown => 'Desconocida';
 
   @override
+  String get weekdayFriday => 'Viernes';
+
+  @override
+  String get weekdayMonday => 'Lunes';
+
+  @override
+  String get weekdaySaturday => 'Sábado';
+
+  @override
+  String get weekdaySunday => 'Domingo';
+
+  @override
+  String get weekdayThursday => 'Jueves';
+
+  @override
+  String get weekdayTuesday => 'Martes';
+
+  @override
+  String get weekdayWednesday => 'Miércoles';
+
+  @override
   String weighted(String amount) {
     return 'ponderado $amount';
   }
@@ -2016,6 +2360,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String writeIn(String language) {
     return 'Escribir en $language';
   }
+
+  @override
+  String get yes => 'Sí';
 
   @override
   String get yourMessage => 'Su mensaje';

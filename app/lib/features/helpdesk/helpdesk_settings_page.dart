@@ -50,6 +50,24 @@ class HelpdeskSettingsPage extends ConsumerWidget {
               child: Text(l.noPermission),
             )
           else ...[
+            Wrap(
+              spacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  key: const ValueKey('open-calendar'),
+                  icon: const Icon(Icons.schedule),
+                  label: Text(l.businessHours),
+                  onPressed: () => context.push('/helpdesk/calendar'),
+                ),
+                OutlinedButton.icon(
+                  key: const ValueKey('open-automation'),
+                  icon: const Icon(Icons.auto_fix_high),
+                  label: Text(l.automationRules),
+                  onPressed: () => context.push('/helpdesk/automation'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
             const _PoliciesCard(),
             const SizedBox(height: 16),
             const _TeamsCard(),
