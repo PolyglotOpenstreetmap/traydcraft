@@ -126,11 +126,15 @@ CREATE TABLE inventory.stock_moves (
     note              text NOT NULL DEFAULT '',
     entered_quantity  numeric(18,4),
     entered_uom       text,
+    -- Cost per stock unit in `currency`: what the module that posted the move paid or booked, else the
+    -- standard cost of the product when the move was made. Copied by a reversal.
     unit_cost         numeric(18,4) CHECK (unit_cost >= 0),
+    currency          char(3),
     reversed_of       uuid UNIQUE REFERENCES inventory.stock_moves(id),
     occurred_at       timestamptz NOT NULL DEFAULT now(),
     created_by        uuid NOT NULL REFERENCES core.users(id),
     created_at        timestamptz NOT NULL DEFAULT now(),
+    CHECK ((unit_cost IS NULL) = (currency IS NULL)),
     CHECK (from_location_id <> to_location_id),
     CHECK (serial_unit_id IS NULL OR quantity = 1)
 );

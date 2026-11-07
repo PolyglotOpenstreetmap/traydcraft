@@ -49,9 +49,12 @@ pub struct StockMove {
     #[schema(value_type = Option<String>)]
     pub entered_quantity: Option<Decimal>,
     pub entered_uom: Option<String>,
-    /// Standard cost per stock unit at the time of the move. Only with `inventory.cost`.
+    /// Cost per stock unit: what the posting module booked, else the standard cost of the product
+    /// at the time of the move. Only with `inventory.cost`.
     #[schema(value_type = Option<String>)]
     pub unit_cost: Option<Decimal>,
+    /// Currency of `unit_cost`. Only with `inventory.cost`.
+    pub currency: Option<String>,
     /// The move this one reverses.
     pub reversed_of: Option<Uuid>,
     /// The move that reversed this one.
@@ -65,6 +68,7 @@ impl StockMove {
     pub fn for_user(mut self, user: &CurrentUser) -> Self {
         if !user.can(Permission::InventoryCost) {
             self.unit_cost = None;
+            self.currency = None;
         }
         self
     }
@@ -74,7 +78,7 @@ pub const SELECT_MOVE: &str = "SELECT m.id, m.seq, m.product_id, p.code AS produ
         m.quantity, m.from_location_id, COALESCE(fw.code || '/' || fl.code, fl.kind) AS from_location,
         m.to_location_id, COALESCE(tw.code || '/' || tl.code, tl.kind) AS to_location,
         m.lot_id, lot.lot_number, m.serial_unit_id, su.serial_number, m.kind, m.reason, m.reference_type,
-        m.reference_id, m.note, m.entered_quantity, m.entered_uom, m.unit_cost, m.reversed_of,
+        m.reference_id, m.note, m.entered_quantity, m.entered_uom, m.unit_cost, m.currency::text AS currency, m.reversed_of,
         rev.id AS reversed_by, m.occurred_at, u.display_name AS created_by_name, m.created_at
      FROM inventory.stock_moves m
      JOIN products.products p ON p.id = m.product_id
@@ -136,6 +140,14 @@ pub struct NewMove {
     pub reversed_of: Option<Uuid>,
     /// Issues and transfers may not take stock that is reserved for orders.
     pub respect_reservations: bool,
+    /// Cost per stock unit booked by the caller (purchasing: the price paid). When absent the
+    /// standard cost of the product is used, in the currency of the company.
+    pub unit_cost: Option<Decimal>,
+    /// Currency of `unit_cost`; default: the currency of the company.
+    pub currency: Option<String>,
+    /// Use `unit_cost` and `currency` exactly as they are, also when they are empty (a reversal
+    /// copies the cost of the move it undoes).
+    pub inherit_cost: bool,
     /// The reservation (`reference_type`, `reference_id`) this move ships or consumes. Only that
     /// reservation's quantity at the source location and lot is exempt from the reservation
     /// check, the move may not take more than it holds, and its quantity is reduced (closed as
@@ -173,6 +185,9 @@ impl NewMove {
             entered: None,
             reversed_of: None,
             respect_reservations: false,
+            unit_cost: None,
+            currency: None,
+            inherit_cost: false,
             consume_reservation: None,
             serial_effect: SerialEffect::None,
         }
@@ -205,6 +220,12 @@ struct Existing {
     kind: String,
     reason: String,
     reversed_of: Option<Uuid>,
+    note: String,
+    reference_type: Option<String>,
+    reference_id: Option<Uuid>,
+    entered_quantity: Option<Decimal>,
+    entered_uom: Option<String>,
+    unit_cost: Option<Decimal>,
 }
 
 #[derive(FromRow)]
@@ -265,6 +286,12 @@ fn same_move(e: &Existing, m: &NewMove) -> bool {
         && e.kind == m.kind
         && e.reason == m.reason
         && e.reversed_of == m.reversed_of
+        && e.note == m.note.trim()
+        && e.reference_type == m.reference.as_ref().map(|r| r.0.clone())
+        && e.reference_id == m.reference.as_ref().map(|r| r.1)
+        && e.entered_quantity == m.entered.as_ref().map(|x| x.0)
+        && e.entered_uom == m.entered.as_ref().map(|x| x.1.clone())
+        && m.unit_cost.is_none_or(|c| e.unit_cost == Some(c))
 }
 
 /// Posts a move: validates it, appends it to the ledger and updates the balances, in the caller's
@@ -294,7 +321,8 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
 
     let existing: Option<Existing> = sqlx::query_as(
         "SELECT company_id, product_id, quantity, from_location_id, to_location_id, lot_id, serial_unit_id,
-                kind, reason, reversed_of
+                kind, reason, reversed_of, note, reference_type, reference_id, entered_quantity, entered_uom,
+                unit_cost
          FROM inventory.stock_moves WHERE id = $1",
     )
     .bind(m.id)
@@ -304,9 +332,10 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
         if same_move(&e, m) {
             return Ok(Posted::Replayed(load_move(conn, m.company_id, m.id).await?));
         }
-        return Err(AppError::Conflict(
-            "this move id was already used for a different move".into(),
-        ));
+        return Err(AppError::Conflict(format!(
+            "the move id {} was already used for a different move; choose a new id for a new move",
+            m.id
+        )));
     }
 
     let product = get_product(&mut *conn, m.product_id).await?;
@@ -344,11 +373,12 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
         )));
     }
 
+    let cost = move_cost(conn, m, &product).await?;
     sqlx::query(
         "INSERT INTO inventory.stock_moves (id, company_id, product_id, quantity, from_location_id, to_location_id,
              lot_id, serial_unit_id, kind, reason, reference_type, reference_id, note, entered_quantity,
-             entered_uom, unit_cost, reversed_of, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+             entered_uom, unit_cost, currency, reversed_of, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
     )
     .bind(m.id)
     .bind(m.company_id)
@@ -365,7 +395,8 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
     .bind(m.note.trim())
     .bind(m.entered.as_ref().map(|e| e.0))
     .bind(m.entered.as_ref().map(|e| e.1.clone()))
-    .bind(product.standard_cost)
+    .bind(cost.as_ref().map(|c| c.0))
+    .bind(cost.as_ref().map(|c| c.1.as_str()))
     .bind(m.reversed_of)
     .bind(m.user_id)
     .execute(&mut *conn)
@@ -395,6 +426,46 @@ pub async fn post_move(conn: &mut PgConnection, m: &NewMove) -> AppResult<Posted
         move_serial(conn, m, unit, from_internal, to_internal, &from.label).await?;
     }
     Ok(Posted::Created(load_move(conn, m.company_id, m.id).await?))
+}
+
+/// The cost stored on the move: the caller's, the copied one of a reversal, or the standard cost of
+/// the product (all in a currency; the company's when none is given).
+async fn move_cost(
+    conn: &mut PgConnection,
+    m: &NewMove,
+    product: &Product,
+) -> AppResult<Option<(Decimal, String)>> {
+    let explicit = if m.inherit_cost || m.unit_cost.is_some() {
+        m.unit_cost
+    } else {
+        product.standard_cost
+    };
+    let Some(cost) = explicit else {
+        if m.currency.is_some() {
+            return Err(AppError::Validation("a currency needs a unit cost".into()));
+        }
+        return Ok(None);
+    };
+    if cost < Decimal::ZERO {
+        return Err(AppError::Validation("unit cost cannot be negative".into()));
+    }
+    let currency = match &m.currency {
+        Some(c) if m.unit_cost.is_some() || m.inherit_cost => c.trim().to_uppercase(),
+        _ => {
+            sqlx::query_scalar::<_, String>(
+                "SELECT currency::text FROM core.companies WHERE id = $1",
+            )
+            .bind(m.company_id)
+            .fetch_one(conn)
+            .await?
+        }
+    };
+    if currency.len() != 3 || !currency.chars().all(|c| c.is_ascii_uppercase()) {
+        return Err(AppError::Validation(
+            "currency must be a three-letter code such as EUR".into(),
+        ));
+    }
+    Ok(Some((cost, currency)))
 }
 
 async fn check_tracking(conn: &mut PgConnection, m: &NewMove, product: &Product) -> AppResult<()> {
@@ -729,6 +800,9 @@ pub async fn reverse_move(
     m.reference = Some(("stock_move".into(), original_id));
     m.reversed_of = Some(original_id);
     m.note = note.to_string();
+    m.unit_cost = o.unit_cost;
+    m.currency = o.currency.clone();
+    m.inherit_cost = true;
     m.serial_effect = match o.reason.as_str() {
         "shipment" => SerialEffect::Restore {
             clear_customer: true,

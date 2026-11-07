@@ -449,7 +449,7 @@ async fn a_correction_is_a_reversal_move_and_the_original_stays(db: PgPool) {
         &e.app,
         ADMIN,
         &format!("/inventory/moves/{issued_id}/reverse"),
-        json!({ "id": rid }),
+        json!({ "id": rid, "note": "wrong product picked" }),
     )
     .await;
     assert_eq!(

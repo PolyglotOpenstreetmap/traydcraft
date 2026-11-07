@@ -34,9 +34,8 @@ tables below are explicit. The crate is `crates/inventory`, schema `inventory`, 
   `return`, `shipment`, `consumption`, `repair_use`, `scrap`, `transfer`, `van_replenishment`,
   `count`, `correction`, `reversal`), `reference_type` + `reference_id` (the source document: a
   count, later a purchase receipt, delivery or production order), `note`, `entered_quantity` +
-  `entered_uom` (what the user typed, for display), `unit_cost` (a snapshot of the product's
-  standard cost when the move was made, `NULL` without one), `reversed_of`, `occurred_at`,
-  `created_by`, `created_at`.
+  `entered_uom` (what the user typed, for display), `unit_cost` + `currency` (see *Cost on moves*),
+  `reversed_of`, `occurred_at`, `created_by`, `created_at`.
 * **Immutable.** A trigger refuses `UPDATE`, `DELETE` and `TRUNCATE` on the table. A correction is
   a **reversal**: a new move with `from` and `to` swapped, `reversed_of` = the original and reason
   `reversal`. A move can be reversed once (unique `reversed_of`); a reversal cannot be reversed
@@ -149,6 +148,15 @@ orders are not included until B2 and C1 exist.
 ### Transfers
 A transfer is one move between two internal locations, instant and atomic. Van replenishment is a
 transfer with reason `van_replenishment`. A two-step transfer with a transit location is deferred.
+
+### Cost on moves
+**Decision.** `stock_moves.unit_cost` is the cost per stock unit and `currency` its currency (both set
+or both `NULL`). `NewMove.unit_cost`/`currency` let the posting module book the real cost (purchasing:
+the price paid); when absent the move gets the product's standard cost in the currency of the company
+(`NULL` when the product has none). A **reversal copies the cost and currency of the original** move
+exactly, also when they are empty. The HTTP receipt accepts `unit_cost`/`currency` only with
+`inventory.cost` (403 otherwise). Cost and currency are removed from every move in every response for
+users without `inventory.cost`. Valuation (FIFO, average, landed cost) stays out of scope.
 
 ### Products and cost
 `products.products` gains `standard_cost` (`numeric(18,4)`), `reorder_min`, `reorder_max`,

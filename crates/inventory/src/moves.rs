@@ -45,6 +45,11 @@ pub struct ReceiptInput {
     pub reason: Option<String>,
     #[serde(default)]
     pub note: String,
+    /// What one stock unit cost (needs `inventory.cost`); default: the standard cost.
+    #[schema(value_type = Option<String>, example = "12.5")]
+    pub unit_cost: Option<Decimal>,
+    /// Currency of `unit_cost` (default: the currency of the company).
+    pub currency: Option<String>,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -172,6 +177,13 @@ async fn receive(
     Json(input): Json<ReceiptInput>,
 ) -> AppResult<(StatusCode, Json<StockMove>)> {
     user.require(Permission::InventoryWrite)?;
+    if (input.unit_cost.is_some() || input.currency.is_some())
+        && !user.can(Permission::InventoryCost)
+    {
+        return Err(AppError::Forbidden(
+            "missing permission inventory.cost".into(),
+        ));
+    }
     let reason = input.reason.as_deref().unwrap_or("manual_receipt");
     if !matches!(reason, "manual_receipt" | "return") {
         return Err(AppError::Validation(
@@ -262,6 +274,8 @@ async fn receive(
     m.serial_unit_id = unit_id;
     m.entered = entered;
     m.note = input.note;
+    m.unit_cost = input.unit_cost;
+    m.currency = input.currency;
     let (status, body, _) = reply(post_move(&mut tx, &m).await?);
     tx.commit().await?;
     Ok((status, Json(body.0.for_user(&user))))
